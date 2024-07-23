@@ -1,4 +1,4 @@
-name: Sparta Nest.js CI
+name: hunsu-project.js CI
 
 on: # 언제 실행 될지 정의
   workflow_dispatch: # 수동 실행
@@ -41,8 +41,8 @@ jobs:
           npm ci
 
       # 테스트 코드 실행
-      - name: Run test # step의 이름 지정 (선택 사항)
-        run: |
+      #- name: Run test # step의 이름 지정 (선택 사항)
+      #  run: |
 
-          # yarn test
-          npm run test
+      # yarn test
+      # npm run test

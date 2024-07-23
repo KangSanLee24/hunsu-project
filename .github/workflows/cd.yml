@@ -1,0 +1,79 @@
+name: Sparta Nest.js CD
+
+on:
+  workflow_dispatch: # 수동 실행
+  workflow_run: # 특정 workflow가 실행됐을 때
+    workflows: ['hunsu-project.js CI'] # CI workflow
+    types: [completed] # 완료 되었을 때
+    branches: [main] # main 브랜치
+
+jobs:
+  deploy:
+    # workflow 완료 후 결과가 성공 일 때
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # 작업을 실행 할 VM의 OS 지정
+    runs-on: ubuntu-22.04
+
+    # 작업 내의 단위 작업(step)을 정의
+    steps:
+      # SSH 접속 후 명령을 통해서 배포 진행
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master # SSH 접속 후 명령 실행을 위해 미리 정의 된 workflow를 불러와서 사용
+        with:
+          host: ${{ secrets.AWS_EC2_HOST }} # EC2 IP주소
+          username: ${{ secrets.AWS_EC2_USERNAME }} # EC2 사용자 (Ubuntu OS 설치 시 기본값은 ubuntu)
+          key: ${{ secrets.AWS_EC2_PEM_KEY }} # EC2 접속을 위한 pem 파일의 raw data
+          port: ${{ secrets.AWS_EC2_PORT }} # EC2 접속을 위한 SSH 포트
+          script: |
+
+            # node, npm, yarn 명령어 사용을 위한 설정 (.bashrc 파일에 추가되어 있는 내용)
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+            # yarn global 설치 한 pm2 명령을 위한 설정 (npm 사용 시 불필요)
+            # export PATH="$(yarn global bin):$PATH"
+
+            # 프로젝트 폴더로 이동
+            cd /home/ubuntu/hunsu-project
+
+            # main 브랜치로 이동
+            git switch main
+
+            # 최신 소스 코드를 가져옴
+            git pull
+
+            # .env 파일 생성
+            # ">" 는 생성 또는 덮어쓰기
+            # ">>" 는 내용 덧붙이기
+            echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" > .env
+
+            echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+            echo "DB_HOST=${{ secrets.DB_PORT }}" >> .env
+            echo "DB_HOST=${{ secrets.DB_USERNAME }}" >> .env
+            echo "DB_HOST=${{ secrets.DB_PASSWORD }}" >> .env
+            echo "DB_HOST=${{ secrets.DB_NAME }}" >> .env
+            echo "DB_HOST=${{ secrets.DB_SYNC }}" >> .env
+
+            echo "JWT_SECRET=${{ secrets.PASSWORD_HASH_ROUNDS }}" >> .env
+            echo "DB_HOST=${{ secrets.JWT_SECRET }}" >> .env
+
+            echo "DB_HOST=${{ secrets.NODE_MAILER_ID }}" >> .env
+            echo "DB_HOST=${{ secrets.NODE_MAILER_PASSWORD }}" >> .env
+
+            # 의존성 설치
+            # yarn --frozen-lockfile
+            npm ci
+
+            # 빌드 (ts 아니면 생략 가능)
+            # yarn build
+            npm run build
+
+            # PM2로 실행 중인 서버 중지 및 삭제
+            pm2 delete hunsu-project
+
+            # 서버를 PM2로 실행
+            pm2 --name hunsu-project start dist/main.js
+
+            # PM2 설정 저장 (선택사항, startup 설정을 해놨다면)
+            pm2 save
