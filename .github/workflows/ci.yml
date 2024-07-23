@@ -1,0 +1,48 @@
+name: Sparta Nest.js CI
+
+on: # 언제 실행 될지 정의
+  workflow_dispatch: # 수동 실행
+  push: # PUSH 됐을 때
+    branches: [main] # main 브랜치
+  pull_request: # PR
+    # opened: 새롭게 생성됐을 때
+    # reopened: close 상태에서 다시 open으로 변경 됐을 때
+    # synchronize: open 상태에서 추가 commit 등으로 갱신 됐을 때
+    types: [opened, reopened, synchronize] # (생략가능) types를 명시하지 않았을 때 적용되는 3가지 이벤트
+    branches: [main] # main 브랜치
+
+jobs:
+  # 실행 할 작업 이름 지정 "ci-test"
+  ci-test:
+    # 작업을 실행 할 VM의 OS 지정
+    runs-on: ubuntu-22.04
+
+    # 작업 내의 단위 작업(step)을 정의
+    steps:
+      # 소스 코드 가져오기
+      - name: Checkout source code # step의 이름 지정 (선택 사항)
+        uses: actions/checkout@v4 # 소스 복사를 위해 미리 정의 된 workflow를 불러와서 사용
+
+      # VM에 Node.js 설치하기
+      - name: Setup Node.js environment # step의 이름 지정 (선택 사항)
+        uses: actions/setup-node@v4 # Node.js 설치를 위해 미리 정의 된 workflow를 불러와서 사용
+        with:
+          node-version: 20 # 설치 할 Node.js 버전 지정
+          cache: 'npm' # yarn 사용 시 'yarn'
+
+      # 의존성 패키지 설치하기
+      - name: Install dependencies # step의 이름 지정 (선택 사항)
+        run: |
+
+          # yarn.lock 파일에 저장 된 버전 정보와 동일하게 설치
+          # yarn --frozen-lockfile
+
+          # package-lock.json 파일에 저장 된 버전 정보와 동일하게 설치
+          npm ci
+
+      # 테스트 코드 실행
+      - name: Run test # step의 이름 지정 (선택 사항)
+        run: |
+
+          # yarn test
+          npm run test
