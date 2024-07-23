@@ -1,4 +1,4 @@
-name: Sparta Nest.js CD
+name: hunsu-project.js CD
 
 on:
   workflow_dispatch: # 수동 실행
