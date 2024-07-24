@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Role } from '../types/userRole.type';
 import { Comment } from 'src/comment/entities/comment.entity';
+<<<<<<< HEAD
 import { Post } from 'src/post/entities/post.entity';
 import { CommentLike } from 'src/like/entities/comment-like.entity';
 import { CommentDislike } from 'src/dislike/entities/comment-dislike.entity';
@@ -17,6 +18,8 @@ import { PostLike } from 'src/like/entities/post-like.entity';
 import { PostDislike } from 'src/dislike/entities/post-dislike.entity';
 import { Point } from './point.entity';
 import { PointLog } from './point-log.entity';
+=======
+>>>>>>> 5661e1a470a0d01b281559f8d81e7deaa71993aa
 
 @Index('email', ['email'], { unique: true })
 @Entity({
