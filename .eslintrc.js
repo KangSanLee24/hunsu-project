@@ -5,6 +5,12 @@ export default [
     rules: {
       // 없으면 기본값 'error', warn, off 설정가능
       'no-unused-vars': 'warn',
+      'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+      },
+    ],
     },
   },
 ];
