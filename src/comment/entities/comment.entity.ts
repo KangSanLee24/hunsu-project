@@ -16,16 +16,19 @@ import {
 
 @Entity('comments')
 export class Comment {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  /**
-   *
-   */
   @IsOptional()
   @IsNumber()
-  @Column()
+  @Column({ nullable: true })
   parentId: number;
+
+  @Column({ name: 'user_id', nullable: false, unsigned: true })
+  userId: number;
+
+  @Column({ name: 'post_id', nullable: false, unsigned: true })
+  postId: number;
 
   /**
    * 내용
