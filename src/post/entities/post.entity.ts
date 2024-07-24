@@ -52,15 +52,15 @@ export class Post {
   @OneToMany(() => Comment, (comment) => comment.post, { cascade: true })
   comments: Comment[];
 
-  // // 게시글과 좋아요 1대:다 관계
+  // 게시글과 좋아요 1대:다 관계
   @OneToMany(() => PostLike, (postLike) => postLike.post, { cascade: true })
   postLikes: PostLike[];
 
-  // // 게시글과 싫어요 1대:다 관계
+  // 게시글과 싫어요 1대:다 관계
   @OneToMany(() => PostDisLike, (postDislike) => postDislike.post, { cascade: true })
   postDisLikes: PostDisLike[];
 
-  // // 게시글과 이미지 1대:다 관계
-  // @OneToMany(() => Image, (image) => image.posts, { cascade: true })
-  // postImages: PostImage[];
+  // 게시글과 이미지 1대:다 관계
+  @OneToMany(() => PostImage, (postImage) => postImage.post, { cascade: true })
+  postImages: PostImage[];
 }

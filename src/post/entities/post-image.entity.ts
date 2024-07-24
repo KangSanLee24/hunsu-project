@@ -20,8 +20,9 @@ export class PostImage {
   createdAt: Date;
 
   // 게시글 이미지와 게시글 다:1 관계
-  // @ManyToOne(() => Post, (post) => post.postImages, {
-  //   cascade: true,
-  //   onDelete: 'CASCADE',
-  // })
+  @ManyToOne(() => Post, (post) => post.postImages, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  post: Post;
 }
