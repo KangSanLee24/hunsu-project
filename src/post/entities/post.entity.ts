@@ -10,6 +10,9 @@ import {
 
 import { User } from 'src/user/entities/user.entity';
 import { PostImage } from './post-image.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
+import { PostLike } from 'src/like/entities/post-like.entity';
+import { PostDisLike } from 'src/dislike/entities/post-dislike.entity';
 
 @Entity({ name: 'posts' })
 export class Post {
@@ -45,12 +48,17 @@ export class Post {
   // @ManyToOne(() => User, (user) => user.posts, { cascade: true })
   // user: User;
 
-  // // 게시글과 댓글 1대:다 관계
-  // @OneToMany(() => Comment, (comment) => comment.posts, { cascade: true })
-  // comments: Comment[];
+  // 게시글과 댓글 1대:다 관계
+  @OneToMany(() => Comment, (comment) => comment.post, { cascade: true })
+  comments: Comment[];
 
   // // 게시글과 좋아요 1대:다 관계
+  @OneToMany(() => PostLike, (postLike) => postLike.post, { cascade: true })
+  postLikes: PostLike[];
+
   // // 게시글과 싫어요 1대:다 관계
+  @OneToMany(() => PostDisLike, (postDislike) => postDislike.post, { cascade: true })
+  postDisLikes: PostDisLike[];
 
   // // 게시글과 이미지 1대:다 관계
   // @OneToMany(() => Image, (image) => image.posts, { cascade: true })
