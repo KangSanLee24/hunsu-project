@@ -1,34 +1,39 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { RecommentService } from './recomment.service';
 import { CreateRecommentDto } from './dtos/create-recomment.dto';
-import { UpdateRecommentDto } from './dtos/update-recomment.dto';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('recomment')
+@ApiTags('recomments')
+@Controller('posts')
 export class RecommentController {
   constructor(private readonly recommentService: RecommentService) {}
 
-  @Post()
-  create(@Body() createRecommentDto: CreateRecommentDto) {
-    return this.recommentService.create(createRecommentDto);
+  /**
+   * 대댓글 생성
+   * @param createRecommentDto
+   * @returns
+   */
+  @Post(':postId/comments/:commentId/recomments')
+  async createRecomment(@Param('postId') postId: number, @Param('commentId') commentId: number, @Body() createRecommentDto: CreateRecommentDto) {
+    return await this.recommentService.createRecomment(+postId, +commentId, createRecommentDto);
   }
 
-  @Get()
-  findAll() {
-    return this.recommentService.findAll();
+  /**
+   * 대댓글 수정
+   * @param createRecommentDto
+   * @returns
+   */
+  @Patch(':postId/comments/:commentId/recomments/:recommentId')
+  async updateRecomment(@Param('postId') postId: number, @Param('commentId') commentId: number, @Param('recommentId') recommentId: number, @Body() createRecommentDto: CreateRecommentDto) {
+    return await this.recommentService.updateRecomment(+postId, +commentId, +recommentId, createRecommentDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.recommentService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRecommentDto: UpdateRecommentDto) {
-    return this.recommentService.update(+id, updateRecommentDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.recommentService.remove(+id);
+  /**
+   * 대댓글 삭제
+   * @returns
+   */
+  @Delete(':postId/comments/:commentsId/recomments/:recommentId')
+  async removeRecomment(@Param('postId') postId: number, @Param('commentId') commentId: number, @Param('recommentId') recommentId: number) {
+    return await this.recommentService.removeRecomment(+postId, +commentId, +recommentId);
   }
 }
