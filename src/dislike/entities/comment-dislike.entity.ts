@@ -1,10 +1,15 @@
 import { Comment } from 'src/comment/entities/comment.entity';
 import { User } from 'src/user/entities/user.entity';
-import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('commentDisLikes')
 export class CommentDislike {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
   @CreateDateColumn()
@@ -13,6 +18,6 @@ export class CommentDislike {
   @ManyToOne(() => Comment, (comment) => comment.commentDislikes)
   comment: Comment;
 
-  // @ManyToOne(() => User, (user) => user.commentDislikes)
-  // user: User;
+  @ManyToOne(() => User, (user) => user.commentDislikes)
+  user: User;
 }

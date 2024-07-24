@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Post } from './post.entity';
 
 @Entity({ name: 'postImages' })
@@ -8,7 +15,7 @@ export class PostImage {
   id: number;
 
   // 게시글 id = id, int
-  @Column({ type: 'int', unsigned: true })
+  @Column({ unsigned: true })
   postId: number;
 
   // 이미지 = URL, String
@@ -20,8 +27,6 @@ export class PostImage {
   createdAt: Date;
 
   // 게시글 이미지와 게시글 다:1 관계
-  // @ManyToOne(() => Post, (post) => post.postImages, {
-  //   cascade: true,
-  //   onDelete: 'CASCADE',
-  // })
+  @ManyToOne(() => Post, (post) => post.postImages)
+  post: Post;
 }

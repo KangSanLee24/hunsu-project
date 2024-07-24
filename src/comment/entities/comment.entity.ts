@@ -16,15 +16,12 @@ import {
 
 @Entity('comments')
 export class Comment {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  /**
-   *
-   */
   @IsOptional()
   @IsNumber()
-  @Column()
+  @Column({ nullable: true })
   parentId: number;
 
   /**
@@ -37,14 +34,14 @@ export class Comment {
   content: string;
 
   @ManyToOne(() => User, (user) => user.comments)
-  @JoinColumn({ name: 'user_id' , referencedColumnName: 'id'})
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: User;
 
   @Column({ type: 'int', name: 'user_id', unsigned: true })
   userId: number;
 
   @ManyToOne(() => Post, (post) => post.comments)
-  @JoinColumn({ name: 'post_id' , referencedColumnName: 'id'})
+  @JoinColumn({ name: 'post_id', referencedColumnName: 'id' })
   post: Post;
 
   @Column({ type: 'int', name: 'post_id', unsigned: true })
@@ -56,9 +53,13 @@ export class Comment {
   @UpdateDateColumn()
   updateAt: Date;
 
-  @OneToMany(() => CommentLike, (commentLike) => commentLike.comment, { cascade: true })
+  @OneToMany(() => CommentLike, (commentLike) => commentLike.comment, {
+    cascade: true,
+  })
   commentLikes: CommentLike[];
 
-  @OneToMany(() => CommentDislike, (commentDislike) => commentDislike.comment, { cascade: true })
+  @OneToMany(() => CommentDislike, (commentDislike) => commentDislike.comment, {
+    cascade: true,
+  })
   commentDislikes: CommentDislike[];
 }

@@ -10,6 +10,13 @@ import {
 } from 'typeorm';
 import { Role } from '../types/userRole.type';
 import { Comment } from 'src/comment/entities/comment.entity';
+import { Post } from 'src/post/entities/post.entity';
+import { CommentLike } from 'src/like/entities/comment-like.entity';
+import { CommentDislike } from 'src/dislike/entities/comment-dislike.entity';
+import { PostLike } from 'src/like/entities/post-like.entity';
+import { PostDislike } from 'src/dislike/entities/post-dislike.entity';
+import { Point } from './point.entity';
+import { PointLog } from './point-log.entity';
 
 @Index('email', ['email'], { unique: true })
 @Entity({
@@ -40,6 +47,35 @@ export class User {
   @DeleteDateColumn()
   deletedAt?: Date;
 
+  @OneToMany(() => Post, (post) => post.user, { cascade: true })
+  posts: Post[];
+
+  @OneToMany(() => PostLike, (postLike) => postLike.user, {
+    cascade: true,
+  })
+  postLikes: PostLike[];
+
+  @OneToMany(() => PostDislike, (postDislike) => postDislike.user, {
+    cascade: true,
+  })
+  postDislikes: PostDislike[];
+
   @OneToMany(() => Comment, (comment) => comment.user, { cascade: true })
   comments: Comment[];
+
+  @OneToMany(() => CommentLike, (commentLike) => commentLike.user, {
+    cascade: true,
+  })
+  commentLikes: CommentLike[];
+
+  @OneToMany(() => CommentDislike, (commentDislike) => commentDislike.user, {
+    cascade: true,
+  })
+  commentDislikes: CommentDislike[];
+
+  @OneToMany(() => Point, (point) => point.user, { cascade: true })
+  points: Point[];
+
+  @OneToMany(() => PointLog, (pointLog) => pointLog.user, { cascade: true })
+  pointLogs: PointLog[];
 }

@@ -1,10 +1,15 @@
 import { Post } from 'src/post/entities/post.entity';
 import { User } from 'src/user/entities/user.entity';
-import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('postDislikes')
-export class PostDisLike {
-  @PrimaryGeneratedColumn()
+export class PostDislike {
+  @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
   @CreateDateColumn()
@@ -13,6 +18,6 @@ export class PostDisLike {
   @ManyToOne(() => Post, (post) => post.postDisLikes)
   post: Post;
 
-  // @ManyToOne(() => User, (user) => user.postDisLikes)
-  // user: User;
+  @ManyToOne(() => User, (user) => user.postDislikes)
+  user: User;
 }
