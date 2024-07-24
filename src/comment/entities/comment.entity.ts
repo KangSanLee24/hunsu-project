@@ -24,12 +24,6 @@ export class Comment {
   @Column({ nullable: true })
   parentId: number;
 
-  @Column({ name: 'user_id', nullable: false, unsigned: true })
-  userId: number;
-
-  @Column({ name: 'post_id', nullable: false, unsigned: true })
-  postId: number;
-
   /**
    * 내용
    * @example "댓글 테스트1"
@@ -58,14 +52,6 @@ export class Comment {
 
   @UpdateDateColumn()
   updateAt: Date;
-
-  @ManyToOne(() => User, (user) => user.comments)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
-
-  @ManyToOne(() => Post, (post) => post.comments)
-  @JoinColumn({ name: 'post_id' })
-  post: Post;
 
   @OneToMany(() => CommentLike, (commentLike) => commentLike.comment, {
     cascade: true,

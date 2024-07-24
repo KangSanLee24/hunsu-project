@@ -45,7 +45,7 @@ export class Post {
   updatedAt: Date;
 
   // 게시글과 사용자 다:1 관계
-  @ManyToOne(() => User, (user) => user.posts, { cascade: true })
+  @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
   user: User;
 
   // 게시글과 댓글 1대:다 관계
@@ -62,7 +62,7 @@ export class Post {
   })
   postDisLikes: PostDislike[];
 
-  // // 게시글과 이미지 1대:다 관계
-  // @OneToMany(() => Image, (image) => image.posts, { cascade: true })
-  // postImages: PostImage[];
+  // 게시글과 이미지 1대:다 관계
+  @OneToMany(() => PostImage, (image) => image.post, { cascade: true })
+  postImages: PostImage[];
 }

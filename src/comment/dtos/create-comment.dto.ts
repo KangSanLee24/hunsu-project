@@ -6,8 +6,4 @@ export class CreateCommentDto {
   @IsNotEmpty({ message: '댓글 내용을 입력해 주세요.' })
   @ApiProperty({ example: '댓글 내용' })
   content: string;
-
-  @IsOptional()
-  @IsNumber()
-  parentId?: number;
 }
