@@ -40,14 +40,14 @@ export class Comment {
   content: string;
 
   @ManyToOne(() => User, (user) => user.comments)
-  @JoinColumn({ name: 'user_id' , referencedColumnName: 'id'})
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: User;
 
   @Column({ type: 'int', name: 'user_id', unsigned: true })
   userId: number;
 
   @ManyToOne(() => Post, (post) => post.comments)
-  @JoinColumn({ name: 'post_id' , referencedColumnName: 'id'})
+  @JoinColumn({ name: 'post_id', referencedColumnName: 'id' })
   post: Post;
 
   @Column({ type: 'int', name: 'post_id', unsigned: true })
@@ -59,7 +59,6 @@ export class Comment {
   @UpdateDateColumn()
   updateAt: Date;
 
-<<<<<<< HEAD
   @ManyToOne(() => User, (user) => user.comments)
   @JoinColumn({ name: 'user_id' })
   user: User;
@@ -71,9 +70,6 @@ export class Comment {
   @OneToMany(() => CommentLike, (commentLike) => commentLike.comment, {
     cascade: true,
   })
-=======
-  @OneToMany(() => CommentLike, (commentLike) => commentLike.comment, { cascade: true })
->>>>>>> 5661e1a470a0d01b281559f8d81e7deaa71993aa
   commentLikes: CommentLike[];
 
   @OneToMany(() => CommentDislike, (commentDislike) => commentDislike.comment, {
