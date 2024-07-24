@@ -8,7 +8,7 @@ import { User } from 'src/user/entities/user.entity';
 
 @UseGuards(JwtStrategy)
 @ApiTags('recomments')
-@Controller('posts')
+@Controller('comments')
 export class RecommentController {
   constructor(private readonly recommentService: RecommentService) {}
 
@@ -17,9 +17,9 @@ export class RecommentController {
    * @param createRecommentDto
    * @returns
    */
-  @Post(':postId/comments/:commentId/recomments')
-  async createRecomment(@Param('postId') postId: number, @Param('commentId') commentId: number, @LogIn() user: User, @Body() createRecommentDto: CreateRecommentDto) {
-    return await this.recommentService.createRecomment(+postId, +commentId, user, createRecommentDto);
+  @Post(':commentId/recomments')
+  async createRecomment(@Param('commentId') commentId: number, @LogIn() user: User, @Body() createRecommentDto: CreateRecommentDto) {
+    return await this.recommentService.createRecomment(+commentId, user, createRecommentDto);
   }
 
   /**
@@ -27,33 +27,33 @@ export class RecommentController {
    * @param createRecommentDto
    * @returns
    */
-  @Patch(':postId/comments/:commentId/recomments/:recommentId')
-  async updateRecomment(@Param('postId') postId: number, @Param('commentId') commentId: number, @Param('recommentId') recommentId: number, @LogIn() user: User, @Body() createRecommentDto: CreateRecommentDto) {
+  @Patch(':commentId/recomments/:recommentId')
+  async updateRecomment(@Param('commentId') commentId: number, @Param('recommentId') recommentId: number, @LogIn() user: User, @Body() createRecommentDto: CreateRecommentDto) {
     const recomment = await this.recommentService.findRecomment(recommentId);
 
-    if(recomment.user.id != user.id) {
+    if(recomment.userId != user.id) {
       throw new ForbiddenException(
         '작성자가 아닙니다.'
       )
     };
 
-    return await this.recommentService.updateRecomment(+postId, +commentId, +recommentId, createRecommentDto);
+    return await this.recommentService.updateRecomment(+commentId, +recommentId, createRecommentDto);
   }
 
   /**
    * 대댓글 삭제
    * @returns
    */
-  @Delete(':postId/comments/:commentsId/recomments/:recommentId')
-  async removeRecomment(@Param('postId') postId: number, @Param('commentId') commentId: number, @Param('recommentId') recommentId: number, @LogIn() user: User, ) {
+  @Delete(':commentsId/recomments/:recommentId')
+  async removeRecomment(@Param('commentId') commentId: number, @Param('recommentId') recommentId: number, @LogIn() user: User, ) {
     const recomment = await this.recommentService.findRecomment(recommentId);
 
-    if(recomment.user.id != user.id) {
+    if(recomment.userId != user.id) {
       throw new ForbiddenException(
         '작성자가 아닙니다.'
       )
     };
 
-    return await this.recommentService.removeRecomment(+postId, +commentId, +recommentId);
+    return await this.recommentService.removeRecomment(+commentId, +recommentId);
   }
 }
