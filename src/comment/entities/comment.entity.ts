@@ -1,4 +1,8 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { CommentDislike } from 'src/dislike/entities/comment-dislike.entity';
+import { CommentLike } from 'src/like/entities/comment-like.entity';
+import { Post } from 'src/post/entities/post.entity';
+import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,51 +14,49 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({
-  name: 'comments',
-})
+@Entity('comments')
 export class Comment {
-    /**
-     * 코맨트 id
-     * @example 1
-     */
-    @PrimaryGeneratedColumn({ name: 'id', unsigned: true, type: 'int' })
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    /**
-     * 부모 댓글 id
-     * @example 1
-     */
-    @IsNotEmpty()
-    @Column({ type: 'int', name: 'parent_id', unsigned: true })
-    parentId: number;
+  /**
+   *
+   */
+  @IsOptional()
+  @IsNumber()
+  @Column()
+  parentId: number;
 
-    /**
-     * 게시글 id
-     * @example 1
-     */
-    @Column({ type: 'int', name: 'post_id' })
-    postId: number;
+  /**
+   * 내용
+   * @example "댓글 테스트1"
+   */
+  @IsNotEmpty({ message: '내용을 입력해 주세요.' })
+  @IsString({ message: '댓글 형식에 맞게 입력해 주세요' })
+  @Column()
+  content: string;
 
-    /**
-     * 사용자 id
-     * @example 1
-     */
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @Column({ type: 'int', name: 'user_id' })
-    userId: number;
+  @UpdateDateColumn()
+  updateAt: Date;
 
-    /**
-     * 내용
-     * @example test댓글내용
-     */
-    @IsNotEmpty()
-    @Column({ type: 'text', name: 'content' })
-    content: string;
+//   @ManyToOne(() => User, (user) => user.comments)
+//   @JoinColumn({ name: 'user_id' })
+//   user: User;
 
-    @CreateDateColumn()
-    createdAt: Date;
+//임시
+  @Column()
+  userId: number;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @ManyToOne(() => Post, (post) => post.comments)
+  @JoinColumn({ name: 'post_id' })
+  post: Post;
+
+  @OneToMany(() => CommentLike, (commentLike) => commentLike.comment, { cascade: true })
+  commentLikes: CommentLike[];
+
+  @OneToMany(() => CommentDislike, (commentDislike) => commentDislike.comment, { cascade: true })
+  commentDislikes: CommentDislike[];
 }

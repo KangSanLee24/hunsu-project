@@ -1,6 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateRecommentDto } from './dtos/create-recomment.dto';
-import { UpdateRecommentDto } from './dtos/update-recomment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from 'src/comment/entities/comment.entity';
@@ -26,7 +25,7 @@ export class RecommentService {
     return newRecomment;
   }
 
-  async updateRecomment(postId: number, commentId: number, recommentId: number, updateRecommentDto: UpdateRecommentDto) {
+  async updateRecomment(postId: number, commentId: number, recommentId: number, createRecommentDto: CreateRecommentDto) {
     
   }
 
