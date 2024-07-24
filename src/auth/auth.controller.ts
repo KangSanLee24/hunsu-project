@@ -1,42 +1,36 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dtos/create-auth.dto';
-import { UpdateAuthDto } from './dtos/update-auth.dto';
+import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
+import { SignUpDto } from './dtos/sign-up.dto';
+import { LogInDto } from './dtos/log-in.dto';
+
+import { AuthService } from './auth.service';
+import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
+
+@ApiTags('1. AUTH API')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  /** 회원 가입(sign-up) API **/
+  @Post('sign-up')
+  async signUp(@Body() signUpDto: SignUpDto) {
+    const data = await this.authService.signUp(signUpDto);
+    return {
+      status: HttpStatus.CREATED,
+      message: AUTH_MESSAGES.SIGN_UP.SUCCESS,
+      data: data,
+    };
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  /** 로그인(log-in) API */
+  @Post('log-in')
+  async logIn(@Body() logInDto: LogInDto) {
+    const data = await this.authService.logIn(logInDto);
+    return {
+      status: HttpStatus.OK,
+      messgae: AUTH_MESSAGES.LOG_IN.SUCCESS,
+      data: data,
+    };
   }
 }
