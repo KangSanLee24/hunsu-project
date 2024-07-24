@@ -22,10 +22,16 @@ export class PostController {
     };
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.postService.findAll();
-  // }
+  @Get()
+  async findAll() {
+    const findAllPost = await this.postService.findAll();
+
+    return {
+      statusCode: 200,
+      message: '게시글 목록 조회에 성공하였습니다.',
+      data: findAllPost,
+    };
+  }
 
   // @Get(':id')
   // findOne(@Param('id') id: string) {
