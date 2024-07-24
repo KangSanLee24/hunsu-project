@@ -4,7 +4,7 @@ import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typ
 
 @Entity('postLikes')
 export class PostLike {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
   @CreateDateColumn()

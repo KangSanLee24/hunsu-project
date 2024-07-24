@@ -4,7 +4,7 @@ import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typ
 
 @Entity('postDislikes')
 export class PostDisLike {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
   @CreateDateColumn()
