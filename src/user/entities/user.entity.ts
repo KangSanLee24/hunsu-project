@@ -6,8 +6,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Role } from '../types/userRole.type';
+import { Comment } from 'src/comment/entities/comment.entity';
 
 @Index('email', ['email'], { unique: true })
 @Entity({
@@ -37,4 +39,7 @@ export class User {
 
   @DeleteDateColumn()
   deletedAt?: Date;
+
+  @OneToMany(() => Comment, (comment) => comment.user, { cascade: true })
+  comments: Comment[];
 }

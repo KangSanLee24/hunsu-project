@@ -36,23 +36,25 @@ export class Comment {
   @Column()
   content: string;
 
+  @ManyToOne(() => User, (user) => user.comments)
+  @JoinColumn({ name: 'user_id' , referencedColumnName: 'id'})
+  user: User;
+
+  @Column({ type: 'int', name: 'user_id', unsigned: true })
+  userId: number;
+
+  @ManyToOne(() => Post, (post) => post.comments)
+  @JoinColumn({ name: 'post_id' , referencedColumnName: 'id'})
+  post: Post;
+
+  @Column({ type: 'int', name: 'post_id', unsigned: true })
+  postId: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updateAt: Date;
-
-//   @ManyToOne(() => User, (user) => user.comments)
-//   @JoinColumn({ name: 'user_id' })
-//   user: User;
-
-//임시
-  @Column()
-  userId: number;
-
-  @ManyToOne(() => Post, (post) => post.comments)
-  @JoinColumn({ name: 'post_id' })
-  post: Post;
 
   @OneToMany(() => CommentLike, (commentLike) => commentLike.comment, { cascade: true })
   commentLikes: CommentLike[];
