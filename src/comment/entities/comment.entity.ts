@@ -45,17 +45,21 @@ export class Comment {
   @UpdateDateColumn()
   updateAt: Date;
 
-  // @ManyToOne(() => User, (user) => user.comments)
-  // @JoinColumn({ name: 'user_id' })
-  // user: User;
+  @ManyToOne(() => User, (user) => user.comments)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
   @ManyToOne(() => Post, (post) => post.comments)
   @JoinColumn({ name: 'post_id' })
   post: Post;
 
-  @OneToMany(() => CommentLike, (commentLike) => commentLike.comment, { cascade: true })
+  @OneToMany(() => CommentLike, (commentLike) => commentLike.comment, {
+    cascade: true,
+  })
   commentLikes: CommentLike[];
 
-  @OneToMany(() => CommentDislike, (commentDislike) => commentDislike.comment, { cascade: true })
+  @OneToMany(() => CommentDislike, (commentDislike) => commentDislike.comment, {
+    cascade: true,
+  })
   commentDislikes: CommentDislike[];
 }
