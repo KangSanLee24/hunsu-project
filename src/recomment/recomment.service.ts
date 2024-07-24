@@ -1,26 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRecommentDto } from './dtos/create-recomment.dto';
-import { UpdateRecommentDto } from './dtos/update-recomment.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Comment } from 'src/comment/entities/comment.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class RecommentService {
-  create(createRecommentDto: CreateRecommentDto) {
-    return 'This action adds a new recomment';
-  }
+  constructor(
+    @InjectRepository(Comment)
+    private CommentRepository: Repository<Comment>,
+  ) {}
 
-  findAll() {
-    return `This action returns all recomment`;
-  }
+  //대댓글 찾기
+  async findRecomment(recommentId: number) {
 
-  findOne(id: number) {
-    return `This action returns a #${id} recomment`;
-  }
+    const findRecomment = await this.CommentRepository.findOne({
+      where: {id: recommentId}
+    });
 
-  update(id: number, updateRecommentDto: UpdateRecommentDto) {
-    return `This action updates a #${id} recomment`;
-  }
+    if(!findRecomment) {
+      throw new NotFoundException(
+        '해당 대댓글이 없습니다.'
+      )
+    };
 
-  remove(id: number) {
-    return `This action removes a #${id} recomment`;
-  }
+    return findRecomment;
+  };
+
+  //대댓글 생성
+
+  async createRecomment(postId: number, commentId: number, user: User ,createRecommentDto: CreateRecommentDto) {
+    
+    const newRecomment = await this.CommentRepository.save({
+      parentId: commentId,
+      postId: postId,
+      userId: user.id, 
+      content: createRecommentDto.content
+    });
+    
+    return newRecomment;
+  };
+
+  //대댓글 수정
+
+  async updateRecomment(postId: number, commentId: number, recommentId: number, createRecommentDto: CreateRecommentDto) {
+
+    const updateRecomment = await this.CommentRepository.update(
+      {id: recommentId},
+      {content: createRecommentDto.content}
+    );
+
+    return updateRecomment;
+  };
+
+  //대댓글 삭제
+
+  async removeRecomment(postId: number, commentId: number, recommentId: number) {
+
+    const removeRecomment = await this.CommentRepository.delete(
+      {id: recommentId},
+    );
+
+    return removeRecomment;
+  };
 }
