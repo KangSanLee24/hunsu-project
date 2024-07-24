@@ -30,11 +30,15 @@ export class RecommentService {
 
   //대댓글 생성
 
-  async createRecomment(postId: number, commentId: number, user: User ,createRecommentDto: CreateRecommentDto) {
+  async createRecomment(commentId: number, user: User ,createRecommentDto: CreateRecommentDto) {
     
+    const findPost = await this.CommentRepository.findOne({
+      where: {parentId: commentId}
+    });
+
     const newRecomment = await this.CommentRepository.save({
       parentId: commentId,
-      postId: postId,
+      postId: findPost.postId,
       userId: user.id, 
       content: createRecommentDto.content
     });
@@ -44,7 +48,7 @@ export class RecommentService {
 
   //대댓글 수정
 
-  async updateRecomment(postId: number, commentId: number, recommentId: number, createRecommentDto: CreateRecommentDto) {
+  async updateRecomment(commentId: number, recommentId: number, createRecommentDto: CreateRecommentDto) {
 
     const updateRecomment = await this.CommentRepository.update(
       {id: recommentId},
@@ -56,7 +60,7 @@ export class RecommentService {
 
   //대댓글 삭제
 
-  async removeRecomment(postId: number, commentId: number, recommentId: number) {
+  async removeRecomment(commentId: number, recommentId: number) {
 
     const removeRecomment = await this.CommentRepository.delete(
       {id: recommentId},
