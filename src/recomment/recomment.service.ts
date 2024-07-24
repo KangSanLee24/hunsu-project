@@ -1,26 +1,36 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateRecommentDto } from './dtos/create-recomment.dto';
 import { UpdateRecommentDto } from './dtos/update-recomment.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Comment } from 'src/comment/entities/comment.entity';
 
 @Injectable()
 export class RecommentService {
-  create(createRecommentDto: CreateRecommentDto) {
-    return 'This action adds a new recomment';
+  constructor(
+    @InjectRepository(Comment)
+    private CommentRepository: Repository<Comment>,
+  ) {}
+
+  //대댓글 생성
+
+  async createRecomment(postId: number, commentId: number, createRecommentDto: CreateRecommentDto) {
+    
+    const newRecomment = await this.CommentRepository.save({
+      parentId: commentId,
+      postId: postId,
+      userId: 1,
+      content: createRecommentDto.content
+    });
+    
+    return newRecomment;
   }
 
-  findAll() {
-    return `This action returns all recomment`;
+  async updateRecomment(postId: number, commentId: number, recommentId: number, updateRecommentDto: UpdateRecommentDto) {
+    
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} recomment`;
-  }
-
-  update(id: number, updateRecommentDto: UpdateRecommentDto) {
-    return `This action updates a #${id} recomment`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} recomment`;
+  async removeRecomment(postId: number, commentId: number, recommentId: number) {
+    
   }
 }
