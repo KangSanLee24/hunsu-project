@@ -7,7 +7,7 @@ import { CreateCommentDto } from './dtos/create-comment.dto';
 import { UpdateCommentDto } from './dtos/update-comment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
-import { IsNull, Not, Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { Post } from 'src/post/entities/post.entity';
 
 @Injectable()
