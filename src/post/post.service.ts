@@ -18,6 +18,7 @@ export class PostService {
   ) {}
 
   /* 게시글 생성 API*/
+  // id 밑에 이미지 출력하기
   async create(createPostDto: CreatePostDto, userId: number) {
     const createdPost = await this.postRepository.save({
       ...createPostDto,
@@ -26,11 +27,14 @@ export class PostService {
     return createdPost;
   }
   /*게시글 목록 조회 API*/
+  // userId 대신에 닉네잉 출력하기
   async findAll() {
     return await this.postRepository.find();
   }
 
   /* 게시글 상세 조회 API*/
+  // userId 대신에 닉네임 출력하기
+  // 이미지 출력하기
   async findOne(id: number) {
     return await this.postRepository.findOne({
       where: { id },

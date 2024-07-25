@@ -13,6 +13,7 @@ import { PostImage } from './post-image.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { PostLike } from 'src/like/entities/post-like.entity';
 import { PostDislike } from 'src/dislike/entities/post-dislike.entity';
+import { Category } from '../types/postCategory.type';
 
 @Entity({ name: 'posts' })
 export class Post {
@@ -28,9 +29,10 @@ export class Post {
   @Column({ type: 'text' })
   title: string;
 
-  // 카테고리 = category, ???
-  @Column({ type: 'varchar' })
-  category: string;
+  // 카테고리 = category, enum
+  // enum에는 패션, 잡담, 요리라는 선택지가 있다.
+  @Column({ type: 'enum', enum: Category, default: Category.FASHION })
+  category: Category;
 
   // 내용 = content, text
   @Column({ type: 'text' })
