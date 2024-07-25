@@ -29,7 +29,7 @@ export class AuthController {
     const data = await this.authService.logIn(logInDto);
     return {
       status: HttpStatus.OK,
-      messgae: AUTH_MESSAGES.LOG_IN.SUCCESS,
+      message: AUTH_MESSAGES.LOG_IN.SUCCESS,
       data: data,
     };
   }

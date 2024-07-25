@@ -28,11 +28,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  /**
-   * 댓글 생성
-   * @param createCommentDto
-   * @returns
-   */
+  /** 댓글 생성 **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '댓글 생성 API' })
@@ -58,10 +54,7 @@ export class CommentController {
     };
   }
 
-  /**
-   * 댓글 목록 조회
-   * @returns
-   */
+  /** 댓글 목록 조회 **/
   @ApiOperation({ summary: '댓글 목록 조회 API' })
   @Get()
   async findAll(@Param('postId', ParseIntPipe) postId: number) {
@@ -73,12 +66,7 @@ export class CommentController {
     };
   }
 
-  /**
-   * 댓글 수정
-   * @param id
-   * @param updateCommentDto
-   * @returns
-   */
+  /** 댓글 수정**/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '댓글 수정 API' })
@@ -105,11 +93,7 @@ export class CommentController {
     };
   }
 
-  /**
-   * 댓글 삭제
-   * @param id
-   * @returns
-   */
+  /** 댓글 삭제 **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '댓글 삭제 API' })
