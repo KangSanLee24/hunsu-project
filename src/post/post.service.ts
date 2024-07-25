@@ -9,36 +9,87 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
+import { User } from 'src/user/entities/user.entity';
+import { Category } from './types/postCategory.type';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post)
-    private readonly postRepository: Repository<Post>
+    private readonly postRepository: Repository<Post>,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) {}
 
   /* 게시글 생성 API*/
-  // id 밑에 이미지 출력하기
+  // 이미지 출력하기
   async create(createPostDto: CreatePostDto, userId: number) {
-    const createdPost = await this.postRepository.save({
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('사용자를 찾지 못하였습니다.');
+    }
+    const createdPost = this.postRepository.create({
       ...createPostDto,
-      userId,
+      user,
     });
-    return createdPost;
+
+    console.log(createdPost);
+
+    const post = await this.postRepository.save(createdPost);
+    return {
+      id: post.id,
+      userId: post.userId,
+      nickname: post.user.nickname,
+      title: post.title,
+      category: post.category,
+      content: post.content,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+    };
   }
   /*게시글 목록 조회 API*/
-  // userId 대신에 닉네잉 출력하기
   async findAll() {
-    return await this.postRepository.find();
+    const posts = await this.postRepository.find({
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
+    });
+    return posts.map((post) => ({
+      id: post.id,
+      userId: post.userId,
+      nickname: post.user.nickname,
+      title: post.title,
+      category: post.category,
+      content: post.content,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+    }));
   }
 
   /* 게시글 상세 조회 API*/
-  // userId 대신에 닉네임 출력하기
+  // userId, 닉네임 출력하기
   // 이미지 출력하기
   async findOne(id: number) {
-    return await this.postRepository.findOne({
+    const post = await this.postRepository.findOne({
       where: { id },
+      relations: ['user'],
     });
+
+    if (!post) {
+      throw new NotFoundException('게시글을 찾을 수 없습니다.');
+    }
+
+    return {
+      id: post.id,
+      userId: post.userId,
+      nickname: post.user.nickname,
+      title: post.title,
+      category: post.category,
+      content: post.content,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+    };
   }
 
   /*게시글 수정 API*/

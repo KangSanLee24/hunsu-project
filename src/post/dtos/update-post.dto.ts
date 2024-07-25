@@ -1,5 +1,7 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreatePostDto } from './create-post.dto';
+import { IsEnum, IsNotEmpty } from 'class-validator';
+import { Category } from '../types/postCategory.type';
 
 export class UpdatePostDto extends PartialType(CreatePostDto) {
   @ApiProperty({ example: '내가 한 수 보여주지!' })
