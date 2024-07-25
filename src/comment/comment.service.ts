@@ -19,13 +19,6 @@ export class CommentService {
     private readonly postRepository: Repository<Post>
   ) {}
 
-  /**
-   * 댓글 생성 메소드
-   * @param userId number
-   * @param postId number
-   * @param createCommentDto { content : string }
-   * @returns
-   */
   async createComment(
     userId: number,
     postId: number,
@@ -65,23 +58,10 @@ export class CommentService {
     return commentsWithRecomments;
   }
 
-  /**
-   * 댓글 ID를 입력하고 조회
-   * @param id
-   * @returns
-   */
   async findOneBy(id: number) {
     return await this.commentRepository.findOneBy({ id });
   }
 
-  /**
-   *
-   * @param userId number
-   * @param postId number
-   * @param commentId number
-   * @param updateCommentDto { content: string}
-   * @returns
-   */
   async update(
     userId: number,
     postId: number,
@@ -115,6 +95,9 @@ export class CommentService {
       throw new UnauthorizedException('해당 댓글에 접근 권한이 없습니다.');
     }
 
-    await this.commentRepository.delete({ id: commentId });
+    await this.commentRepository.save({
+      id: commentId,
+      content: '삭제된 댓글입니다.',
+    });
   }
 }

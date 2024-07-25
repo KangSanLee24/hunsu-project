@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Patch,
@@ -18,7 +17,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtStrategy } from 'src/auth/guards/jwt.strategy';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
@@ -30,11 +28,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class RecommentController {
   constructor(private readonly recommentService: RecommentService) {}
 
-  /**
-   * 대댓글 생성
-   * @param createRecommentDto
-   * @returns
-   */
+  /** 대댓글 생성 **/
   @ApiOperation({ summary: '대댓글 생성 API' })
   @ApiResponse({ status: HttpStatus.CREATED })
   @Post(':commentId/recomments')
@@ -50,11 +44,7 @@ export class RecommentController {
     );
   }
 
-  /**
-   * 대댓글 수정
-   * @param createRecommentDto
-   * @returns
-   */
+  /** 대댓글 수정 **/
   @ApiOperation({ summary: '대댓글 수정 API' })
   @Patch(':commentId/recomments/:recommentId')
   async updateRecomment(
@@ -76,10 +66,7 @@ export class RecommentController {
     );
   }
 
-  /**
-   * 대댓글 삭제
-   * @returns
-   */
+  /** 대댓글 삭제 **/
   @ApiOperation({ summary: '대댓글 삭제 API' })
   @Delete(':commentsId/recomments/:recommentId')
   async removeRecomment(
