@@ -1,5 +1,5 @@
 import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { SignUpDto } from './dtos/sign-up.dto';
 import { LogInDto } from './dtos/log-in.dto';
@@ -12,7 +12,8 @@ import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  /** 회원 가입(sign-up) API **/
+  /** 1. 회원 가입(sign-up) API **/
+  @ApiOperation({ summary: '1. 회원 가입(sign-up) API' })
   @Post('sign-up')
   async signUp(@Body() signUpDto: SignUpDto) {
     const data = await this.authService.signUp(signUpDto);
@@ -23,7 +24,8 @@ export class AuthController {
     };
   }
 
-  /** 로그인(log-in) API */
+  /** 2. 로그인(log-in) API **/
+  @ApiOperation({ summary: '2. 로그인(log-in) API' })
   @Post('log-in')
   async logIn(@Body() logInDto: LogInDto) {
     const data = await this.authService.logIn(logInDto);
