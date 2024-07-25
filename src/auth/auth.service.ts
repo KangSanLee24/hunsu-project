@@ -40,14 +40,15 @@ export class AuthService {
     }
 
     // 1. 해당 email로 가입한 user가 존재하는지?
-    const isExistingEmail = await this.userService.findByEmail(email);
+    const isExistingEmail: User = await this.userService.findByEmail(email);
     // 1-1. 이미 존재한다면 에러메시지(409)
     if (isExistingEmail) {
       throw new ConflictException(AUTH_MESSAGES.SIGN_UP.FAILURE.EXISTING_EMAIL);
     }
 
     // 2. 해당 nickname으로 가입한 user가 존재하는지?
-    const isExistingNickname = await this.userService.findByNickname(nickname);
+    const isExistingNickname: User =
+      await this.userService.findByNickname(nickname);
     // 2-1. 이미 존재한다면 에러메시지(409)
     if (isExistingNickname) {
       throw new ConflictException(
@@ -57,7 +58,6 @@ export class AuthService {
 
     // 3. 비밀번호는 hash할 것
     const hashedPassword = await hash(password, 10);
-    console.log('====================================', hashedPassword);
 
     // 4. 트랜잭션 : 회원 가입 + 포인트 테이블 생성
     // 4-1. 트랜잭션 세팅
@@ -72,7 +72,6 @@ export class AuthService {
         nickname: signUpDto.nickname,
         password: hashedPassword,
       });
-      console.log('**************************', newMember);
       // 4-2-2. 포인트 테이블 생성 (포인트)
       const newPoint = await queryRunner.manager.save(Point, {
         userId: newMember.id,
@@ -108,7 +107,7 @@ export class AuthService {
     const { email, password } = logInDto;
 
     // 1. 해당 email로 가입된 사용자가 있는지 확인
-    const user = await this.userService.findByEmail(email);
+    const user: User = await this.userService.findByEmail(email);
 
     // 2. 해당 user가 없다면 에러메시지(404)
     if (_.isNil(user)) {
@@ -127,7 +126,7 @@ export class AuthService {
     // 4. 페이로드
     const payload = { email, sub: user.id };
 
-    // 5. Access Token 발급
+    // 5. Access Token 발급 및 반환
     return {
       greeting: `${user.nickname} 님, 어서오세요!`,
       accessToken: this.jwtService.sign(payload),
