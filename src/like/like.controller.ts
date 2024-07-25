@@ -1,34 +1,123 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Delete,
+  UseGuards,
+  ParseIntPipe,
+  HttpStatus,
+} from '@nestjs/common';
 import { LikeService } from './like.service';
-import { CreateLikeDto } from './dtos/create-like.dto';
-import { UpdateLikeDto } from './dtos/update-like.dto';
+import { AuthGuard } from '@nestjs/passport';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { LogIn } from 'src/decorators/log-in.decorator';
+import { User } from 'src/user/entities/user.entity';
 
-@Controller('like')
+@Controller('')
 export class LikeController {
   constructor(private readonly likeService: LikeService) {}
 
-  @Post()
-  create(@Body() createLikeDto: CreateLikeDto) {
-    return this.likeService.create(createLikeDto);
+  @ApiTags('댓글 API')
+  @ApiOperation({ summary: '댓글 좋아요 조회 API' })
+  @Get('/comments/:commentId/likes')
+  async getCommentLikes(@Param('commentId', ParseIntPipe) commentId: number) {
+    const data = await this.likeService.getCommentLikes(commentId);
+
+    return {
+      status: HttpStatus.OK,
+      message: '댓글 좋아요 조회에 성공했습니다.',
+      data,
+    };
   }
 
-  @Get()
-  findAll() {
-    return this.likeService.findAll();
+  @ApiTags('댓글 API')
+  @ApiOperation({ summary: '댓글 좋아요 생성 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/comments/:commentId/likes')
+  async createCommentLike(
+    @LogIn() user: User,
+    @Param('commentId', ParseIntPipe) commentId: number
+  ) {
+    const userId = user.id;
+    await this.likeService.createCommentLike(userId, commentId);
+
+    return {
+      status: HttpStatus.OK,
+      message: '댓글 좋아요 생성에 성공했습니다.',
+    };
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.likeService.findOne(+id);
+  @ApiTags('댓글 API')
+  @ApiOperation({ summary: '댓글 좋아요 삭제 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('/comments/:commentId/likes')
+  async deleteCommentLike(
+    @LogIn() user: User,
+    @Param('commentId', ParseIntPipe) commentId: number
+  ) {
+    const userId = user.id;
+    await this.likeService.deleteCommentLike(userId, commentId);
+
+    return {
+      status: HttpStatus.OK,
+      message: '댓글 좋아요 삭제에 성공했습니다.',
+    };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLikeDto: UpdateLikeDto) {
-    return this.likeService.update(+id, updateLikeDto);
+  @ApiTags('게시글 API')
+  @ApiOperation({ summary: '게시글 좋아요 조회 API' })
+  @Get('/posts/:postId/likes')
+  async getPostLikes(@Param('postId', ParseIntPipe) postId: number) {
+    const data = await this.likeService.getPostLikes(postId);
+
+    return {
+      status: HttpStatus.OK,
+      message: '게시글 좋아요 조회에 성공했습니다.',
+      data,
+    };
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.likeService.remove(+id);
+  @ApiTags('게시글 API')
+  @ApiOperation({ summary: '게시글 좋아요 생성 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/posts/:postId/likes')
+  async createPostLike(
+    @LogIn() user: User,
+    @Param('postId', ParseIntPipe) postId: number
+  ) {
+    const userId = user.id;
+    await this.likeService.createPostLike(userId, postId);
+
+    return {
+      status: HttpStatus.OK,
+      message: '게시글 좋아요 생성에 성공했습니다.',
+    };
+  }
+
+  @ApiTags('게시글 API')
+  @ApiOperation({ summary: '게시글 좋아요 삭제 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('/posts/:postId/likes')
+  async deletePostLike(
+    @LogIn() user: User,
+    @Param('postId', ParseIntPipe) postId: number
+  ) {
+    const userId = user.id;
+    await this.likeService.deletePostLike(userId, postId);
+
+    return {
+      status: HttpStatus.OK,
+      message: '게시글 좋아요 삭제에 성공했습니다.',
+    };
   }
 }

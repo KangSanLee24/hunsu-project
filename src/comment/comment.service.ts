@@ -1,9 +1,13 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateCommentDto } from './dtos/create-comment.dto';
 import { UpdateCommentDto } from './dtos/update-comment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { Post } from 'src/post/entities/post.entity';
 
 @Injectable()
@@ -22,21 +26,43 @@ export class CommentService {
    * @param createCommentDto { content : string }
    * @returns
    */
-  async createComment(userId: number, postId: number, createCommentDto: CreateCommentDto) {
+  async createComment(
+    userId: number,
+    postId: number,
+    createCommentDto: CreateCommentDto
+  ) {
     const post = await this.postRepository.findOneBy({ id: postId });
     if (!post) {
       throw new NotFoundException('해당하는 게시글이 존재하지 않습니다.');
     }
 
-    const data = await this.commentRepository.save({ userId, postId, ...createCommentDto });
+    const data = await this.commentRepository.save({
+      userId,
+      postId,
+      ...createCommentDto,
+    });
 
     return data;
   }
 
   async findCommentsByPostId(postId: number) {
-    const comments = await this.commentRepository.findBy({ postId });
+    // comments
+    const comments = await this.commentRepository.find({
+      where: { postId, parentId: IsNull() },
+    });
 
-    return comments;
+    // recomments
+    const commentsWithRecomments = await Promise.all(
+      comments.map(async (comment) => {
+        const recomments = await this.commentRepository.find({
+          where: { postId, parentId: comment.id },
+        });
+
+        return { ...comment, recomments };
+      })
+    );
+
+    return commentsWithRecomments;
   }
 
   /**
@@ -89,6 +115,6 @@ export class CommentService {
       throw new UnauthorizedException('해당 댓글에 접근 권한이 없습니다.');
     }
 
-    const data = await this.commentRepository.delete({ id: commentId });
+    await this.commentRepository.delete({ id: commentId });
   }
 }
