@@ -15,6 +15,6 @@ export class CreatePostDto {
 
   @IsString()
   @IsNotEmpty({ message: POST_MESSAGE.POST.CREATE.CATEGORY_EMPTY })
-  @ApiProperty({ example: '코디' })
+  @ApiProperty({ example: '패션' })
   category: string;
 }

@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
+import { POST_MESSAGE } from 'src/constants/post-message.constant';
 
 @Injectable()
 export class PostService {
@@ -32,13 +37,40 @@ export class PostService {
     });
   }
 
-  // /*게시글 수정 API*/
-  // update(id: number, updatePostDto: UpdatePostDto) {
-  //   return `This action updates a #${id} post`;
-  // }
+  /*게시글 수정 API*/
+  async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
+    const post = await this.postRepository.findOne({
+      where: { id },
+    });
 
-  // /*게시글 삭제 API*/
-  // remove(id: number) {
-  //   return `This action removes a #${id} post`;
-  // }
+    // 게시글이 존재하는지 확인
+    if (!post) {
+      throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
+    }
+
+    // 작성자 본인인지 확인
+    if (post.userId !== userId) {
+      throw new ForbiddenException('권한이 없습니다.');
+    }
+    await this.postRepository.update({ id }, updatePostDto);
+    return await this.postRepository.findOneBy({ id });
+  }
+
+  /*게시글 삭제 API*/
+  async remove(id: number, userId: number) {
+    const post = await this.postRepository.findOne({
+      where: { id },
+    });
+
+    // 게시글이 존재하는지 확인
+    if (!post) {
+      throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
+    }
+
+    // 작성자 본인인지 확인
+    if (post.userId !== userId) {
+      throw new ForbiddenException('권한이 없습니다.');
+    }
+    return this.postRepository.remove(post);
+  }
 }

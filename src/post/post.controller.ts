@@ -61,13 +61,38 @@ export class PostController {
     };
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-  //   return this.postService.update(+id, updatePostDto);
-  // }
+  /*게시글 수정 API*/
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @Patch(':id')
+  async update(
+    @LogIn() user: User,
+    @Param('id') id: number,
+    @Body() updatePostDto: UpdatePostDto
+  ) {
+    const userId = user.id;
+    const updatedPost = await this.postService.update(
+      id,
+      updatePostDto,
+      userId
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.UPDATE.SUCCESS,
+      data: updatedPost,
+    };
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.postService.remove(+id);
-  // }
+  /*게시글 삭제 API*/
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @Delete(':id')
+  async remove(@LogIn() user: User, @Param('id') id: number) {
+    const userId = user.id;
+    await this.postService.remove(id, userId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.DELETE.SUCCESS,
+    };
+  }
 }
