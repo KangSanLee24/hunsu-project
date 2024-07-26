@@ -23,35 +23,36 @@ export class PostService {
   ) {}
 
   /* 게시글 생성 API*/
-  // 이미지 출력하기
   async create(createPostDto: CreatePostDto, userId: number) {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      withDeleted: true,
+    });
 
     if (!user) {
       throw new NotFoundException('사용자를 찾지 못하였습니다.');
     }
     const createdPost = this.postRepository.create({
       ...createPostDto,
-      user,
+      userId,
     });
 
     const post = await this.postRepository.save(createdPost);
     return {
       id: post.id,
       userId: post.userId,
-      nickname: post.user.nickname,
+      nickname: user.nickname,
       title: post.title,
       category: post.category,
-      // 이미지
       content: post.content,
       createdAt: post.createdAt,
-      updatedAt: post.updatedAt,
+      updatedAt: post.updatedAt, // 테스트를 위해 남겨둠 마무리에는 포스트아이디만 리턴할 예정
     };
   }
   /*게시글 목록 조회 API*/
   async findAll() {
     const posts = await this.postRepository.find({
-      relations: ['user'],
+      relations: ['user', 'comments'],
       order: { createdAt: 'DESC' }, // 최신순 정렬
     });
     return posts.map((post) => ({
@@ -59,8 +60,8 @@ export class PostService {
       userId: post.userId,
       nickname: post.user.nickname,
       title: post.title,
+      numComments: post.comments.length, // 댓글 수 배열로 표현됨
       category: post.category,
-      content: post.content,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
     }));
@@ -70,7 +71,13 @@ export class PostService {
   async findOne(id: number) {
     const post = await this.postRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: [
+        'user',
+        'postImages',
+        'comments',
+        'postLikes',
+        // 'postDislikes',
+      ],
     });
 
     if (!post) {
@@ -82,13 +89,17 @@ export class PostService {
       userId: post.userId,
       nickname: post.user.nickname,
       title: post.title,
+      images: post.postImages.map((image) => image.imgUrl), // 게시글 이미지 : { 이미지 URL}
       category: post.category,
       content: post.content,
+      comments: post.comments, // 댓글
+      numLikes: post.postLikes.length, // 좋아요 수
+      // numDislikes: post.postDislikes.length, // 싫어요 수
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
     };
   }
-  /*이번주의 hot 게시물 조횟*/
+  /*이번주의 hot 게시물 조회수*/
   // [누적 좋아요]
   // /posts/hot
   // 화제글 목록 조회
