@@ -11,6 +11,8 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configValidationSchema } from './configs/env-validation.config';
 import { typeOrmModuleOptions } from './configs/database.config';
+import { AwsService } from './aws/aws.service';
+import { AwsModule } from './aws/aws.module';
 
 @Module({
   imports: [
@@ -26,7 +28,9 @@ import { typeOrmModuleOptions } from './configs/database.config';
     RecommentModule,
     LikeModule,
     DislikeModule,
+    AwsModule,
   ],
   controllers: [AppController],
+  providers: [AwsService],
 })
 export class AppModule {}
