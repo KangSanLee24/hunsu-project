@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
 import { User } from 'src/user/entities/user.entity';
-import { Category } from './types/postCategory.type';
+// import { Category } from './types/postCategory.type';
 
 @Injectable()
 export class PostService {
@@ -35,8 +35,6 @@ export class PostService {
       user,
     });
 
-    console.log(createdPost);
-
     const post = await this.postRepository.save(createdPost);
     return {
       id: post.id,
@@ -44,6 +42,7 @@ export class PostService {
       nickname: post.user.nickname,
       title: post.title,
       category: post.category,
+      // 이미지
       content: post.content,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
@@ -53,7 +52,7 @@ export class PostService {
   async findAll() {
     const posts = await this.postRepository.find({
       relations: ['user'],
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'DESC' }, // 최신순 정렬
     });
     return posts.map((post) => ({
       id: post.id,
@@ -86,11 +85,21 @@ export class PostService {
       nickname: post.user.nickname,
       title: post.title,
       category: post.category,
+      // 이미지
       content: post.content,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
+      // 댓글
+      // 대댓글
+      // 좋아요
+      // 싫어요
     };
   }
+  /*이번주의 hot 게시물 조횟*/
+  // [누적 좋아요]
+  // /posts/hot
+  // 화제글 목록 조회
+  // 주석처리하고 지금 기준으로 일주일 좋아요 많은 순으로
 
   /*게시글 수정 API*/
   async update(id: number, updatePostDto: UpdatePostDto, userId: number) {

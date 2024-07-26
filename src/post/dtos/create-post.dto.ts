@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
-import { Category } from '../types/postCategory.type';
+// import { Category } from '../types/postCategory.type';
 
 export class CreatePostDto {
   @IsString()
