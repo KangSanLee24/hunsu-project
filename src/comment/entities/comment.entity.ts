@@ -24,10 +24,6 @@ export class Comment {
   @Column({ nullable: true })
   parentId: number;
 
-  /**
-   * 내용
-   * @example "댓글 테스트1"
-   */
   @IsNotEmpty({ message: '내용을 입력해 주세요.' })
   @IsString({ message: '댓글 형식에 맞게 입력해 주세요' })
   @Column()
