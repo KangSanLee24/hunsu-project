@@ -22,6 +22,7 @@ import {
 import { User } from 'src/user/entities/user.entity';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { AuthGuard } from '@nestjs/passport';
+import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
 
 @ApiTags('댓글 API')
 @Controller('/posts/:postId/comments')
@@ -49,7 +50,7 @@ export class CommentController {
 
     return {
       status: HttpStatus.CREATED,
-      message: '댓글 생성에 성공하셨습니다.',
+      message: COMMENT_MESSAGE.SUCCESS.CREATE,
       data,
     };
   }
@@ -61,7 +62,7 @@ export class CommentController {
     const data = await this.commentService.findCommentsByPostId(postId);
     return {
       status: HttpStatus.OK,
-      message: '댓글 목록 조회에 성공하셨습니다.',
+      message: COMMENT_MESSAGE.SUCCESS.GET,
       data,
     };
   }
@@ -70,6 +71,7 @@ export class CommentController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '댓글 수정 API' })
+  @ApiResponse({ status: HttpStatus.CREATED })
   @Patch(':commentId')
   async update(
     @LogIn() user: User,
@@ -88,7 +90,7 @@ export class CommentController {
 
     return {
       status: HttpStatus.OK,
-      message: '댓글이 수정되었습니다.',
+      message: COMMENT_MESSAGE.SUCCESS.UPDATE,
       data,
     };
   }
@@ -107,7 +109,7 @@ export class CommentController {
 
     return {
       status: HttpStatus.OK,
-      message: '댓글 삭제에 성공했습니다.',
+      message: COMMENT_MESSAGE.SUCCESS.DELETE,
     };
   }
 }

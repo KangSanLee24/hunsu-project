@@ -20,6 +20,7 @@ import {
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
 
 @UseGuards(AuthGuard('jwt'))
 @ApiTags('대댓글 API')
@@ -37,11 +38,17 @@ export class RecommentController {
     @LogIn() user: User,
     @Body() createRecommentDto: CreateRecommentDto
   ) {
-    return await this.recommentService.createRecomment(
+    const data = await this.recommentService.createRecomment(
       +commentId,
       user,
       createRecommentDto
     );
+
+    return {
+      status: HttpStatus.CREATED,
+      message: COMMENT_MESSAGE.SUCCESS.CREATE,
+      data,
+    };
   }
 
   /** 대댓글 수정 **/
@@ -56,14 +63,20 @@ export class RecommentController {
     const recomment = await this.recommentService.findRecomment(recommentId);
 
     if (recomment.userId != user.id) {
-      throw new ForbiddenException('작성자가 아닙니다.');
+      throw new ForbiddenException(COMMENT_MESSAGE.FAILURE.UN_AUTH);
     }
 
-    return await this.recommentService.updateRecomment(
+    const data = await this.recommentService.updateRecomment(
       +commentId,
       +recommentId,
       createRecommentDto
     );
+
+    return {
+      status: HttpStatus.OK,
+      message: COMMENT_MESSAGE.SUCCESS.UPDATE,
+      data,
+    };
   }
 
   /** 대댓글 삭제 **/
@@ -77,12 +90,14 @@ export class RecommentController {
     const recomment = await this.recommentService.findRecomment(recommentId);
 
     if (recomment.userId != user.id) {
-      throw new ForbiddenException('작성자가 아닙니다.');
+      throw new ForbiddenException(COMMENT_MESSAGE.FAILURE.UN_AUTH);
     }
 
-    return await this.recommentService.removeRecomment(
-      +commentId,
-      +recommentId
-    );
+    await this.recommentService.removeRecomment(+commentId, +recommentId);
+
+    return {
+      status: HttpStatus.OK,
+      message: COMMENT_MESSAGE.SUCCESS.DELETE,
+    };
   }
 }

@@ -6,9 +6,10 @@ import {
 } from '@nestjs/common';
 import { CreateRecommentDto } from './dtos/create-recomment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Not, Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { User } from 'src/user/entities/user.entity';
+import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
 
 @Injectable()
 export class RecommentService {
@@ -24,7 +25,7 @@ export class RecommentService {
     });
 
     if (!findRecomment) {
-      throw new NotFoundException('해당 대댓글이 없습니다.');
+      throw new NotFoundException(COMMENT_MESSAGE.FAILURE.NO_COMMENT);
     }
 
     return findRecomment;
@@ -37,17 +38,17 @@ export class RecommentService {
     createRecommentDto: CreateRecommentDto
   ) {
     // 댓글에 대댓글에 대댓글이 가능해서 수정.
-    const findPost = await this.commentRepository.findOne({
+    const findComment = await this.commentRepository.findOne({
       where: { id: commentId, parentId: IsNull() },
     });
 
-    if (!findPost) {
-      throw new BadRequestException('댓글이 존재하지 않습니다.');
+    if (!findComment) {
+      throw new NotFoundException(COMMENT_MESSAGE.FAILURE.NO_COMMENT);
     }
 
     const newRecomment = await this.commentRepository.save({
       parentId: commentId,
-      postId: findPost.postId,
+      postId: findComment.postId,
       userId: user.id,
       content: createRecommentDto.content,
     });

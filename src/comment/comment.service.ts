@@ -1,7 +1,7 @@
 import {
+  ForbiddenException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateCommentDto } from './dtos/create-comment.dto';
 import { UpdateCommentDto } from './dtos/update-comment.dto';
@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
 import { IsNull, Repository } from 'typeorm';
 import { Post } from 'src/post/entities/post.entity';
+import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
 
 @Injectable()
 export class CommentService {
@@ -26,7 +27,7 @@ export class CommentService {
   ) {
     const post = await this.postRepository.findOneBy({ id: postId });
     if (!post) {
-      throw new NotFoundException('해당하는 게시글이 존재하지 않습니다.');
+      throw new NotFoundException(COMMENT_MESSAGE.FAILURE.NO_POST);
     }
 
     const data = await this.commentRepository.save({
@@ -70,14 +71,14 @@ export class CommentService {
   ) {
     const post = await this.postRepository.findOneBy({ id: postId });
     if (!post) {
-      throw new NotFoundException('게시글이 존재하지 않습니다.');
+      throw new NotFoundException(COMMENT_MESSAGE.FAILURE.NO_POST);
     }
 
     const comment = await this.commentRepository.findOneBy({ id: commentId });
     if (!comment) {
-      throw new NotFoundException('댓글이 존재하지 않습니다.');
+      throw new NotFoundException(COMMENT_MESSAGE.FAILURE.NO_COMMENT);
     } else if (comment.userId !== userId) {
-      throw new UnauthorizedException('해당 댓글에 접근 권한이 없습니다.');
+      throw new ForbiddenException(COMMENT_MESSAGE.FAILURE.UN_AUTH);
     }
 
     const updatedComment = await this.commentRepository.save({
@@ -90,14 +91,14 @@ export class CommentService {
   async remove(userId: number, commentId: number) {
     const comment = await this.commentRepository.findOneBy({ id: commentId });
     if (!comment) {
-      throw new NotFoundException('댓글이 존재하지 않습니다.');
+      throw new NotFoundException(COMMENT_MESSAGE.FAILURE.NO_COMMENT);
     } else if (comment.userId !== userId) {
-      throw new UnauthorizedException('해당 댓글에 접근 권한이 없습니다.');
+      throw new ForbiddenException(COMMENT_MESSAGE.FAILURE.UN_AUTH);
     }
 
     await this.commentRepository.save({
       id: commentId,
-      content: '삭제된 댓글입니다.',
+      content: COMMENT_MESSAGE.ETC.DELETED_COMMENT,
     });
   }
 }
