@@ -67,8 +67,6 @@ export class PostService {
   }
 
   /* 게시글 상세 조회 API*/
-  // userId, 닉네임 출력하기
-  // 이미지 출력하기
   async findOne(id: number) {
     const post = await this.postRepository.findOne({
       where: { id },
@@ -85,14 +83,9 @@ export class PostService {
       nickname: post.user.nickname,
       title: post.title,
       category: post.category,
-      // 이미지
       content: post.content,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-      // 댓글
-      // 대댓글
-      // 좋아요
-      // 싫어요
     };
   }
   /*이번주의 hot 게시물 조횟*/
