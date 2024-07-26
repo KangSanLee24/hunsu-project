@@ -31,7 +31,7 @@ export class Post {
 
   // 카테고리 = category, enum
   // enum에는 패션, 잡담, 요리라는 선택지가 있다.
-  @Column({ type: 'enum', enum: Category, default: Category.FASHION })
+  @Column({ type: 'enum', enum: Category, default: Category.CHAT })
   category: Category;
 
   // 내용 = content, text
