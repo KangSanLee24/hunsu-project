@@ -18,6 +18,7 @@ export class AwsService {
     });
   }
 
+  // 첨부파일, 이미지 업로드
   async imageUploadToS3(
     fileName: string, // 업로드될 파일의 이름
     file: Express.Multer.File, // 업로드할 파일
@@ -32,10 +33,13 @@ export class AwsService {
       ContentType: `image/${ext}`, // 파일 타입
     });
 
+    // 업로드된 이미지의 URL을 생성합니다.
+    const fileUrl = `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET_NAME}/${fileName}`;
+
     // 생성된 명령을 S3 클라이언트에 전달하여 이미지 업로드를 수행합니다.
     await this.s3Client.send(command);
 
     // 업로드된 이미지의 URL을 반환합니다.
-    return `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET_NAME}/${fileName}`;
+    return fileUrl;
   }
 }
