@@ -51,6 +51,7 @@ export class ChatService {
   async findChatRooms() {
     
     const chatRooms = await this.chatRoomRepository.find({
+      relations: ['user'],
       select: {
         id: true,
         user: {
@@ -63,7 +64,7 @@ export class ChatService {
 
     const chatRoomsFormatted = chatRooms.map((room) => ({
       ...room,
-      createdAt: format(new Date(room.createdAt), 'YYYY-MM-DD HH:mm')
+      createdAt: format(new Date(room.createdAt), 'yyyy-MM-dd HH:mm')
     }));
 
     return chatRoomsFormatted;

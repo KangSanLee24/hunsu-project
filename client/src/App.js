@@ -1,14 +1,16 @@
-import { useState } from "react";
-
-import { Chat } from "./chat.js";
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Chat } from './chat/chat.js';
+import { ChatList } from './chat/chat-list.js';
 
 function App() {
-  //const [currentUser, setCurrentUser] = useState(null);
-
   return (
-    <div className="app">
-      <Chat />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<ChatList />} />
+        <Route path="/chat/:roomId" element={<Chat />} />
+      </Routes>
+    </Router>
   );
 }
 

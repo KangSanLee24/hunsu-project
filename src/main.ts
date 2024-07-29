@@ -40,6 +40,7 @@ async function bootstrap() {
     },
   });
 
+  app.enableCors(); // CORS 설정
   // PORT 실행
   await app.listen(port);
 }
