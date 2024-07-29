@@ -17,6 +17,7 @@ import { PostLike } from 'src/like/entities/post-like.entity';
 import { PostDislike } from 'src/dislike/entities/post-dislike.entity';
 import { Point } from './point.entity';
 import { PointLog } from './point-log.entity';
+import { ChatRoom } from 'src/chat/entities/chat-room.entity';
 
 @Index('email', ['email'], { unique: true })
 @Entity({
@@ -81,4 +82,7 @@ export class User {
 
   @OneToMany(() => PointLog, (pointLog) => pointLog.user, { cascade: true })
   pointLogs: PointLog[];
+
+  @OneToMany(() => ChatRoom, (chatRoom) => chatRoom.user, { cascade: true })
+  chatRooms: ChatRoom[];
 }

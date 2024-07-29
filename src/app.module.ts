@@ -14,6 +14,8 @@ import { typeOrmModuleOptions } from './configs/database.config';
 import { AwsService } from './aws/aws.service';
 import { AwsModule } from './aws/aws.module';
 import { MailModule } from './mail/mail.module';
+import { ChatModule } from './chat/chat.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { MailModule } from './mail/mail.module';
     DislikeModule,
     AwsModule,
     MailModule,
+    ChatModule,
+    EventsModule
   ],
   controllers: [AppController],
   providers: [AwsService],
