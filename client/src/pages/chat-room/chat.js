@@ -1,6 +1,7 @@
 import { useState, useEffect, useLayoutEffect } from "react";
 import { useLocation } from 'react-router-dom';
 import { io } from "socket.io-client";
+import "./styles/chat.css";
 
 const socket = io('http://localhost:4000');
 
@@ -9,7 +10,7 @@ export function Chat({ }) {
   const [messages, setMessages] = useState([]);
   const [currentUser, setCurrentUser] = useState(generateUserName());
 
-  const location = useLocation(); // 링크에서 전달된 상xo
+  const location = useLocation(); // 링크에서 전달된 상태
 
   function generateUserName() {
     const count = Math.floor(Math.random() * 1000) + 1;

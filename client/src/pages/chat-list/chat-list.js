@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import './chat-list.css'
+import './styles/chat-list.css'
 
 export function ChatList() {
   const [chatRooms, setChatRooms] = useState([]);
