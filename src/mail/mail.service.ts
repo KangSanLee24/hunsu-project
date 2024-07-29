@@ -55,10 +55,10 @@ export class MailService {
         from: this.configService.get<string>('NODE_MAILER_ID'),
         to: email, //string or Array
         subject: '[5zirap] 회원 가입 인증 메일',
-        text: `인증번호 4자리 : ${certification}, 
+        text: `
+        인증번호 4자리 : ${certification}, 
         이 인증번호 4자리를 입력하면 회원가입이 완료됩니다.`,
       });
-      console.log('********** 인증 메일이 전송되었습니다 **********');
     } catch (err) {
       throw new InternalServerErrorException(
         AUTH_MESSAGES.VERIFY_EMAIL.FAILURE.SEND_ERROR
