@@ -1,5 +1,7 @@
 import { useState, useEffect, useLayoutEffect } from "react";
+import { useLocation } from 'react-router-dom';
 import { io } from "socket.io-client";
+import "./styles/chat.css";
 
 const socket = io('http://localhost:4000');
 
@@ -7,6 +9,8 @@ export function Chat({ }) {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState([]);
   const [currentUser, setCurrentUser] = useState(generateUserName());
+
+  const location = useLocation(); // 링크에서 전달된 상태
 
   function generateUserName() {
     const count = Math.floor(Math.random() * 1000) + 1;
@@ -35,17 +39,25 @@ export function Chat({ }) {
   }, [messages]);
 
   const handleSendMessage = (e) => {
-    if (e.key !== "Enter" || inputValue.trim().length === 0) return;
+    if (inputValue.trim().length === 0) return;
 
     console.log("Sending message:", inputValue);
     socket.emit("chat", { author: currentUser, body: inputValue });
     setInputValue("");
   };
 
+  const handleEnterMessage = (e) => {
+    if (e.key === 'Enter') {
+      handleSendMessage();
+    }
+  }
+
   return (
     <div className="chat">
       <div className="chat-header">
-        <span>chatting room name</span>
+        <span className="chatting room name">
+          {location.state.title}
+        </span>
         <button className="button" >
           나가기
         </button>
@@ -73,8 +85,11 @@ export function Chat({ }) {
           placeholder="메세지를 입력해주세요."
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={handleSendMessage}
+          onKeyPress={handleEnterMessage}
         />
+         <button className="send-button" onClick={handleSendMessage}>
+          전송
+        </button>
       </div>
     </div>
   );
