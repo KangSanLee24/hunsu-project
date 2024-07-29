@@ -17,7 +17,7 @@ export class Point {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  @Column({ name: 'user_id', unique: true, unsigned: true })
+  @Column({ unique: true, unsigned: true })
   userId: number;
 
   @Column({ default: 0 })

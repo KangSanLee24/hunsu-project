@@ -13,6 +13,9 @@ import { Point } from 'src/user/entities/point.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Post } from 'src/post/entities/post.entity';
+import { RefreshToken } from './entities/refresh-token.entity';
+import { VerifyEmail } from 'src/mail/entities/verify-email.entity';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
@@ -21,13 +24,21 @@ import { Post } from 'src/post/entities/post.entity';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+        secret: configService.get<string>('ACCESS_SECRET_KEY'),
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([User, Point, Post, Comment]),
+    TypeOrmModule.forFeature([
+      User,
+      Point,
+      Post,
+      Comment,
+      RefreshToken,
+      VerifyEmail,
+    ]),
     ConfigModule,
     UserModule,
+    MailModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
