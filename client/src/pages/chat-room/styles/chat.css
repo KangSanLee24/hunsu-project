@@ -132,3 +132,16 @@ body {
     color: rgba(0,0,0,.87);
     font-size: 15px;
   }
+
+  .send-button {
+    width: 10%;
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+    font-size: 1rem;
+    border-radius: 0.2rem;
+    text-align: center;
+    border: 1px solid transparent;
+    padding: 0.35rem 0.5rem;
+    cursor: pointer;
+  }

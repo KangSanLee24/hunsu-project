@@ -9,7 +9,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ChatRoom } from './chat-room.entity';
-import { ChatMember } from './chat-member.entity';
 
 @Entity('chat_logs')
 export class ChatLog {
@@ -22,10 +21,6 @@ export class ChatLog {
 
   @Column({ type: 'int', name: 'room_id', unsigned: true })
   roomId: number;
-
-  // @ManyToOne(() => ChatMember, (chatMember) => chatMember.chatLogs)
-  // @JoinColumn({ name: 'member_id', referencedColumnName: 'id' })
-  // chatMembers: ChatMember;
 
   @Column({ type: 'int', name: 'member_id', unsigned: true })
   memberId: number;

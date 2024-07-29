@@ -10,7 +10,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ChatRoom } from './chat-room.entity';
-import { ChatLog } from './chat-log.entity';
 
 @Entity('chat_members')
 export class ChatMember {
@@ -33,7 +32,4 @@ export class ChatMember {
 
   @CreateDateColumn()
   createdAt: Date;
-
-  // @OneToMany(() => ChatLog, (chatLog) => chatLog.chatMembers, { cascade: true })
-  // chatLogs: ChatLog[];
 }
