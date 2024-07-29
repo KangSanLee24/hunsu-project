@@ -15,7 +15,7 @@ export class PointLog {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  @Column({ name: 'user_id', unsigned: true })
+  @Column({ unsigned: true })
   userId: number;
 
   @Column()

@@ -13,6 +13,7 @@ import { configValidationSchema } from './configs/env-validation.config';
 import { typeOrmModuleOptions } from './configs/database.config';
 import { AwsService } from './aws/aws.service';
 import { AwsModule } from './aws/aws.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AwsModule } from './aws/aws.module';
     LikeModule,
     DislikeModule,
     AwsModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AwsService],
