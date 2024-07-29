@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.620.0",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^3.2.3",
@@ -30,10 +31,13 @@
     "@nestjs/schedule": "^4.1.0",
     "@nestjs/swagger": "^6.3.0",
     "@nestjs/typeorm": "^9.0.1",
+    "@types/multer": "^1.4.11",
     "bcrypt": "^5.1.1",
     "class-validator": "^0.14.1",
     "handlebars": "^4.7.8",
     "joi": "^17.13.3",
+    "multer": "^1.4.5-lts.1",
+    "multer-s3": "^3.0.1",
     "mysql2": "^3.10.3",
     "nodemailer": "^6.9.14",
     "passport-jwt": "^4.0.1",
