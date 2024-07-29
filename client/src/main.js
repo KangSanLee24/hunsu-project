@@ -1,7 +1,29 @@
 const liveChatData = [
   { id: 13021, title: '실시간 채팅 1', users: 30 },
   { id: 12995, title: '실시간 채팅 2', users: 44 },
-  // 추가 데이터...
+  { id: 12995, title: '주간 게시글 2', comments: 44 },
+  { id: 13021, title: '주간 게시글 3', comments: 30 },
+  { id: 12995, title: '주간 게시글 4', comments: 44 },
+  { id: 13021, title: '주간 게시글 5', comments: 30 },
+  { id: 12995, title: '주간 게시글 6', comments: 44 },
+  { id: 13021, title: '주간 게시글 7', comments: 30 },
+  { id: 12995, title: '주간 게시글 8', comments: 44 },
+  { id: 13021, title: '주간 게시글 9', comments: 30 },
+  { id: 12995, title: '주간 게시글 10', comments: 44 },
+  { id: 13021, title: '주간 게시글 11', comments: 30 },
+  { id: 12995, title: '주간 게시글 12', comments: 44 },
+  { id: 13021, title: '주간 게시글 13', comments: 30 },
+  { id: 12995, title: '주간 게시글 14', comments: 44 },
+  { id: 13021, title: '주간 게시글 15', comments: 30 },
+  { id: 12995, title: '주간 게시글 16', comments: 44 },
+  { id: 13021, title: '주간 게시글 17', comments: 30 },
+  { id: 12995, title: '주간 게시글 18', comments: 44 },
+  { id: 13021, title: '주간 게시글 19', comments: 30 },
+  { id: 12995, title: '주간 게시글 20', comments: 44 },
+  { id: 13021, title: '주간 게시글 21', comments: 30 },
+  { id: 12995, title: '주간 게시글 22', comments: 44 },
+  { id: 13021, title: '주간 게시글 23', comments: 30 },
+  { id: 12995, title: '주간 게시글 24', comments: 44 },
 ];
 
 const weeklyPostsData = [

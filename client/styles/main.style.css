@@ -10,20 +10,24 @@ main,
 footer {
   max-width: 1200px; /* 최대 너비 설정 */
   margin: 0 auto; /* 중앙 정렬 */
-  padding: 10px 20px; /* 안쪽 여백 */
+  padding: 10px 10px; /* 안쪽 여백*/
 }
 
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #ffffff;
+  background-color: #000000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: 4px;
+  text-align: center;
+  align-content: center;
 }
 
 header .logo {
   font-size: 24px;
   font-weight: bold;
+  color: white;
 }
 
 nav ul {
@@ -33,8 +37,8 @@ nav ul {
 }
 
 nav li:hover {
-  background-color: #8f8f8f;
-  color: white;
+  background-color: #ffffff;
+  color: black;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -42,13 +46,15 @@ nav li:hover {
 
 nav a {
   text-decoration: none;
-  color: #333;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 18px;
 }
 
-nav a {
+/* nav a {
   text-decoration: none;
-  color: #333;
-}
+  color: #000000;
+} */
 
 main {
   padding: 20px;
@@ -61,6 +67,13 @@ main {
   margin-bottom: 20px;
   padding: 15px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.live-chat li,
+.weekly-posts li {
+  list-style-type: none;
+  padding: 5px;
+  letter-spacing: 1px;
 }
 
 h2 {
@@ -78,28 +91,31 @@ footer {
   left: 0;
   right: 0;
   color: white;
+  background-color: #000000;
   text-align: center;
 }
 
 .footer-menu {
   display: flex;
   justify-content: space-around;
-  padding: 10px;
-  background-color: #333;
+  /* padding: 10px; */
+  background-color: #000000;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
 
 button {
-  background-color: #333;
+  background-color: #000000;
   color: white;
   border: none;
   padding: 10px;
   border-radius: 5px;
   cursor: pointer;
+  /* font-weight: bold; */
+  font-size: 18px;
 }
 
 button:hover {
-  background-color: #8f8f8f;
+  background-color: #000000;
 }
 
 /* 반응형 디자인 */

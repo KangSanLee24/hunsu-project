@@ -7,7 +7,7 @@ body {
 
 .container {
   max-width: 400px;
-  margin: 50px auto;
+  margin: 250px auto;
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
@@ -37,18 +37,14 @@ input[type='text'] {
 }
 
 button {
-  width: 95%;
+  width: 100%;
   padding: 10px;
-  background-color: #4caf50;
+  background-color: #000000;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-}
-
-button:hover {
-  background-color: #45a049;
 }
 
 /* 반응형 디자인 */
