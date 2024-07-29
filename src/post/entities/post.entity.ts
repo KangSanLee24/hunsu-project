@@ -62,7 +62,7 @@ export class Post {
   @OneToMany(() => PostDislike, (postDislike) => postDislike.post, {
     cascade: true,
   })
-  postDisLikes: PostDislike[];
+  postDislikes: PostDislike[];
 
   // 게시글과 이미지 1대:다 관계
   @OneToMany(() => PostImage, (image) => image.post, { cascade: true })
