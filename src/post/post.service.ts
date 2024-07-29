@@ -10,6 +10,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
 import { User } from 'src/user/entities/user.entity';
+import { AwsService } from 'src/aws/aws.service';
+import { PostImage } from './entities/post-image.entity';
 // import { Category } from './types/postCategory.type';
 
 @Injectable()
@@ -18,8 +20,12 @@ export class PostService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
 
+    @InjectRepository(PostImage)
+    private readonly postImageRepository: Repository<PostImage>,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
+
+    private readonly awsService: AwsService
   ) {}
 
   /* 게시글 생성 API*/
@@ -99,7 +105,8 @@ export class PostService {
       updatedAt: post.updatedAt,
     };
   }
-  /*이번주의 hot 게시물 조회수*/
+
+  /*화제글 목록 조회 API*/
   // [누적 좋아요]
   // /posts/hot
   // 화제글 목록 조회
@@ -140,5 +147,29 @@ export class PostService {
       throw new ForbiddenException('권한이 없습니다.');
     }
     return this.postRepository.remove(post);
+  }
+  /** 이미지 업로드 API **/
+  async uploadPostImage(id: number, file: Express.Multer.File) {
+    const post = await this.postRepository.findOne({ where: { id } });
+
+    if (!post) {
+      throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
+    }
+    const [fileName, fileExt] = file.originalname.split('.');
+    const fileUrl = await this.awsService.imageUploadToS3(
+      // 업로드
+      `${Date.now()}_${fileName}`, // 이미지 이름과 URL이 같고 이미지는 다르게 되는 경우를 방지하고자 날짜를 넣음
+      file,
+      fileExt
+    );
+    // url db에 저장하는 코드 추가
+    const postImage = this.postImageRepository.create({
+      imgUrl: fileUrl,
+      postId: post.id,
+    });
+
+    await this.postImageRepository.save(postImage);
+
+    return fileUrl; // S3 URL 반환
   }
 }
