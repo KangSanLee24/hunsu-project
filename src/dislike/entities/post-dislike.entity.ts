@@ -23,7 +23,7 @@ export class PostDislike {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => Post, (post) => post.postLikes)
+  @ManyToOne(() => Post, (post) => post.postDislikes)
   @JoinColumn({ name: 'post_id', referencedColumnName: 'id' })
   post: Post;
 
