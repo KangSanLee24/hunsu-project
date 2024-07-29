@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Patch,
+  Delete,
   UseGuards,
   Body,
   Param,
@@ -17,11 +18,12 @@ import { UserService } from './user.service';
 
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { USER_MESSAGES } from 'src/constants/user-message.constant';
+import { SoftdeleteUserDto } from './dtos/softdelete-user.dto';
 
 @ApiTags('2. USER API')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   /** 내 정보 조회(R) API **/
   @UseGuards(AuthGuard('jwt'))
@@ -63,6 +65,24 @@ export class UserController {
       status: HttpStatus.OK,
       message: USER_MESSAGES.READ.SUCCESS,
       data: data,
+    };
+  }
+
+
+  /** 회원탈퇴(softdelete) API **/
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '회원탈퇴 API' })
+  @Patch('me/softdelete')
+  async softdeleteUser(
+    @LogIn() user: User,
+    @Body() softdeleteUserDto: SoftdeleteUserDto
+  ) {
+    const data = await this.userService.softdeleteUser(user, softdeleteUserDto);
+    return {
+      status: HttpStatus.OK,
+      message: USER_MESSAGES.DELETE_ME.SUCCESS,
+      data: data
     };
   }
 }

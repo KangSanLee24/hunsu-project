@@ -7,7 +7,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, QueryFailedError } from 'typeorm';
 
 import { compare, hash } from 'bcrypt';
 import _ from 'lodash';
@@ -18,6 +18,8 @@ import { Point } from 'src/user/entities/point.entity';
 
 import { SignUpDto } from './dtos/sign-up.dto';
 import { LogInDto } from './dtos/log-in.dto';
+import { FindIdDto } from './dtos/find-id.dto';
+import { RePasswordDto } from './dtos/re-password.dto';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -45,7 +47,7 @@ export class AuthService {
 
     @InjectRepository(VerifyEmail)
     private verifyEmailRepository: Repository<VerifyEmail>
-  ) {}
+  ) { }
 
   /** 회원 가입(sign-up) API **/
   async signUp(signUpDto: SignUpDto) {
@@ -116,7 +118,12 @@ export class AuthService {
       await queryRunner.rollbackTransaction();
       // 4-3-실패시. 롤백된 상태를 release하면서 트랜잭션 최종완료
       await queryRunner.release();
-
+      // 4-4. 이메일 중복 예외 처리
+      if (err instanceof QueryFailedError && err.driverError.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException(
+          AUTH_MESSAGES.SIGN_UP.FAILURE.DUPLICATE
+        );
+      }
       // 5. 에러처리
       throw err;
     }
@@ -321,4 +328,53 @@ export class AuthService {
       verified: email,
     };
   }
+
+  /** 아이디 찾기(find-id) API **/
+  async findId(findIdDto: FindIdDto) {
+
+    // 0. dto에서 데이터 꺼내기
+    const { email } = findIdDto;
+
+    // 1. 해당 email로 가입된 사용자가 있는지 확인
+    const user: User = await this.userService.findByEmail(email);
+
+    // 2. 해당 user가 없다면 에러메시지(404)
+    if (_.isNil(user)) {
+      throw new NotFoundException(AUTH_MESSAGES.LOG_IN.FAILURE.NO_USER);
+    }
+
+    // 3. 페이로드
+    const payload = { email, sub: user.id };
+
+    // 4. Access Token 발급 및 반환
+    return {
+      greeting: `당신의 아이디는 ${user.id} 입니다!`,
+      accessToken: this.jwtService.sign(payload),
+    };
+  }
+
+  // /** 비밀번호 바꾸기 API **/
+  // async rePassword(rePasswordDto: RePasswordDto) {
+  //   // 0. dto에서 데이터 꺼내기
+  //   const { password, passwordConfirm } = rePasswordDto;
+
+  //   // 2. 내 정보 수정
+  //   const user: User = await this.userService.update(
+  //     { password: user.password },
+  //     { nickname: updateUserDto.nickname }
+  //   );
+
+  //   // 4. 데이터 가공
+  //   const data = {
+  //     before: {
+  //       nickname: user.nickname,
+  //     },
+  //     after: {
+  //       nickname: updateUserDto.nickname,
+  //     },
+  //   };
+
+  //   // 5. 반환
+  //   return data;
+  // }
 }
