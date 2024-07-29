@@ -6,7 +6,7 @@ export function ChatList() {
   const [chatRooms, setChatRooms] = useState([]);
 
   useEffect(() => {
-    // 채팅방 조회 api 호출
+    // 채팅방 조회 api 호출 
     fetch('/api/chatrooms')
       .then(response => response.json())
       .then(data => {
