@@ -32,6 +32,24 @@ export class ChatController {
   }
 
   /**
+   * 채팅방 인원 계산
+   * @returns
+   */
+  @Get(':chatRoomId/member-count')
+  async memberCount(@Param('chatRoomId') chatRoomId: string) {
+    return await this.chatService.memberCount(+chatRoomId);
+  }
+
+  /**
+   * 채팅 마지막 시간 계산
+   * @returns
+   */
+  @Get(':chatRoomId/chat-time')
+  async chatLastTime(@Param('chatRoomId') chatRoomId: string) {
+    return await this.chatService.chatLastTime(+chatRoomId);
+  }
+
+  /**
    * 채팅방 입장
    * @returns
    */

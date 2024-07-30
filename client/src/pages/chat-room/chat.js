@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect } from "react";
-import { useLocation } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { io } from "socket.io-client";
 import "./styles/chat.css";
 
@@ -9,6 +9,8 @@ export function Chat({ }) {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState([]);
   const [currentUser, setCurrentUser] = useState(generateUserName());
+  
+  const { roomId } = useParams(); // URL 파라미터에서 방 ID를 추출
 
   const location = useLocation(); // 링크에서 전달된 상태
 
@@ -19,7 +21,10 @@ export function Chat({ }) {
 
   useEffect(() => {
 
-    // 이벤트 리스너 등록
+    //방 입장
+    socket.emit('joinRoom', { roomId });
+
+    // 메세지 수신
     const handleMessage = (newMessage) => {
       console.log("New message received:", newMessage);
       setMessages((previousMessages) => [...previousMessages, newMessage]);
@@ -28,10 +33,11 @@ export function Chat({ }) {
     socket.on("chat", handleMessage);
 
     return () => {
+      //socket.emit('leaveRoom', { roomId });
       socket.off("chat", handleMessage);
     };
 
-  }, []);
+  }, [roomId]);
 
   useLayoutEffect(() => {
     let chat = document.querySelector('#chatscroll');
@@ -42,7 +48,7 @@ export function Chat({ }) {
     if (inputValue.trim().length === 0) return;
 
     console.log("Sending message:", inputValue);
-    socket.emit("chat", { author: currentUser, body: inputValue });
+    socket.emit("chat", { roomId , author: currentUser, body: inputValue });
     setInputValue("");
   };
 
