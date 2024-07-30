@@ -1,31 +1,38 @@
-// pages/log-in/LogIn.js
-import React from 'react';
-import './styles/log-in.style.css';
+document.addEventListener('DOMContentLoaded', () => {
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
 
-const LogIn = () => {
-  return (
-    <div className="container">
-      <h1>로그인</h1>
-      <form>
-        <label htmlFor="email">이메일 (Email)</label>
-        <input
-          type="email"
-          id="email"
-          placeholder="example@example.com"
-          required
-        />
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
 
-        <label htmlFor="password">비밀번호 (Password)</label>
-        <input type="password" id="password" placeholder="********" required />
+      const response = await fetch('http://localhost:4000/api/auth/log-in', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-        <button type="submit">로그인하기</button>
-        <p className="forgot-password">
-          아이디 또는 비밀번호를 잊으셨나요?
-          <a href="./find-pw">찾기</a>
-        </p>
-      </form>
-    </div>
-  );
-};
+      const result = await response.json();
 
-export default LogIn;
+      if (response.ok && result.status === 200) {
+        // 토큰 저장
+        localStorage.setItem('accessToken', result.data.accessToken);
+        localStorage.setItem('refreshToken', result.data.refreshToken);
+
+        // 알림 표시
+        alert(result.message);
+
+        // 메인 페이지로 이동
+        window.location.href = './main.html';
+      } else {
+        // 에러 처리
+        alert(result.message || '로그인에 실패했습니다.');
+      }
+    });
+  } else {
+    console.error('로그인 폼을 찾을 수 없습니다.');
+  }
+});

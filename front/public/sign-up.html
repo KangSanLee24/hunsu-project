@@ -40,11 +40,41 @@
         <label for="nickname">닉네임 (Nickname)</label>
         <input type="text" id="nickname" placeholder="홍길동" required />
 
-        <label for="extra">뭘 추가하지? (What to add?)</label>
-        <input type="text" id="extra" placeholder="imageUrl??" />
-
         <button type="submit">회원 가입하기</button>
       </form>
     </div>
+
+    <div id="notification" class="notification hidden">
+      <div class="notification-content">
+        <p>
+          회원가입이 성공적으로 완료되었습니다. 이메일 인증 페이지로 이동합니다.
+        </p>
+        <button id="confirm-btn">확인</button>
+      </div>
+    </div>
+
+    <!-- 스타일을 추가해 알림을 화면에 표시 -->
+    <style>
+      .notification {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        border: 1px solid black;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+
+    <script
+      type="module"
+      src="../src/sign-up/sign-up.js"
+      type="module"
+    ></script>
   </body>
 </html>

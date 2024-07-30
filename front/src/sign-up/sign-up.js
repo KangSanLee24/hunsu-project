@@ -1,95 +1,60 @@
-// pages/sign-up/SignUp.js
-import React, { useState } from 'react';
-import API from '../../../client/src/shared/API';
-import './styles/sign-up.style.css'; // CSS 파일 경로 확인 후 수정
+document.addEventListener('DOMContentLoaded', () => {
+  const signUpForm = document.querySelector('form');
+  if (!signUpForm) {
+    console.error('회원가입 폼을 찾을 수 없습니다.');
+    return;
+  }
 
-const SignUp = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [nickname, setNickname] = useState('');
+  signUpForm.addEventListener('submit', async (event) => {
+    event.preventDefault(); // 폼의 기본 동작을 막습니다.
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+    // 폼 데이터 가져오기
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const passwordConfirm = document.getElementById(
+      'confirm-signup-password'
+    ).value;
+    const nickname = document.getElementById('nickname').value;
 
-    // 회원 가입 정보 객체
-    const signUpData = {
-      email,
-      password,
-      passwordConfirm,
-      nickname,
-    };
-
-    console.log('전송할 데이터:', signUpData); // 데이터 확인
+    // 비밀번호 확인
+    if (password !== passwordConfirm) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
 
     try {
-      const response = await API.post(
-        '/auth/sign-up',
-        JSON.stringify(signUpData)
+      console.log(
+        '🚀 ~ signUpForm.addEventListener ~ JSON.stringify({ email, password, passwordConfirm, nickname }:',
+        JSON.stringify({ email, password, passwordConfirm, nickname })
       );
-      console.log(response); // 성공 응답 처리
-      // 여기서 성공 후 처리 로직 추가 (예: 알림 메시지, 리디렉션 등)
+
+      const response = await fetch('http://localhost:4000/api/auth/sign-up', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, passwordConfirm, nickname }),
+      });
+
+      const result = await response.json();
+
+      if (result.status === 201) {
+        // 사용자 정의 알림 표시
+        const notification = document.getElementById('notification');
+        const confirmBtn = document.getElementById('confirm-btn');
+        notification.classList.remove('hidden'); // 알림 표시
+
+        // 확인 버튼 클릭 시 페이지 이동
+        confirmBtn.addEventListener('click', () => {
+          window.location.href = './email-confirmation.html';
+        });
+      } else {
+        // 오류 처리
+        alert(result.message || '회원가입에 실패했습니다.');
+      }
     } catch (error) {
-      console.error(
-        '회원 가입 실패:',
-        error.response ? error.response.data : error.message
-      ); // 오류 응답 처리
-      // 여기서 오류 처리 로직 추가 (예: 알림 메시지 표시)
+      console.error('회원가입 요청 중 오류 발생:', error);
+      alert('회원가입 요청 중 오류가 발생했습니다.');
     }
-  };
-
-  return (
-    <div className="container1">
-      <h1>회원 가입</h1>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="signup-email">이메일 (Email)</label>
-        <input
-          type="email"
-          id="signup-email"
-          placeholder="example@example.com"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)} // 이메일 상태 업데이트
-        />
-
-        <label htmlFor="signup-password">비밀번호 (Password)</label>
-        <input
-          type="password"
-          id="signup-password"
-          placeholder="********"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)} // 비밀번호 상태 업데이트
-        />
-
-        <label htmlFor="confirm-signup-password">
-          비밀번호 확인 (Password Confirm)
-        </label>
-        <input
-          type="password"
-          id="confirm-signup-password"
-          placeholder="********"
-          required
-          value={passwordConfirm}
-          onChange={(e) => setPasswordConfirm(e.target.value)} // 비밀번호 확인 상태 업데이트
-        />
-
-        <label htmlFor="nickname">닉네임 (Nickname)</label>
-        <input
-          type="text"
-          id="nickname"
-          placeholder="홍길동"
-          required
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)} // 닉네임 상태 업데이트
-        />
-
-        {/* <label htmlFor="extra">프로필 이미지(프로필)</label>
-        <input type="text" id="extra" placeholder="imageUrl??" /> */}
-
-        <button type="submit">회원 가입하기</button>
-      </form>
-    </div>
-  );
-};
-export default SignUp;
+  });
+});
