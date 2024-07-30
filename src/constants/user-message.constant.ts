@@ -10,7 +10,14 @@ export const USER_MESSAGES = {
       EXISTING_NICKNAME: '이미 사용중인 닉네임입니다.',
     },
   },
-  DELETE_ME: {},
+  DELETE_ME: {
+    NOT_FOUND: '회원이 존재하지 않습니다.',
+    SUCCESS: '회원 탈퇴에 성공했습니다.',
+    FAILURE: {
+      NO_EMAIL: '삭제할 이메일을 입력해 주세요.',
+      NO_PASSWORD: '삭제할 패스워드를 입력해 주세요.',
+    },
+  },
   READ: {
     SUCCESS: '사용자 정보 조회에 성공했습니다.',
     FAILURE: {

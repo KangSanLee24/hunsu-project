@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { ChatRoom } from './entities/chat-room.entity';
@@ -8,6 +8,7 @@ import { User } from 'src/user/entities/user.entity';
 import { ChatMember } from './entities/chat-member.entity';
 import moment from 'moment';
 import { format } from 'date-fns';
+import { ChatLog } from './entities/chat-log.entity';
 
 @Injectable()
 export class ChatService {
@@ -15,7 +16,9 @@ export class ChatService {
     @InjectRepository(ChatRoom)
     private readonly chatRoomRepository: Repository<ChatRoom>,
     @InjectRepository(ChatMember)
-    private readonly chatMemberRepository: Repository<ChatMember>
+    private readonly chatMemberRepository: Repository<ChatMember>,
+    @InjectRepository(ChatLog)
+    private readonly chatLogRepository: Repository<ChatLog>
   ) {}
   
   //채팅방 생성자 (채팅방 오너) 체크
@@ -90,6 +93,15 @@ export class ChatService {
 
   async joinChatRoom(chatRoomId: number, user: User) {
 
+    //100명 제한
+    const checkJoin = await this.memberCount(chatRoomId);
+
+    if(checkJoin.user_count >= 100) {
+      throw new BadRequestException(
+        '채팅 제한 인원 100명 이상으로 입장 하실 수 없습니다.'
+      );
+    };
+
     const chatRoom = await this.chatRoomRepository.findOne({
       where: {id: chatRoomId}
     });
@@ -123,5 +135,30 @@ export class ChatService {
     );
 
     return outChatMember;
+  }
+
+  //채팅방 인원 계산
+
+  async memberCount(chatRoomId: number) {
+
+    const membercount = await this.chatMemberRepository.query(
+      `select count(user_id) as user_count
+        from chat_members
+        group by room_id
+        having room_id = ${chatRoomId};`
+    );
+
+    return membercount;
+  }
+
+  //채팅방 마지막 채팅 시간
+
+  async chatLastTime(chatRoomId: number) {
+
+    const chatLastTime = await this.chatLogRepository.query(
+      ``
+    )
+
+    return chatLastTime;
   }
 }
