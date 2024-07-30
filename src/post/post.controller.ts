@@ -10,6 +10,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dtos/create-post.dto';
@@ -20,6 +21,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Category } from './types/postCategory.type';
 
 @ApiTags('게시글 API')
 @Controller('posts')
@@ -45,8 +47,11 @@ export class PostController {
   /** 게시글 목록 조회 API **/
   @ApiOperation({ summary: '게시글 목록 조회 API' })
   @Get()
-  async findAll() {
-    const findAllPost = await this.postService.findAll();
+  async findAll(
+    @Query('category') category?: Category,
+    @Query('sort') sort: 'asc' | 'desc' = 'desc'
+  ) {
+    const findAllPost = await this.postService.findAll(category, sort);
 
     return {
       statusCode: HttpStatus.OK,

@@ -12,7 +12,7 @@ import { POST_MESSAGE } from 'src/constants/post-message.constant';
 import { User } from 'src/user/entities/user.entity';
 import { AwsService } from 'src/aws/aws.service';
 import { PostImage } from './entities/post-image.entity';
-// import { Category } from './types/postCategory.type';
+import { Category } from './types/postCategory.type';
 
 @Injectable()
 export class PostService {
@@ -56,10 +56,13 @@ export class PostService {
     };
   }
   /*게시글 목록 조회 API*/
-  async findAll() {
+  async findAll(category?: Category, sort: 'asc' | 'desc' = 'desc') {
+    // 카테고리에 따른 정렬
+    const sortCategory = category ? { category } : {};
     const posts = await this.postRepository.find({
+      where: sortCategory,
       relations: ['user', 'comments'],
-      order: { createdAt: 'DESC' }, // 최신순 정렬
+      order: { createdAt: sort ? sort : 'DESC' }, // 정렬조건
     });
     return posts.map((post) => ({
       id: post.id,
