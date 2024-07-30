@@ -13,6 +13,7 @@ import { User } from 'src/user/entities/user.entity';
 import { AwsService } from 'src/aws/aws.service';
 import { PostImage } from './entities/post-image.entity';
 import { Category } from './types/post-category.type';
+import { Order } from './types/post-order.type';
 
 @Injectable()
 export class PostService {
@@ -56,7 +57,7 @@ export class PostService {
     };
   }
   /*게시글 목록 조회 API*/
-  async findAll(category?: Category, sort: 'asc' | 'desc' = 'desc') {
+  async findAll(category?: Category, sort?: Order) {
     // 카테고리에 따른 정렬
     const sortCategory = category ? { category } : {};
     const posts = await this.postRepository.find({

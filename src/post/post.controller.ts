@@ -27,6 +27,7 @@ import { LogIn } from 'src/decorators/log-in.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Category } from './types/post-category.type';
+import { Order } from './types/post-order.type';
 
 @ApiTags('게시글 API')
 @Controller('posts')
@@ -59,13 +60,13 @@ export class PostController {
   @ApiQuery({
     name: 'sort',
     required: false,
-    enum: ['ASC', 'DESC'],
+    enum: Order,
   })
   @Get()
   async findAll(
     @Query('category')
     category?: Category,
-    @Query('sort') sort: 'asc' | 'desc' = 'desc'
+    @Query('sort') sort?: Order
   ) {
     const findAllPost = await this.postService.findAll(category, sort);
 
