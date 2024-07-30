@@ -329,31 +329,7 @@ export class AuthService {
     };
   }
 
-  /** 아이디 찾기(find-id) API **/
-  async findId(findIdDto: FindIdDto) {
-
-    // 0. dto에서 데이터 꺼내기
-    const { email } = findIdDto;
-
-    // 1. 해당 email로 가입된 사용자가 있는지 확인
-    const user: User = await this.userService.findByEmail(email);
-
-    // 2. 해당 user가 없다면 에러메시지(404)
-    if (_.isNil(user)) {
-      throw new NotFoundException(AUTH_MESSAGES.LOG_IN.FAILURE.NO_USER);
-    }
-
-    // 3. 페이로드
-    const payload = { email, sub: user.id };
-
-    // 4. Access Token 발급 및 반환
-    return {
-      greeting: `당신의 아이디는 ${user.id} 입니다!`,
-      accessToken: this.jwtService.sign(payload),
-    };
-  }
-
-  // /** 비밀번호 바꾸기 API **/
+  // /** 6. 비밀번호 바꾸기 API **/
   // async rePassword(rePasswordDto: RePasswordDto) {
   //   // 0. dto에서 데이터 꺼내기
   //   const { password, passwordConfirm } = rePasswordDto;
@@ -377,4 +353,25 @@ export class AuthService {
   //   // 5. 반환
   //   return data;
   // }
+
+
+  /** 7. 아이디 찾기(find-id) API **/
+  async findId(findIdDto: FindIdDto) {
+
+    // 0. dto에서 데이터 꺼내기
+    const { nickname } = findIdDto;
+
+    // 1. 해당 email로 가입된 사용자가 있는지 확인
+    const user: User = await this.userService.findByNickname(nickname);
+
+    // 2. 해당 user가 없다면 에러메시지(404)
+    if (_.isNil(user)) {
+      throw new NotFoundException(AUTH_MESSAGES.FIND_ID.FAILURE.NO_USER);
+    }
+
+    // 3. 사용자 이메일 반환
+    return {
+      greeting: `당신의 아이디는 ${user.email} 입니다!`,
+    };
+  }
 }
