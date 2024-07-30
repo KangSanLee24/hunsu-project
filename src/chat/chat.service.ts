@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { ChatMember } from './entities/chat-member.entity';
 import moment from 'moment';
-import { format } from 'date-fns';
+import { format, isSameDay } from 'date-fns';
 import { ChatLog } from './entities/chat-log.entity';
 
 @Injectable()
@@ -155,10 +155,39 @@ export class ChatService {
 
   async chatLastTime(chatRoomId: number) {
 
-    const chatLastTime = await this.chatLogRepository.query(
-      ``
-    )
+    const chatLastTime = await this.chatLogRepository.findOne({
+      where: {roomId: chatRoomId},
+      select: {createdAt: true},
+      order: {createdAt: 'DESC'}
+    });
 
-    return chatLastTime;
+    if(!chatLastTime) {
+      return { 'message' : ' ' };
+    }
+
+    const formatTime = format(new Date(chatLastTime.createdAt), 'yyyy-MM-dd HH:mm');
+
+    //오늘인지 확인
+
+    const chatDate = new Date(chatLastTime.createdAt);
+    const nowDate = new Date();
+
+    const isToday = isSameDay(chatDate, nowDate);
+
+    if(isToday === true) {
+      const timeDifference = nowDate.getTime() - chatDate.getTime();
+
+      const diffInMinutes = Math.floor(timeDifference / (1000 * 60));  //분단위 환산 1분
+      const diffInHours = Math.floor(timeDifference / (1000 * 60 * 60));   //시간단위 환산 1시간
+
+      if( diffInMinutes < 60 ) {
+        return { 'message' : `${diffInMinutes}분 전` };
+      } else {
+        return { 'message' : `${diffInHours}시간 전` };
+      }
+
+    }else {
+      return { 'message' : formatTime };
+    }
   }
 }
