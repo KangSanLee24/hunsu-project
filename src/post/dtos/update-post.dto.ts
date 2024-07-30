@@ -1,7 +1,7 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreatePostDto } from './create-post.dto';
 import { Category } from '../types/postCategory.type';
-import { IsEnum } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
 
 export class UpdatePostDto extends PartialType(CreatePostDto) {
   @ApiProperty({ example: '내가 한 수 보여주지!' })
@@ -11,6 +11,7 @@ export class UpdatePostDto extends PartialType(CreatePostDto) {
   content: string;
 
   @IsEnum(Category)
+  @IsOptional()
   @ApiProperty({ example: 'CHAT', enum: Category })
   category?: Category;
 }
