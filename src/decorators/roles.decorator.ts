@@ -1,4 +1,4 @@
-import { Role } from 'src/user/types/userRole.type';
+import { Role } from 'src/user/types/user-role.type';
 
 import { SetMetadata } from '@nestjs/common';
 

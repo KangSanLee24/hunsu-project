@@ -25,6 +25,7 @@ import { RefreshToken } from './entities/refresh-token.entity';
 import { VerifyEmailDto } from './dtos/verify-email.dto';
 import { VerifyEmail } from 'src/mail/entities/verify-email.entity';
 import { MailService } from 'src/mail/mail.service';
+import { SocialType } from 'src/user/types/social-type.type';
 
 @Injectable()
 export class AuthService {
@@ -321,4 +322,91 @@ export class AuthService {
       verified: email,
     };
   }
+
+  /** 6-1. 소셜로그인 - 네이버 **/
+  async logInNaver(req: any) {
+    try {
+      // 0. 필요한 정보 받아오기 + 생성
+      const naverUser = req.user;
+      const hashedPassword = await hash(naverUser.id, 10);
+      const user = {
+        email: `${naverUser.id}@naver.com`,
+        nickname: `NAVER${naverUser.id}`,
+        password: hashedPassword,
+        verifyEmail: true,
+        socialId: naverUser.id,
+        type: SocialType.NAVER,
+      };
+
+      // 1. 가입한 회원인지 확인
+      const isExistingUser = await this.userRepository.findOneBy({
+        email: user.email,
+      });
+      // 1-1. 가입한 회원이 아니라면 소셜계정으로 회원가입
+
+      if (!isExistingUser) {
+        // 2. 트랜잭션 시작
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        // 3. 트랜잭션 묶기
+        try {
+          // 3-1. 신규 회원 데이터 생성 (회원 가입)
+          const newMember = await queryRunner.manager.save(User, {
+            email: user.email,
+            nickname: user.nickname,
+            password: user.password,
+            verifiedEmail: user.verifyEmail,
+            socialId: user.socialId,
+            type: user.type,
+          });
+          // 3-2. 포인트 테이블 생성 (포인트)
+          const newPoint = await queryRunner.manager.save(Point, {
+            userId: newMember.id,
+            accPoint: 0,
+          });
+
+          // 3-3. 성공: 트랜잭션 묶음 종료: commit
+          await queryRunner.commitTransaction();
+          // 3-4-성공시. 트랜잭션 된 상태를 release하면서 트랜잭션 최종완료
+          await queryRunner.release();
+        } catch (err) {
+          // 3-3. 실패: 도중에 에러 발생시: rollback
+          await queryRunner.rollbackTransaction();
+          // 3-4-실패시. 롤백된 상태를 release하면서 트랜잭션 최종완료
+          await queryRunner.release();
+
+          // 3-5. 에러처리
+          throw new UnauthorizedException(
+            '[네이버 로그인] 가입에서 오류가 발생하였습니다.'
+          );
+        }
+      }
+
+      // 4. 로그인
+      const logInDto = {
+        email: user.email,
+        password: naverUser.id,
+      };
+      const data = await this.logIn(logInDto);
+
+      // 5. 반환
+      return data;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  /** 6-2. 소셜로그인 - 구글 **/
+  async logInGoogle() {}
+
+  // /** 토큰 발급 **/
+  // async createToken(user, refresh) {
+  //   const payload = {
+  //     type: refresh ? 'RF' : 'AC',
+  //     email: user.email,
+  //     sub: user.id,
+  //   };
+  //   const key = refresh ?
+  // }
 }
