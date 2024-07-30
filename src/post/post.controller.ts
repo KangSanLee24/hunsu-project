@@ -1,34 +1,121 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpStatus,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
+import { AuthGuard, IAuthGuard, Type } from '@nestjs/passport';
+import { POST_MESSAGE } from 'src/constants/post-message.constant';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { LogIn } from 'src/decorators/log-in.decorator';
+import { User } from 'src/user/entities/user.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
 
-@Controller('post')
+@ApiTags('게시글 API')
+@Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
+  /** 게시글 생성 API **/
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '게시글 생성 API' })
   @Post()
-  create(@Body() createPostDto: CreatePostDto) {
-    return this.postService.create(createPostDto);
+  async create(@LogIn() user: User, @Body() createPostDto: CreatePostDto) {
+    const userId = user.id;
+    const createdPost = await this.postService.create(createPostDto, userId);
+
+    return {
+      status: HttpStatus.CREATED,
+      message: POST_MESSAGE.POST.CREATE.SUCCESS,
+      data: createdPost,
+    };
   }
 
+  /** 게시글 목록 조회 API **/
+  @ApiOperation({ summary: '게시글 목록 조회 API' })
   @Get()
-  findAll() {
-    return this.postService.findAll();
+  async findAll() {
+    const findAllPost = await this.postService.findAll();
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.READ_ALL.SUCCESS,
+      data: findAllPost,
+    };
   }
 
+  /** 게시글 상세 조회 API **/
+  @ApiOperation({ summary: '게시글 상세 조회 API' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(+id);
+  async findOne(@Param('id') id: number) {
+    const findOnePost = await this.postService.findOne(id);
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.READ_DETAIL.SUCCESS,
+      data: findOnePost,
+    };
   }
 
+  /** 게시글 수정 API **/
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '게시글 수정 API' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(+id, updatePostDto);
+  async update(
+    @LogIn() user: User,
+    @Param('id') id: number,
+    @Body() updatePostDto: UpdatePostDto
+  ) {
+    const userId = user.id;
+    const updatedPost = await this.postService.update(
+      id,
+      updatePostDto,
+      userId
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.UPDATE.SUCCESS,
+      data: updatedPost,
+    };
   }
 
+  /** 게시글 삭제 API **/
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '게시글 삭제 API' })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+  async remove(@LogIn() user: User, @Param('id') id: number) {
+    const userId = user.id;
+    await this.postService.remove(id, userId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.DELETE.SUCCESS,
+    };
+  }
+  /** 이미지 업로드 API **/
+  @ApiOperation({ summary: '게시글 이미지 업로드 API' })
+  @Post(':id/image')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    const uploadedImageUrl = await this.postService.uploadPostImage(id, file);
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.IMAGE.UPLOAD.SUCCESS,
+      data: uploadedImageUrl,
+    };
   }
 }

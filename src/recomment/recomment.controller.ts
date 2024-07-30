@@ -1,34 +1,88 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  ForbiddenException,
+  HttpStatus,
+} from '@nestjs/common';
 import { RecommentService } from './recomment.service';
 import { CreateRecommentDto } from './dtos/create-recomment.dto';
-import { UpdateRecommentDto } from './dtos/update-recomment.dto';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { LogIn } from 'src/decorators/log-in.decorator';
+import { User } from 'src/user/entities/user.entity';
+import { AuthGuard } from '@nestjs/passport';
 
-@Controller('recomment')
+@UseGuards(AuthGuard('jwt'))
+@ApiTags('대댓글 API')
+@ApiBearerAuth()
+@Controller('comments')
 export class RecommentController {
   constructor(private readonly recommentService: RecommentService) {}
 
-  @Post()
-  create(@Body() createRecommentDto: CreateRecommentDto) {
-    return this.recommentService.create(createRecommentDto);
+  /** 대댓글 생성 **/
+  @ApiOperation({ summary: '대댓글 생성 API' })
+  @ApiResponse({ status: HttpStatus.CREATED })
+  @Post(':commentId/recomments')
+  async createRecomment(
+    @Param('commentId') commentId: number,
+    @LogIn() user: User,
+    @Body() createRecommentDto: CreateRecommentDto
+  ) {
+    return await this.recommentService.createRecomment(
+      +commentId,
+      user,
+      createRecommentDto
+    );
   }
 
-  @Get()
-  findAll() {
-    return this.recommentService.findAll();
+  /** 대댓글 수정 **/
+  @ApiOperation({ summary: '대댓글 수정 API' })
+  @Patch(':commentId/recomments/:recommentId')
+  async updateRecomment(
+    @Param('commentId') commentId: number,
+    @Param('recommentId') recommentId: number,
+    @LogIn() user: User,
+    @Body() createRecommentDto: CreateRecommentDto
+  ) {
+    const recomment = await this.recommentService.findRecomment(recommentId);
+
+    if (recomment.userId != user.id) {
+      throw new ForbiddenException('작성자가 아닙니다.');
+    }
+
+    return await this.recommentService.updateRecomment(
+      +commentId,
+      +recommentId,
+      createRecommentDto
+    );
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.recommentService.findOne(+id);
-  }
+  /** 대댓글 삭제 **/
+  @ApiOperation({ summary: '대댓글 삭제 API' })
+  @Delete(':commentsId/recomments/:recommentId')
+  async removeRecomment(
+    @Param('commentId') commentId: number,
+    @Param('recommentId') recommentId: number,
+    @LogIn() user: User
+  ) {
+    const recomment = await this.recommentService.findRecomment(recommentId);
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRecommentDto: UpdateRecommentDto) {
-    return this.recommentService.update(+id, updateRecommentDto);
-  }
+    if (recomment.userId != user.id) {
+      throw new ForbiddenException('작성자가 아닙니다.');
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.recommentService.remove(+id);
+    return await this.recommentService.removeRecomment(
+      +commentId,
+      +recommentId
+    );
   }
 }
