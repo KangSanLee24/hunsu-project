@@ -12,7 +12,7 @@ import { POST_MESSAGE } from 'src/constants/post-message.constant';
 import { User } from 'src/user/entities/user.entity';
 import { AwsService } from 'src/aws/aws.service';
 import { PostImage } from './entities/post-image.entity';
-import { Category } from './types/postCategory.type';
+import { Category } from './types/post-category.type';
 
 @Injectable()
 export class PostService {

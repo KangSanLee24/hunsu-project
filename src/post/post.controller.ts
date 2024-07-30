@@ -17,11 +17,16 @@ import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { AuthGuard, IAuthGuard, Type } from '@nestjs/passport';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Category } from './types/postCategory.type';
+import { Category } from './types/post-category.type';
 
 @ApiTags('게시글 API')
 @Controller('posts')
@@ -46,9 +51,20 @@ export class PostController {
 
   /** 게시글 목록 조회 API **/
   @ApiOperation({ summary: '게시글 목록 조회 API' })
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    enum: Category,
+  })
+  @ApiQuery({
+    name: 'sort',
+    required: false,
+    enum: ['ASC', 'DESC'],
+  })
   @Get()
   async findAll(
-    @Query('category') category?: Category,
+    @Query('category')
+    category?: Category,
     @Query('sort') sort: 'asc' | 'desc' = 'desc'
   ) {
     const findAllPost = await this.postService.findAll(category, sort);

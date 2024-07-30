@@ -13,7 +13,7 @@ import { PostImage } from './post-image.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { PostLike } from 'src/like/entities/post-like.entity';
 import { PostDislike } from 'src/dislike/entities/post-dislike.entity';
-import { Category } from '../types/postCategory.type';
+import { Category } from '../types/post-category.type';
 
 @Entity({ name: 'posts' })
 export class Post {
