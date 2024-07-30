@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Chat } from './pages/chat-room/chat.js';
 import { ChatList } from './pages/chat-list/chat-list.js';
-import { Main } from './pages/main/main.js'; // Main 컴포넌트 추가
-import SignUp from './pages/sign-up/sign-up.js'; // SignUp 컴포넌트 import
+import { Main } from './pages/main/main.js';
+import SignUp from './pages/sign-up/sign-up.js';
 import LogIn from './pages/log-in/log-in.js';
 import FindPassword from './pages/find-pw/find-pw.js';
 import ResetPassword from './pages/reset-pw/reset-pw.js';
