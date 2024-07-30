@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import './styles/chat-list.css'
+import '../../shared/styles/util.style.css';
+import './styles/chat-list.css';
 
 export function ChatList() {
   const [chatRooms, setChatRooms] = useState([]);
 
   useEffect(() => {
-    // 채팅방 목록 조회 api 호출 
+    // 채팅방 목록 조회 api 호출
     fetch('/api/chatrooms')
       .then(response => response.json())
       .then(data => {
@@ -31,7 +32,7 @@ export function ChatList() {
           setChatRooms(chatWithInfo);
         });
       })
-      .catch(error => console.error('Error fetching chat rooms:', error));
+      .catch((error) => console.error('Error fetching chat rooms:', error));
   }, []);
 
   return (
@@ -40,10 +41,12 @@ export function ChatList() {
       <ul>
         {chatRooms.map((room, index) => (
           <li key={index}>
-            <Link to={`/chat/${room.id}`}
-                  state={{title: room.title}}
-                  className="chat-list-link">
-                <div className="chat-room-info">
+            <Link
+              to={`/chat/${room.id}`}
+              state={{ title: room.title }}
+              className="chat-list-link"
+            >
+              <div className="chat-room-info">
                 <span className="chat-room-name">{room.title}</span>
                 <span className="chat-room-user">{room.user.nickname}</span>
                 <span className="chat-room-count">
