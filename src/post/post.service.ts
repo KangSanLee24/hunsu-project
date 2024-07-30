@@ -159,6 +159,7 @@ export class PostService {
     const fileUrl = await this.awsService.imageUploadToS3(
       // 업로드
       `${Date.now()}_${fileName}`, // 이미지 이름과 URL이 같고 이미지는 다르게 되는 경우를 방지하고자 날짜를 넣음
+      'posts',
       file,
       fileExt
     );
