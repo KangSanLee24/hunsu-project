@@ -27,5 +27,11 @@ export const POST_MESSAGE = {
     DELETE: {
       SUCCESS: '댓글 삭제에 성공하였습니다.',
     },
+    // 이미지 업로드
+    IMAGE: {
+      UPLOAD: {
+        SUCCESS: '이미지 업로드에 성공하습니다.',
+      },
+    },
   },
 };
