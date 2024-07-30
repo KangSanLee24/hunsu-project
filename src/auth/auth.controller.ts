@@ -1,31 +1,23 @@
-import {
-  HttpStatus,
-  Controller,
-  UseGuards,
-  Body,
-  Query,
-  Post,
-  Delete,
-  Patch,
-} from '@nestjs/common';
+import { Controller, Patch, Post, Body, HttpStatus, Get, UseGuards, Delete } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-
-import { LogIn } from 'src/decorators/log-in.decorator';
-import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from './auth.service';
-
-import { User } from 'src/user/entities/user.entity';
 
 import { SignUpDto } from './dtos/sign-up.dto';
 import { LogInDto } from './dtos/log-in.dto';
+import { FindIdDto } from './dtos/find-id.dto';
+// import { RePasswordDto } from './dtos/re-password.dto';
+
+import { AuthService } from './auth.service';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
+import { User } from 'src/user/entities/user.entity';
+import { AuthGuard } from '@nestjs/passport';
+import { LogIn } from 'src/decorators/log-in.decorator';
 import { Token } from 'src/decorators/token.decorator';
 import { VerifyEmailDto } from './dtos/verify-email.dto';
 
 @ApiTags('1. AUTH API')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   /** 1. 회원 가입(sign-up) API **/
   @ApiOperation({ summary: '1. 회원 가입(sign-up) API' })
@@ -90,3 +82,16 @@ export class AuthController {
     };
   }
 }
+// /** 비밀번호 바꾸기 API **/
+// @ApiOperation({ summary: '비밀번호 바꾸기 API' })
+// @Patch('re-password')
+// async rePassword(
+//   @Body() rePasswordDto: RePasswordDto
+// ) {
+//   const data = await this.authService.rePassword(rePasswordDto);
+//   return {
+//     status: HttpStatus.OK,
+//     // message: USER_MESSAGES.UPDATE_ME.SUCCESS,
+//     message: "비밀번호 바꾸기를 성공하셨습니다.",
+//   };
+// }

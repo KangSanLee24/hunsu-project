@@ -8,24 +8,28 @@ import {
   Delete,
   HttpStatus,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { AuthGuard, IAuthGuard, Type } from '@nestjs/passport';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { User } from 'src/user/entities/user.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
 
-@ApiTags('POSTS API')
+@ApiTags('게시글 API')
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  /*게시글 생성 API */
+  /** 게시글 생성 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
+  @ApiOperation({ summary: '게시글 생성 API' })
   @Post()
   async create(@LogIn() user: User, @Body() createPostDto: CreatePostDto) {
     const userId = user.id;
@@ -38,7 +42,8 @@ export class PostController {
     };
   }
 
-  /*게시글 목록 조회 API */
+  /** 게시글 목록 조회 API **/
+  @ApiOperation({ summary: '게시글 목록 조회 API' })
   @Get()
   async findAll() {
     const findAllPost = await this.postService.findAll();
@@ -50,7 +55,8 @@ export class PostController {
     };
   }
 
-  /* 게시글 상세 조회 API*/
+  /** 게시글 상세 조회 API **/
+  @ApiOperation({ summary: '게시글 상세 조회 API' })
   @Get(':id')
   async findOne(@Param('id') id: number) {
     const findOnePost = await this.postService.findOne(id);
@@ -61,9 +67,10 @@ export class PostController {
     };
   }
 
-  /*게시글 수정 API*/
+  /** 게시글 수정 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
+  @ApiOperation({ summary: '게시글 수정 API' })
   @Patch(':id')
   async update(
     @LogIn() user: User,
@@ -83,9 +90,10 @@ export class PostController {
     };
   }
 
-  /*게시글 삭제 API*/
+  /** 게시글 삭제 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
+  @ApiOperation({ summary: '게시글 삭제 API' })
   @Delete(':id')
   async remove(@LogIn() user: User, @Param('id') id: number) {
     const userId = user.id;
@@ -93,6 +101,21 @@ export class PostController {
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.DELETE.SUCCESS,
+    };
+  }
+  /** 이미지 업로드 API **/
+  @ApiOperation({ summary: '게시글 이미지 업로드 API' })
+  @Post(':id/image')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    const uploadedImageUrl = await this.postService.uploadPostImage(id, file);
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.IMAGE.UPLOAD.SUCCESS,
+      data: uploadedImageUrl,
     };
   }
 }
