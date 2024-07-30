@@ -7,7 +7,7 @@ import { User } from 'src/user/entities/user.entity';
 import { LogIn } from 'src/decorators/log-in.decorator';
 
 //@UseGuards(JwtStrategy)
-@ApiTags('chat')
+@ApiTags('채팅 API')
 @Controller('chatrooms')
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
@@ -56,6 +56,24 @@ export class ChatController {
   @Post(':chatRoomId/join')
   async joinChatRoom(@Param('chatRoomId') chatRoomId: string, @LogIn() user: User) {
     return await this.chatService.joinChatRoom(+chatRoomId, user);
+  }
+
+  /**
+   * 채팅방 채팅 내역 저장
+   * @returns
+   */
+  @Post(':chatRoomId/chatting')
+  async sendChatRoom(@Param('chatRoomId') chatRoomId: string, @LogIn() user: User) {
+    return await this.chatService.sendChatRoom(+chatRoomId, user);
+  }
+
+  /**
+   * 채팅방 이미지 전송
+   * @returns
+   */
+  @Post(':chatRoomId/image')
+  async sendImageRoom(@Param('chatRoomId') chatRoomId: string, @LogIn() user: User) {
+    return await this.chatService.sendImageRoom(+chatRoomId, user);
   }
 
   /**
