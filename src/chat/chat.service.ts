@@ -190,4 +190,14 @@ export class ChatService {
       return { 'message' : formatTime };
     }
   }
+
+  //채팅방 채팅 내역 저장
+  async sendChatRoom(chatRoomId: number, user: User) {
+    
+  }
+
+  //채팅방 이미지 전송
+  async sendImageRoom(chatRoomId: number, user: User) {
+
+  }
 }
