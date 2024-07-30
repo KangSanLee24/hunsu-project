@@ -1,4 +1,9 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  ForbiddenException
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -7,6 +12,7 @@ import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { USER_MESSAGES } from 'src/constants/user-message.constant';
 import { PointLog } from './entities/point-log.entity';
+import { SoftdeleteUserDto } from './dtos/softdelete-user.dto';
 
 @Injectable()
 export class UserService {
@@ -19,7 +25,7 @@ export class UserService {
 
     @InjectRepository(PointLog)
     private pointLogRepository: Repository<PointLog>
-  ) {}
+  ) { }
 
   /** 내 정보 조회(R) API **/
   async myProfile(user: User) {
@@ -125,5 +131,57 @@ export class UserService {
   /** nickname으로 사용자 찾기(+) **/
   async findByNickname(nickname: string) {
     return await this.userRepository.findOneBy({ nickname });
+  }
+
+  /** 비밀번호 바꾸기 API **/
+  async updateMyPassword(user: User, updateUserDto: UpdateUserDto) {
+    // 0. dto에서 데이터 꺼내기
+    const { nickname } = updateUserDto;
+
+    // 1. nickname을 변경한다면 중복이 존재하는지 확인
+    const isExistingNickname: User = await this.userRepository.findOneBy({
+      nickname,
+    });
+    // 1-1. 변경하고싶은 nickname이 이미 사용중인 nickname이면 에러처리
+    if (isExistingNickname) {
+      throw new ConflictException({
+        message: USER_MESSAGES.UPDATE_ME.FAILURE.EXISTING_NICKNAME,
+      });
+    }
+
+    // 2. 내 정보 수정
+    await this.userRepository.update(
+      { id: user.id },
+      { nickname: updateUserDto.nickname }
+    );
+
+    // 4. 데이터 가공
+    const data = {
+      before: {
+        nickname: user.nickname,
+      },
+      after: {
+        nickname: updateUserDto.nickname,
+      },
+    };
+
+    // 5. 반환
+    return data;
+  }
+
+  /** 회원탈퇴 API*/
+  async softdeleteUser(user: User, softdeleteUserDto: SoftdeleteUserDto) {
+    const foundUser = await this.userRepository.findOne({ where: { id: user.id } });
+
+    // 유저가 존재하는지 확인
+    if (!foundUser) {
+      throw new NotFoundException(USER_MESSAGES.DELETE_ME.NOT_FOUND);
+    }
+
+    // 유저 정보를 업데이트
+    user.nickname = `탈퇴한 회원입니다 : ${user.nickname}`
+    user.deletedAt = new Date();
+
+    return this.userRepository.save(user);
   }
 }

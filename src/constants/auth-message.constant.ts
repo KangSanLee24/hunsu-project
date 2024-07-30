@@ -10,6 +10,7 @@ export const AUTH_MESSAGES = {
       NO_PASSWORD_CONFIRM: '비밀번호 확인을 입력해 주세요.',
       EXISTING_EMAIL: '이미 사용중인 이메일입니다.',
       EXISTING_NICKNAME: '이미 사용중인 닉네임입니다.',
+      RESTORE: '해당 계정은 복구 대상입니다.',
       ETC: '회원 가입 중 알 수 없는 에러가 발생했습니다. 다시 시도해 주세요.',
     },
   },
@@ -41,6 +42,12 @@ export const AUTH_MESSAGES = {
     SUCCESS: '로그아웃에 성공했습니다.',
     FAILURE: {
       NO_TOKEN: '이미 로그아웃 된 상태입니다.',
+    },
+  },
+  RE_PASSWORD: {
+    SUCCESS: '비밀번호 바꾸기에 성공했습니다.',
+    FAILURE: {
+      NO_PASSWORD: '비밀번호를 입력해 주세요.',
     },
   },
   JWT: {
