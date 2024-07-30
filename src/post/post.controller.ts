@@ -89,6 +89,18 @@ export class PostController {
     };
   }
 
+  /** 화제글 목록 조회 API **/
+  // @ApiOperation({ summary: '화제글 목록 조회 API' })
+  // @Get('hot')
+  // async findHotPost() {
+  //   const hotPosts = await this.postService.findAll();
+  //   return {
+  //     statusCode: HttpStatus.OK,
+  //     message: POST_MESSAGE.POST.READ_HOT.SUCCESS,
+  //     data: hotPosts,
+  //   };
+  // }
+
   /** 게시글 수정 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()

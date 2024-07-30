@@ -38,6 +38,10 @@ export class Post {
   @Column({ type: 'text' })
   content: string;
 
+  // 좋아요수 = numLikes, int
+  @Column({ type: 'int', default: 0 })
+  numLikes: number;
+
   // 생성일시 = createdAt, Date
   @CreateDateColumn()
   createdAt: Date;

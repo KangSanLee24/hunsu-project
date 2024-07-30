@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
@@ -111,10 +111,16 @@ export class PostService {
   }
 
   /*화제글 목록 조회 API*/
-  // [누적 좋아요]
-  // /posts/hot
-  // 화제글 목록 조회
-  // 주석처리하고 지금 기준으로 일주일 좋아요 많은 순으로
+  // async findHotPost() {
+  //   const now = new Date(); // 현재시간
+  //   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 현재시간으로부터 일주일전
+
+  //   const posts = await this.postRepository.find({
+  //     where: { createdAt: MoreThan(weekAgo) },
+  //     relations: ['user', 'postImages', 'comments', 'postLikes'],
+  //     order: { numLikes: 'DESC' },
+  //   });
+  // }
 
   /*게시글 수정 API*/
   async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
