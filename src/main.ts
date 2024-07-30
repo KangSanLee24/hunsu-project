@@ -22,6 +22,12 @@ async function bootstrap() {
     })
   );
 
+  // CORS 설정
+  app.enableCors({
+    origin: 'http://localhost:3000', // 허용할 도메인
+    credentials: true, // 인증 정보 허용
+  });
+
   // Swagger 문서 준비
   const config = new DocumentBuilder()
     .setTitle('p6-hunsu-project')

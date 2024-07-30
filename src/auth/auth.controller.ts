@@ -23,6 +23,7 @@ export class AuthController {
   @ApiOperation({ summary: '1. 회원 가입(sign-up) API' })
   @Post('sign-up')
   async signUp(@Body() signUpDto: SignUpDto) {
+    console.log('회원 가입 요청 데이터:', signUpDto); // 요청 데이터 확인
     const data = await this.authService.signUp(signUpDto);
     return {
       status: HttpStatus.CREATED,
