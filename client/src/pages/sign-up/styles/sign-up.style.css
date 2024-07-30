@@ -4,10 +4,17 @@ body {
   padding: 0;
   background-color: #f5f5f5;
 }
+html {
+  height: 100vh;
+}
 
-.container {
+root {
+  margin-top: -100px;
+}
+
+.container1 {
   max-width: 400px;
-  margin: 50px auto;
+  margin: 175px auto;
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
