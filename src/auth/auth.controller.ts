@@ -1,4 +1,13 @@
-import { Controller, Patch, Post, Body, HttpStatus, Get, UseGuards, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Patch,
+  Post,
+  Body,
+  HttpStatus,
+  Get,
+  UseGuards,
+  Delete,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { SignUpDto } from './dtos/sign-up.dto';
@@ -17,12 +26,13 @@ import { VerifyEmailDto } from './dtos/verify-email.dto';
 @ApiTags('1. AUTH API')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   /** 1. 회원 가입(sign-up) API **/
   @ApiOperation({ summary: '1. 회원 가입(sign-up) API' })
   @Post('sign-up')
   async signUp(@Body() signUpDto: SignUpDto) {
+    console.log('회원 가입 요청 데이터:', signUpDto); // 요청 데이터 확인
     const data = await this.authService.signUp(signUpDto);
     return {
       status: HttpStatus.CREATED,
