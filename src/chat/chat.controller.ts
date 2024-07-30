@@ -31,6 +31,15 @@ export class ChatController {
     return await this.chatService.findChatRooms();
   }
 
+  // /**
+  //  * 채팅방 내역 조회
+  //  * @returns
+  //  */
+  // @Get(':chatRoomId')
+  // async findChatting(@Param('chatRoomId') chatRoomId: string) {
+  //   return await this.chatService.findChatting(+chatRoomId);
+  // }
+
   /**
    * 채팅방 인원 계산
    * @returns

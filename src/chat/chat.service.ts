@@ -200,4 +200,13 @@ export class ChatService {
   async sendImageRoom(chatRoomId: number, user: User) {
 
   }
+
+  // async findChatting(chatRoomId: number) {
+    
+  //   const findChatting = await this.chatRoomRepository.findOne({
+  //     where: {id: chatRoomId}
+  //   });
+
+  //   return { 'message' : findChatting.title}
+  // }
 }
