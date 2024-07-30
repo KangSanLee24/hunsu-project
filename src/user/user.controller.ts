@@ -73,7 +73,7 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '회원탈퇴 API' })
-  @Patch('me/softdelete')
+  @Delete('me')
   async softdeleteUser(
     @LogIn() user: User,
     @Body() softdeleteUserDto: SoftdeleteUserDto

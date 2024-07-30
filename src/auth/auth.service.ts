@@ -121,7 +121,7 @@ export class AuthService {
       // 4-4. 이메일 중복 예외 처리
       if (err instanceof QueryFailedError && err.driverError.code === 'ER_DUP_ENTRY') {
         throw new ConflictException(
-          AUTH_MESSAGES.SIGN_UP.FAILURE.DUPLICATE
+          AUTH_MESSAGES.SIGN_UP.FAILURE.RESTORE
         );
       }
       // 5. 에러처리
