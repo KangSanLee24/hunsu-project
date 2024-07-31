@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config/config.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   const verifyEmailForm = document.getElementById('verify-email-form');
   if (!verifyEmailForm) {
@@ -13,16 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const token = document.getElementById('token').value;
 
     try {
-      const response = await fetch(
-        'http://localhost:4000/api/auth/verify-email',
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, certification: parseInt(token, 10) }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, certification: parseInt(token, 10) }),
+      });
 
       const result = await response.json();
 
