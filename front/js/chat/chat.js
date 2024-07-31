@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageInput = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendButton');
     const roomNameElement = document.getElementById('roomName');
+    const fileInput = document.getElementById('fileInput'); 
+    const imagePreview = document.getElementById('imagePreview');
+    let file = null; // 파일 변수 초기화
 
     let currentUser = generateUserName(); 
 
@@ -30,7 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function addMessage(message) {
         const messageElement = document.createElement('div');
         messageElement.className = `chat-message ${currentUser === message.author ? 'outgoing' : ''}`;
-        messageElement.innerHTML = `
+        if(message.body){
+            messageElement.innerHTML = `
             <div class="chat-message-wrapper">
                 <span class="chat-message-author">${message.author}</span>
                 <div class="chat-message-bubble">
@@ -38,6 +42,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
+        } else if (message.fileUrl) {
+            messageElement.innerHTML = `
+            <div class="chat-message-wrapper">
+                <span class="chat-message-author">${message.author}</span>
+                <div class="chat-message-bubble">
+                    <img src="${message.fileUrl}" alt="Chat Image" style="max-width: 100%; height: auto;" />
+                </div>
+            </div>
+        `;
+        }
+
         chatScroll.appendChild(messageElement);
         scrollToBottom();
     }
@@ -51,14 +66,52 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessage(newMessage);
     });
 
+    // 서버로부터 'chatImage' 이벤트 수신
+    socket.on('chatImage', (ImageMessage) => {
+        console.log('새로운 이미지 수신:', ImageMessage);
+        addMessage(ImageMessage);
+    });
+
     // 메시지 전송 버튼 클릭 이벤트 처리   
     sendButton.addEventListener('click', () => {
         const inputValue = messageInput.value.trim();
-        if (inputValue.length === 0) return;
+        const imageExists = file ? true : false;
 
-        console.log('전송할 메시지:', inputValue);
-        socket.emit('chat', { roomId, author: currentUser, body: inputValue });
-        messageInput.value = ''; // 입력 필드 비우기
+        if (inputValue.length === 0 && !imageExists) return;
+
+        if(inputValue.length > 0){
+            console.log('전송할 메시지:', inputValue);
+            socket.emit('chat', { roomId, author: currentUser, body: inputValue });
+            messageInput.value = ''; // 입력 필드 비우기
+        }
+
+        if(imageExists) {
+            console.log('전송할 이미지:', file);
+
+            // 서버로 이미지 전송
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('roomId', roomId);
+            formData.append('author', currentUser);
+
+            fetch(`http://localhost:3000/api/chatrooms/${roomId}/image`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                const { fileUrl } = data;
+                socket.emit('chatImage', { roomId, author: currentUser, fileUrl });
+            })
+            .catch(error => console.error('Error:', error));
+
+            // 파일 입력 필드 초기화
+            fileInput.value = '';
+            imagePreview.style.display = 'none'; // 메시지 전송 후 이미지 미리보기 숨기기
+            imagePreview.style.backgroundImage = ''; // 이미지 배경 초기화
+            file = null; // 파일 변수 초기화
+        }
     });
 
     // Enter 키 입력 시 메시지 전송
@@ -66,6 +119,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') {
             e.preventDefault(); // 기본 Enter 동작 방지
             sendButton.click(); // 전송 버튼 클릭 이벤트와 동일
+        }
+    });
+
+    // 파일 선택 시 이미지 미리보기
+    fileInput.addEventListener('change', (e) => {
+        file = e.target.files[0];
+
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.innerHTML = `<img src="${event.target.result}" alt="Image Preview" />`;
+            };
+            reader.readAsDataURL(file);
         }
     });
 

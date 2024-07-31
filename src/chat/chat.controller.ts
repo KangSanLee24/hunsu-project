@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { JwtStrategy } from 'src/auth/guards/jwt.strategy';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/user/entities/user.entity';
 import { LogIn } from 'src/decorators/log-in.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 //@UseGuards(JwtStrategy)
 @ApiTags('채팅 API')
@@ -58,14 +59,17 @@ export class ChatController {
     return await this.chatService.joinChatRoom(+chatRoomId, user);
   }
 
-  // /**
-  //  * 채팅방 이미지 전송
-  //  * @returns
-  //  */
-  // @Post(':chatRoomId/image')
-  // async sendImageRoom(@Param('chatRoomId') chatRoomId: string, @LogIn() user: User) {
-  //   return await this.chatService.sendImageRoom(+chatRoomId, user);
-  // }
+  /**
+   * 채팅방 이미지 전송
+   * @returns
+   */
+  @Post(':chatRoomId/image')
+  @UseInterceptors(FileInterceptor('file'))
+  async sendImageRoom(@Param('chatRoomId') chatRoomId: string, @UploadedFile() file: Express.Multer.File, @Body() body) {
+    const { author } = body;
+    const fileUrl = await this.chatService.sendImageRoom(+chatRoomId, author, file);
+    return { fileUrl };
+  }
 
   /**
    * 채팅방 나가기

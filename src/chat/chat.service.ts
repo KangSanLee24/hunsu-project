@@ -9,6 +9,8 @@ import { ChatMember } from './entities/chat-member.entity';
 import moment from 'moment';
 import { format, isSameDay } from 'date-fns';
 import { ChatLog } from './entities/chat-log.entity';
+import { AwsService } from 'src/aws/aws.service';
+import { ChatImage } from './entities/chat-image.entity';
 
 @Injectable()
 export class ChatService {
@@ -20,7 +22,10 @@ export class ChatService {
     @InjectRepository(ChatLog)
     private readonly chatLogRepository: Repository<ChatLog>,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(ChatImage)
+    private readonly chatImageRepository: Repository<ChatImage>,
+    private readonly awsService: AwsService
   ) {}
   
   //채팅방 생성자 (채팅방 오너) 체크
@@ -201,15 +206,38 @@ export class ChatService {
       select: {id : true}
     });
     
-    const newChat = await this.chatLogRepository.save({
+    await this.chatLogRepository.save({
       roomId: chatRoomId,
       content: message,
       memberId: 1   //임시
     });
   }
 
-  //채팅방 이미지 전송
-  async sendImageRoom(chatRoomId: number, user: User, file: Express.Multer.File) {
-    
-  }
+  //채팅방 이미지 저장
+  async sendImageRoom(chatRoomId: number, author: string, file: Express.Multer.File) {
+
+    const findUser = await this.userRepository.findOne({
+      where: {nickname: author},
+      select: {id : true}
+    });
+
+    const [fileName, fileExt] = file.originalname.split('.');
+
+    const fileUrl = await this.awsService.imageUploadToS3(
+      // 업로드
+      `${Date.now()}_${fileName}`, 
+      'chats',
+      file,
+      fileExt
+    );
+
+    //디비 저장
+    await this.chatImageRepository.save({
+      roomId: chatRoomId,
+      userId: 1, //임시
+      imgUrl: fileUrl
+    });
+
+    return fileUrl;
+  } 
 }

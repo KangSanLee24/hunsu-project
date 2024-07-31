@@ -11,6 +11,13 @@ import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from '../chat/chat.service';
 
+interface CustomFile {
+  buffer: Buffer;
+  originalname: string;
+  mimetype: string;
+  size: number;
+}
+
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -25,6 +32,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(private readonly chatService: ChatService) {}
 
+  //입장
   @SubscribeMessage('joinRoom')
   handleJoinRoom(@MessageBody() { roomId }: { roomId: string }, @ConnectedSocket() socket: Socket) {
     socket.join(roomId);
@@ -32,6 +40,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // Optional: Notify the room when a new user joins
   }
 
+  //나가기
   @SubscribeMessage('leaveRoom')
   handleLeaveRoom(@MessageBody() { roomId }: { roomId: string }, @ConnectedSocket() socket: Socket) {
     socket.leave(roomId);
@@ -39,6 +48,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // Optional: Notify the room when a user leaves
   }
 
+  //채팅 전송
   @SubscribeMessage('chat')
   async handleMessage(@MessageBody() payload: { roomId: string; author: string; body: string }, socket: Socket) {
     this.logger.log(`Message received: ${payload.body}`);
@@ -46,6 +56,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await this.chatService.sendChatRoom(+payload.roomId, payload.author, payload.body);
 
     this.server.to(payload.roomId).emit('chat', {author: payload.author, body: payload.body});
+    return payload;
+  }
+
+  //이미지 전송
+  @SubscribeMessage('chatImage')
+  async handleImage(@MessageBody() payload: { roomId: string; author: string; fileUrl: string }, @ConnectedSocket() socket: Socket) {
+    this.logger.log(`Message received: ${payload.fileUrl}`);
+
+    this.server.to(payload.roomId).emit('chatImage', {author: payload.author, fileUrl: payload.fileUrl });
     return payload;
   }
 
