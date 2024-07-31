@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { ChatRoom } from './entities/chat-room.entity';
@@ -7,7 +7,8 @@ import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { ChatMember } from './entities/chat-member.entity';
 import moment from 'moment';
-import { format } from 'date-fns';
+import { format, isSameDay } from 'date-fns';
+import { ChatLog } from './entities/chat-log.entity';
 
 @Injectable()
 export class ChatService {
@@ -15,7 +16,9 @@ export class ChatService {
     @InjectRepository(ChatRoom)
     private readonly chatRoomRepository: Repository<ChatRoom>,
     @InjectRepository(ChatMember)
-    private readonly chatMemberRepository: Repository<ChatMember>
+    private readonly chatMemberRepository: Repository<ChatMember>,
+    @InjectRepository(ChatLog)
+    private readonly chatLogRepository: Repository<ChatLog>
   ) {}
   
   //채팅방 생성자 (채팅방 오너) 체크
@@ -90,6 +93,15 @@ export class ChatService {
 
   async joinChatRoom(chatRoomId: number, user: User) {
 
+    //100명 제한
+    const checkJoin = await this.memberCount(chatRoomId);
+
+    if(checkJoin.user_count >= 100) {
+      throw new BadRequestException(
+        '채팅 제한 인원 100명 이상으로 입장 하실 수 없습니다.'
+      );
+    };
+
     const chatRoom = await this.chatRoomRepository.findOne({
       where: {id: chatRoomId}
     });
@@ -124,4 +136,77 @@ export class ChatService {
 
     return outChatMember;
   }
+
+  //채팅방 인원 계산
+
+  async memberCount(chatRoomId: number) {
+
+    const membercount = await this.chatMemberRepository.query(
+      `select count(user_id) as user_count
+        from chat_members
+        group by room_id
+        having room_id = ${chatRoomId};`
+    );
+
+    return membercount;
+  }
+
+  //채팅방 마지막 채팅 시간
+
+  async chatLastTime(chatRoomId: number) {
+
+    const chatLastTime = await this.chatLogRepository.findOne({
+      where: {roomId: chatRoomId},
+      select: {createdAt: true},
+      order: {createdAt: 'DESC'}
+    });
+
+    if(!chatLastTime) {
+      return { 'message' : ' ' };
+    }
+
+    const formatTime = format(new Date(chatLastTime.createdAt), 'yyyy-MM-dd HH:mm');
+
+    //오늘인지 확인
+
+    const chatDate = new Date(chatLastTime.createdAt);
+    const nowDate = new Date();
+
+    const isToday = isSameDay(chatDate, nowDate);
+
+    if(isToday === true) {
+      const timeDifference = nowDate.getTime() - chatDate.getTime();
+
+      const diffInMinutes = Math.floor(timeDifference / (1000 * 60));  //분단위 환산 1분
+      const diffInHours = Math.floor(timeDifference / (1000 * 60 * 60));   //시간단위 환산 1시간
+
+      if( diffInMinutes < 60 ) {
+        return { 'message' : `${diffInMinutes}분 전` };
+      } else {
+        return { 'message' : `${diffInHours}시간 전` };
+      }
+
+    }else {
+      return { 'message' : formatTime };
+    }
+  }
+
+  //채팅방 채팅 내역 저장
+  async sendChatRoom(chatRoomId: number, user: User) {
+    
+  }
+
+  //채팅방 이미지 전송
+  async sendImageRoom(chatRoomId: number, user: User) {
+
+  }
+
+  // async findChatting(chatRoomId: number) {
+    
+  //   const findChatting = await this.chatRoomRepository.findOne({
+  //     where: {id: chatRoomId}
+  //   });
+
+  //   return { 'message' : findChatting.title}
+  // }
 }

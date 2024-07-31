@@ -1,0 +1,55 @@
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+}
+
+nav li:hover {
+  background-color: #ffffff;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+nav a {
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.live-chat,
+.weekly-posts {
+  background-color: #ffffff;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.live-chat li,
+.weekly-posts li {
+  list-style-type: none;
+  padding: 5px;
+  letter-spacing: 1px;
+}
+
+h2 {
+  margin: 0 0 10px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+button {
+  background-color: #000000;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+}
