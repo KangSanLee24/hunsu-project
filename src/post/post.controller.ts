@@ -64,8 +64,7 @@ export class PostController {
   })
   @Get()
   async findAll(
-    @Query('category')
-    category?: Category,
+    @Query('category') category?: Category,
     @Query('sort') sort?: Order
   ) {
     const findAllPost = await this.postService.findAll(category, sort);

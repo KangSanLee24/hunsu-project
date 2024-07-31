@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Post } from './post.entity';
 
-@Entity({ name: 'postImages' })
+@Entity({ name: 'post_images' })
 export class PostImage {
   // 게시글 이미지 ID, int
   @PrimaryGeneratedColumn({ unsigned: true })
