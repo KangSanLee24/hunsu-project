@@ -38,16 +38,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     socket.join(payload.roomId);  //유저를 룸에 추가
     this.logger.log(`Socket ${socket.id} joined room: ${payload.roomId}`);
 
+    socket.data.roomId = payload.roomId;
+    socket.data.author = payload.author;
+
     //유저가 들어왔음을 알림
     this.server.to(payload.roomId).emit('userJoined', {message: `${payload.author} 님이 입장하셨습니다`});
-  }
-
-  //나가기
-  @SubscribeMessage('leaveRoom')
-  handleLeaveRoom(@MessageBody() { roomId }: { roomId: string }, @ConnectedSocket() socket: Socket) {
-    socket.leave(roomId);
-    this.logger.log(`Socket ${socket.id} left room: ${roomId}`);
-    // Optional: Notify the room when a user leaves
   }
 
   //채팅 전송
@@ -74,7 +69,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log(`Socket connected: ${socket.id}`);
   }
 
+  //나가기
   handleDisconnect(socket: Socket) {
     this.logger.log(`Socket disconnected: ${socket.id}`);
+
+    const { roomId, author } = socket.data;
+    socket.leave(roomId);
+    this.server.to(roomId).emit('userLeft', { message: `${author} 님이 퇴장하셨습니다` });
   }
 }
