@@ -1,5 +1,4 @@
 import { API_BASE_URL } from "../../config/config.js";
-//채팅 내용
 
 document.addEventListener('DOMContentLoaded', () => {
 

@@ -45,13 +45,13 @@ export class ChatService {
   async createChatRoom(user: User, createChatDto: CreateChatDto) {
     
     const newChatRoom = await this.chatRoomRepository.save({
-      userId: user.id,
+      userId: 1, //user.id,임시
       title: createChatDto.title
     });
 
     await this.chatMemberRepository.save({
       roomId: newChatRoom.id,
-      userId: user.id
+      userId: 1//user.id
     });
 
     return newChatRoom;
@@ -250,7 +250,7 @@ export class ChatService {
         from chat_rooms
         where title like '%${title}%';`
       );
-      
+
       return findChatRoom;
     }
 }
