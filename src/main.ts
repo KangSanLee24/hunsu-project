@@ -24,15 +24,11 @@ async function bootstrap() {
 
   // CORS 설정
   app.enableCors({
-<<<<<<< HEAD
-    origin: 'http://127.0.0.1:5500', // 허용할 도메인
-=======
     origin: [
       'http://localhost:3000',
       'http://127.0.0.1:5500',
       'https://nid.naver.com/oauth2.0/*',
     ], // 허용할 도메인
->>>>>>> ac7a1f15a5801a8ef3133636dd789dd9ebb73b6a
     credentials: true, // 인증 정보 허용
   });
 
