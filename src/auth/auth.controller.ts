@@ -2,12 +2,13 @@ import {
   HttpStatus,
   Controller,
   UseGuards,
+  Req,
   Body,
+  Query,
   Post,
   Get,
   Patch,
   Delete,
-  Req,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -23,7 +24,6 @@ import { VerifyEmailDto } from './dtos/verify-email.dto';
 import { FindIdDto } from './dtos/find-id.dto';
 // import { RePasswordDto } from './dtos/re-password.dto';
 
-import { AuthService } from './auth.service';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
 
 import { LogIn } from 'src/decorators/log-in.decorator';
