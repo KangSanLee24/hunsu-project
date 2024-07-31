@@ -20,11 +20,15 @@ import { SignUpDto } from './dtos/sign-up.dto';
 import { LogInDto } from './dtos/log-in.dto';
 import { FindIdDto } from './dtos/find-id.dto';
 import { RePasswordDto } from './dtos/re-password.dto';
+import { VerifyPasswordDto } from './dtos/verify-password.dto';
+import { UpdatePasswordDto } from './dtos/update-password.dto';
+import { VerifyEmailDto } from './dtos/verify-email.dto';
+
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshToken } from './entities/refresh-token.entity';
-import { VerifyEmailDto } from './dtos/verify-email.dto';
+import { VerifyPassword } from './entities/verify-password.entity';
 import { VerifyEmail } from 'src/mail/entities/verify-email.entity';
 import { MailService } from 'src/mail/mail.service';
 import { SocialType } from 'src/user/types/social-type.type';
@@ -47,10 +51,13 @@ export class AuthService {
     private refreshTokenRepository: Repository<RefreshToken>,
 
     @InjectRepository(VerifyEmail)
-    private verifyEmailRepository: Repository<VerifyEmail>
-  ) {}
+    private verifyEmailRepository: Repository<VerifyEmail>,
 
-  /** 회원 가입(sign-up) API **/
+    @InjectRepository(VerifyPassword)
+    private verifyPasswordRepository: Repository<VerifyPassword>
+  ) { }
+
+  /** 1. 회원 가입(sign-up) API **/
   async signUp(signUpDto: SignUpDto) {
     // 0. dto에서 데이터 꺼내기
     const { email, nickname, password, passwordConfirm } = signUpDto;
@@ -131,7 +138,7 @@ export class AuthService {
     }
   }
 
-  /** 로그인(log-in) API **/
+  /** 2. 로그인(log-in) API **/
   async logIn(logInDto: LogInDto) {
     // 0. dto에서 데이터 꺼내기
     const { email, password } = logInDto;
@@ -319,12 +326,14 @@ export class AuthService {
     await this.verifyEmailRepository.delete({ email });
 
     // 4. 해당 email에 대한 인증여부를 true로 변경
+    const user: User = await this.userService.findByEmail(email);
     await this.userRepository.update(
       { email },
       {
         verifiedEmail: true,
       }
     );
+
     // 5. 결과 반환
     return {
       verified: email,
@@ -406,7 +415,7 @@ export class AuthService {
   }
 
   /** 6-2. 소셜로그인 - 구글 **/
-  async logInGoogle() {}
+  async logInGoogle() { }
 
   // /** 토큰 발급 **/
   // async createToken(user, refresh) {
@@ -418,32 +427,133 @@ export class AuthService {
   //   const key = refresh ?
   // }
 
-  // /** 6. 비밀번호 바꾸기 API **/
-  // async rePassword(rePasswordDto: RePasswordDto) {
-  //   // 0. dto에서 데이터 꺼내기
-  //   const { password, passwordConfirm } = rePasswordDto;
+  /** 7. 비밀번호 변경 요청 API **/
+  async rePassword(rePasswordDto: RePasswordDto) {
+    // 0. dto에서 데이터 꺼내기
+    const { email } = rePasswordDto;
 
-  //   // 2. 내 정보 수정
-  //   const user: User = await this.userService.update(
-  //     { password: user.password },
-  //     { nickname: updateUserDto.nickname }
-  //   );
+    // 1. 해당 email로 가입된 사용자가 있는지 확인
+    const user: User = await this.userService.findByEmail(email);
 
-  //   // 4. 데이터 가공
-  //   const data = {
-  //     before: {
-  //       nickname: user.nickname,
-  //     },
-  //     after: {
-  //       nickname: updateUserDto.nickname,
-  //     },
-  //   };
+    // 2. 해당 user가 없다면 에러메시지(404)
+    if (_.isNil(user)) {
+      throw new NotFoundException(AUTH_MESSAGES.RE_PASSWORD.FAILURE.NO_USER);
+    }
 
-  //   // 5. 반환
-  //   return data;
-  // }
+    // 3. 이메일 인증을 아직 하지 않았다면 에러메시지
+    if (user.verifiedEmail !== true) {
+      throw new UnauthorizedException(
+        AUTH_MESSAGES.RE_PASSWORD.FAILURE.NOT_VERIFIED
+      );
+    }
 
-  /** 7. 아이디 찾기(find-id) API **/
+    // 4. 인증 이메일 발송
+    await this.mailService.sendEmail(user.email);
+  }
+
+  /** 8. 비밀번호 변경 인증 API **/
+  async verifyPassword(verifyPasswordDto: VerifyPasswordDto) {
+    // 0. dto에서 데이터 추출
+    const { email, certification } = verifyPasswordDto;
+
+
+    // 1. 해당 email로 인증번호를 받은 것이 맞는지 확인
+    const isExistingEmail = await this.verifyPasswordRepository.findOneBy({
+      email,
+    });
+    // 1-1. 그렇지 않다면 에러처리
+    if (!isExistingEmail) {
+      throw new BadRequestException(
+        AUTH_MESSAGES.VERIFY_PASSWORD.FAILURE.WRONG_EMAIL
+      );
+    }
+
+    // 2. 인증번호가 일치하는지 검증. 불일치 시 에러처리
+    if (certification !== isExistingEmail.certification) {
+      throw new BadRequestException(
+        AUTH_MESSAGES.VERIFY_PASSWORD.FAILURE.WRONG_CERTIFICATION
+      );
+    }
+
+    // 3. 더이상 사용하지 않는 데이터 삭제
+    await this.verifyEmailRepository.delete({ email });
+
+    // 4. 해당 email에 대한 인증여부를 true로 변경
+    const verifyPassword = await this.verifyPasswordRepository.findOneBy({ email });
+    if (!verifyPassword.isCertified) {
+      await this.verifyPasswordRepository.update(
+        { email },
+        {
+          isCertified: true,
+        }
+      );
+    }
+
+    // 5. 결과 반환
+    return {
+      verified: email,
+    };
+  }
+
+  /** 9. 비밀번호 변경 API **/
+  async updatePassword(updatePasswordDto: UpdatePasswordDto) {
+    // 0. dto에서 데이터 꺼내기
+    const { email, password, passwordConfirm } = updatePasswordDto;
+
+    // 1. 해당 email로 가입된 사용자가 있는지 확인
+    const verifyPassword = await this.verifyPasswordRepository.findOneBy({ email });
+
+    // 1-1. 해당 user가 없다면 에러메시지(404)
+    if (_.isNil(verifyPassword)) {
+      throw new NotFoundException(AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.NO_VERYFYING);
+    }
+
+    // 2. 비밀번호 변경 인증을 완료한지 확인
+    if (!verifyPassword.isCertified) {
+      throw new ConflictException({
+        message: AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.NO_CERTIFIED,
+      });
+    }
+
+    // 3. 비밀번호 일치 여부 확인
+    if (password !== passwordConfirm) {
+      throw new ConflictException({
+        message: AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.PASSWORD_MISMATCH,
+      });
+    }
+
+    // 4. 비밀번호 해시화
+    const hashedPassword = await hash(password, 10);
+
+    // 5. 비밀번호 업데이트
+    await this.userRepository.update(
+      { email },
+      {
+        password: hashedPassword,
+      }
+    );
+
+    // 6. 데이터 가공
+    const data = {
+      before: {
+        password: password,
+      },
+      after: {
+        password: hashedPassword,
+      },
+    };
+
+    // 7. 임시로 생성했던 verify_passwords 테이블의 레코드 삭제
+    await this.verifyPasswordRepository.delete({ email });
+
+    // 8. 결과 반환
+    return {
+      message: '비밀번호가 성공적으로 변경되었습니다.',
+      data,
+    };
+  }
+
+  /** 10. 아이디 찾기(find-id) API **/
   async findId(findIdDto: FindIdDto) {
     // 0. dto에서 데이터 꺼내기
     const { nickname } = findIdDto;

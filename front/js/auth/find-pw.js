@@ -1,22 +1,21 @@
-// pages/find-password/FindPassword.js
 import React from 'react';
-import './styles/find-pw.style.css'; // CSS 파일 경로 확인 후 수정
+import './styles/find-pw.style.css';
 
 const FindPassword = () => {
   const handleEmail = (event) => {
     event.preventDefault();
-    const email = event.target.elements['send-email'].value; // send-email로 수정
-    // 여기에 API 호출 또는 비밀번호 찾기 로직 추가
+    const email = event.target.elements['send-email'].value;
+    //
     console.log(`Email: ${email}`);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     // 비밀번호 찾기 로직 처리
-    const email = event.target.elements['send-email'].value; // send-email로 수정
+    const email = event.target.elements['send-email'].value;
     const token = event.target.elements['find-password-token'].value;
 
-    // 여기에 API 호출 또는 비밀번호 찾기 로직 추가
+    //
     console.log(`Email: ${email}, Token: ${token}`);
   };
 

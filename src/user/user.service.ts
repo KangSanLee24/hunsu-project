@@ -16,6 +16,9 @@ import { SoftdeleteUserDto } from './dtos/softdelete-user.dto';
 
 @Injectable()
 export class UserService {
+  updateUserPassword(user: User) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,

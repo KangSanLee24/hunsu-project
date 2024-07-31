@@ -1,14 +1,15 @@
-//채팅 목록
+import { API_BASE_URL } from "../../config/config.js";
 
-async function fetchChatRooms() {
+//채팅 목록 가져오기
+export async function fetchChatRooms() {
     try {
-      const response = await fetch('http://localhost:3000/api/chatrooms');
+      const response = await fetch(`${API_BASE_URL}/chatrooms`);
       const rooms = await response.json();
       
       const roomsWithDetails = await Promise.all(rooms.map(async (room) => {
         const [memberCountResponse, lastChatTimeResponse] = await Promise.all([
-          fetch(`http://localhost:3000/api/chatrooms/${room.id}/member-count`),
-          fetch(`http://localhost:3000/api/chatrooms/${room.id}/chat-time`)
+          fetch(`${API_BASE_URL}/chatrooms/${room.id}/member-count`),
+          fetch(`${API_BASE_URL}/chatrooms/${room.id}/chat-time`)
         ]);
         
         const memberCount = await memberCountResponse.json();
@@ -28,8 +29,8 @@ async function fetchChatRooms() {
     }
   }
   
-
-function renderChatRooms(chatRooms) {
+//목록 화면에 뿌리기
+export function renderChatRooms(chatRooms) {
 const chatListElement = document.getElementById('chatList');
 chatListElement.innerHTML = ""; // 기존 목록 초기화
 
@@ -37,7 +38,7 @@ chatRooms.forEach((room, index) => {
     let tempHTML = `
     <ul>
         <li key=${index}>
-        <a href="http://localhost:3000/chat.html?roomId=${room.id}&roomName=${encodeURIComponent(room.title)}" class="chat-list-link">
+        <a href="/html/chat.html?roomId=${room.id}&roomName=${encodeURIComponent(room.title)}" class="chat-list-link">
             <div className="chat-room-info">
                 <span className="chat-room-name">${room.title}</span>
                 <span className="chat-room-user">${room.user.nickname}</span>

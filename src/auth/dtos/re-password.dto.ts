@@ -1,15 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsEmail } from 'class-validator';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
 
 export class RePasswordDto {
-    @IsString()
-    @IsNotEmpty({ message: AUTH_MESSAGES.RE_PASSWORD.FAILURE.NO_PASSWORD })
-    @ApiProperty({ example: 'Test!@34' })
-    password: string;
-
-    @IsString()
-    @IsNotEmpty({ message: AUTH_MESSAGES.RE_PASSWORD.FAILURE.NO_PASSWORD })
-    @ApiProperty({ example: 'Test!@34' })
-    passwordConfirm: string;
+    @IsEmail()
+    @IsNotEmpty({ message: AUTH_MESSAGES.LOG_IN.FAILURE.NO_EMAIL })
+    @ApiProperty({ example: 'test@naver.com' })
+    email: string;
 }

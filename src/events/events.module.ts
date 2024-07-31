@@ -8,9 +8,11 @@ import { User } from 'src/user/entities/user.entity';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { ChatService } from 'src/chat/chat.service';
+import { ChatImage } from 'src/chat/entities/chat-image.entity';
+import { AwsModule } from 'src/aws/aws.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ChatRoom, ChatMember, ChatLog, User]), UserModule, AuthModule],
+  imports: [TypeOrmModule.forFeature([ChatRoom, ChatMember, ChatLog, ChatImage, User]), UserModule, AuthModule, AwsModule],
   providers: [ChatGateway, ChatService]
 })
 export class EventsModule {}
