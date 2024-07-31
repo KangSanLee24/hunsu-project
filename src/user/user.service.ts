@@ -16,6 +16,9 @@ import { SoftdeleteUserDto } from './dtos/softdelete-user.dto';
 
 @Injectable()
 export class UserService {
+  updateUserPassword(user: User) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -127,6 +130,11 @@ export class UserService {
   async findByEmail(email: string) {
     return await this.userRepository.findOneBy({ email });
   }
+
+  // /** deletedAt으로 인증여부 확인하기(+) **/
+  // async findByDeletedAt(deletedAt: Date) {
+  //   return await this.userRepository.findOneBy({ deletedAt });
+  // }
 
   /** nickname으로 사용자 찾기(+) **/
   async findByNickname(nickname: string) {

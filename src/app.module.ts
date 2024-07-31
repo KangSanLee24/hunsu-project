@@ -45,4 +45,4 @@ import { join } from 'path';
   controllers: [AppController],
   providers: [AwsService],
 })
-export class AppModule {}
+export class AppModule { }
