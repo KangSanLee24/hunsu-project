@@ -32,12 +32,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // Optional: Notify the room when a new user joins
   }
 
-  // @SubscribeMessage('leaveRoom')
-  // handleLeaveRoom(@MessageBody() { roomId }: { roomId: string }, socket: Socket) {
-  //   socket.leave(roomId);
-  //   this.logger.log(`Socket ${socket.id} left room: ${roomId}`);
-  //   // Optional: Notify the room when a user leaves
-  // }
+  @SubscribeMessage('leaveRoom')
+  handleLeaveRoom(@MessageBody() { roomId }: { roomId: string }, @ConnectedSocket() socket: Socket) {
+    socket.leave(roomId);
+    this.logger.log(`Socket ${socket.id} left room: ${roomId}`);
+    // Optional: Notify the room when a user leaves
+  }
 
   @SubscribeMessage('chat')
   async handleMessage(@MessageBody() payload: { roomId: string; author: string; body: string }, socket: Socket) {

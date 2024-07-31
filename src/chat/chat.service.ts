@@ -209,7 +209,7 @@ export class ChatService {
   }
 
   //채팅방 이미지 전송
-  async sendImageRoom(chatRoomId: number, user: User) {
-
+  async sendImageRoom(chatRoomId: number, user: User, file: Express.Multer.File) {
+    
   }
 }

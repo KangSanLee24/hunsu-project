@@ -8,9 +8,10 @@ import { ChatLog } from './entities/chat-log.entity';
 import { User } from 'src/user/entities/user.entity';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { ChatImage } from './entities/chat-image.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ChatRoom, ChatMember, ChatLog, User]), UserModule, AuthModule],
+  imports: [TypeOrmModule.forFeature([ChatRoom, ChatMember, ChatLog, User, ChatImage]), UserModule, AuthModule],
   controllers: [ChatController],
   providers: [ChatService]
 })

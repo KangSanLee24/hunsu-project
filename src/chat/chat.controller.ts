@@ -59,22 +59,13 @@ export class ChatController {
   }
 
   // /**
-  //  * 채팅방 채팅 내역 저장
+  //  * 채팅방 이미지 전송
   //  * @returns
   //  */
-  // @Post(':chatRoomId/chatting')
-  // async sendChatRoom(@Param('chatRoomId') chatRoomId: string, @LogIn() user: User) {
-  //   return await this.chatService.sendChatRoom(+chatRoomId, user);
+  // @Post(':chatRoomId/image')
+  // async sendImageRoom(@Param('chatRoomId') chatRoomId: string, @LogIn() user: User) {
+  //   return await this.chatService.sendImageRoom(+chatRoomId, user);
   // }
-
-  /**
-   * 채팅방 이미지 전송
-   * @returns
-   */
-  @Post(':chatRoomId/image')
-  async sendImageRoom(@Param('chatRoomId') chatRoomId: string, @LogIn() user: User) {
-    return await this.chatService.sendImageRoom(+chatRoomId, user);
-  }
 
   /**
    * 채팅방 나가기

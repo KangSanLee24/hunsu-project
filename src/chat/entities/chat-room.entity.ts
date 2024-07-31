@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { ChatMember } from './chat-member.entity';
 import { ChatLog } from './chat-log.entity';
+import { ChatImage } from './chat-image.entity';
 
 @Entity('chat_rooms')
 export class ChatRoom {
@@ -39,7 +40,4 @@ export class ChatRoom {
 
   @OneToMany(() => ChatMember, (chatMember) => chatMember.chatRooms, { cascade: true })
   chatMembers: ChatMember[];
-
-  @OneToMany(() => ChatLog, (chatLog) => chatLog.chatRooms, { cascade: true })
-  chatLogs: ChatLog[];
 }
