@@ -6,9 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   signUpForm.addEventListener('submit', async (event) => {
-    event.preventDefault(); // 폼의 기본 동작을 막습니다.
+    event.preventDefault();
 
-    // 폼 데이터 가져오기
     const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
     const passwordConfirm = document.getElementById(
@@ -16,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ).value;
     const nickname = document.getElementById('nickname').value;
 
-    // 비밀번호 확인
     if (password !== passwordConfirm) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
@@ -42,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 사용자 정의 알림 표시
         const notification = document.getElementById('notification');
         const confirmBtn = document.getElementById('confirm-btn');
-        notification.classList.remove('hidden'); // 알림 표시
+        notification.classList.remove('hidden');
 
         // 확인 버튼 클릭 시 페이지 이동
         confirmBtn.addEventListener('click', () => {

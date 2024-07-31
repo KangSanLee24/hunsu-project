@@ -27,6 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 메인 페이지로 이동
         window.location.href = './main.html';
+      } else if (
+        result.message ===
+        '아직 이메일 인증을 하지 않으셨습니다. 이메일 인증을 진행해 주세요.'
+      ) {
+        // 이메일 인증이 필요한 경우
+        alert(result.message);
+        window.location.href = './email-confirmation.html';
       } else {
         // 에러 처리
         alert(result.message || '로그인에 실패했습니다.');
