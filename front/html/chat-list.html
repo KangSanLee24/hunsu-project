@@ -12,9 +12,29 @@
     <ul id="chatList">
       <!-- 채팅방 목록이 동적으로 삽입됩니다. -->
     </ul>
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="채팅방 검색...">
+      <select id="sortSelect">
+        <option value="latest">최신순</option>
+        <option value="oldest">오래된순</option>
+      </select>
+      <button id="searchRoomButton">검색</button>
+      <button id="createChatButton">채팅방 만들기</button>
+    </div>
+  </div>
+
+  <!-- 모달 창 HTML -->
+  <div id="modalOverlay"></div>
+  <div id="chatRoomForm">
+    <button id="closeButton" class="close-btn">&times;</button>
+    <h2>채팅방 생성</h2>
+    <label for="roomName">채팅방 이름:</label>
+    <input type="text" id="roomName" name="roomName">
+    <button id="createButton">채팅방 생성하기</button>
   </div>
 
   <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
   <script type= "module" src="../js/chat/chat-list.js"></script>
+  <script type= "module" src="../js/chat/chat-create.js"></script>
 </body>
 </html>
