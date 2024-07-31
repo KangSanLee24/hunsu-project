@@ -141,4 +141,3 @@ document.addEventListener('DOMContentLoaded', () => {
         roomNameElement.textContent = decodeURIComponent(roomName);
     }
 });
-
