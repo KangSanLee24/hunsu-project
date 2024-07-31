@@ -44,6 +44,12 @@ export const AUTH_MESSAGES = {
       NO_TOKEN: '이미 로그아웃 된 상태입니다.',
     },
   },
+  FIND_ID: {
+    SUCCESS: '아이디 찾기에 성공했습니다.',
+    FAILURE: {
+      NO_USER: '존재하지 않는 유저입니다.',
+    },
+  },
   RE_PASSWORD: {
     SUCCESS: '비밀번호 바꾸기에 성공했습니다.',
     FAILURE: {

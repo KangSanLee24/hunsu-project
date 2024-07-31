@@ -16,9 +16,15 @@ import { AwsModule } from './aws/aws.module';
 import { MailModule } from './mail/mail.module';
 import { ChatModule } from './chat/chat.module';
 import { EventsModule } from './events/events.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'front', 'public'), // public 폴더를 정적 파일의 루트로 설정
+      serveRoot: '/', // 기본 URL 경로를 '/'로 설정
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: configValidationSchema,

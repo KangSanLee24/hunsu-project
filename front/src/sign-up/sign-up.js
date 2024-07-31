@@ -1,6 +1,6 @@
 // pages/sign-up/SignUp.js
 import React, { useState } from 'react';
-import API from '../../shared/API';
+import API from '../../../client/src/shared/API';
 import './styles/sign-up.style.css'; // CSS 파일 경로 확인 후 수정
 
 const SignUp = () => {

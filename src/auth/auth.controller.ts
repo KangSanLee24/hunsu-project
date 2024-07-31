@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Patch,
-  Post,
-  Body,
-  HttpStatus,
-  Get,
-  UseGuards,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Patch, Post, Body, HttpStatus, Get, UseGuards, Delete, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { SignUpDto } from './dtos/sign-up.dto';
@@ -26,7 +17,7 @@ import { VerifyEmailDto } from './dtos/verify-email.dto';
 @ApiTags('1. AUTH API')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   /** 1. 회원 가입(sign-up) API **/
   @ApiOperation({ summary: '1. 회원 가입(sign-up) API' })
@@ -91,17 +82,30 @@ export class AuthController {
       data: data,
     };
   }
+
+  // /** 6. 비밀번호 바꾸기 API **/
+  // @ApiOperation({ summary: '비밀번호 바꾸기 API' })
+  // @Patch('re-password')
+  // async rePassword(
+  //   @Body() rePasswordDto: RePasswordDto
+  // ) {
+  //   const data = await this.authService.rePassword(rePasswordDto);
+  //   return {
+  //     status: HttpStatus.OK,
+  //     // message: AUTH_MESSAGES.UPDATE_ME.SUCCESS,
+  //     message: "비밀번호 바꾸기를 성공하셨습니다.",
+  //   };
+  // }
+
+  /** 7. 아이디 찾기 API **/
+  @ApiOperation({ summary: '아이디 찾기 API' })
+  @Get('find-id')
+  async findId(@Query() findIdDto: FindIdDto) {
+    const data = await this.authService.findId(findIdDto);
+    return {
+      status: HttpStatus.OK,
+      message: AUTH_MESSAGES.FIND_ID.SUCCESS,
+      data: data,
+    };
+  }
 }
-// /** 비밀번호 바꾸기 API **/
-// @ApiOperation({ summary: '비밀번호 바꾸기 API' })
-// @Patch('re-password')
-// async rePassword(
-//   @Body() rePasswordDto: RePasswordDto
-// ) {
-//   const data = await this.authService.rePassword(rePasswordDto);
-//   return {
-//     status: HttpStatus.OK,
-//     // message: USER_MESSAGES.UPDATE_ME.SUCCESS,
-//     message: "비밀번호 바꾸기를 성공하셨습니다.",
-//   };
-// }
