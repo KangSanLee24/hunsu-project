@@ -1,7 +1,6 @@
 import { API_BASE_URL } from "../../config/config.js";
 
-//채팅 목록
-
+//채팅 목록 가져오기
 async function fetchChatRooms() {
     try {
       const response = await fetch(`${API_BASE_URL}/chatrooms`);
@@ -30,7 +29,7 @@ async function fetchChatRooms() {
     }
   }
   
-
+//목록 화면에 뿌리기
 function renderChatRooms(chatRooms) {
 const chatListElement = document.getElementById('chatList');
 chatListElement.innerHTML = ""; // 기존 목록 초기화

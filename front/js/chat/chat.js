@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/config.js";
 //채팅 내용
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -94,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('roomId', roomId);
             formData.append('author', currentUser);
 
-            fetch(`http://localhost:3000/api/chatrooms/${roomId}/image`, {
+            fetch(`${API_BASE_URL}/chatrooms/${roomId}/image`, {
                 method: 'POST',
                 body: formData
             })

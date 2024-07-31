@@ -11,6 +11,7 @@ import { format, isSameDay } from 'date-fns';
 import { ChatLog } from './entities/chat-log.entity';
 import { AwsService } from 'src/aws/aws.service';
 import { ChatImage } from './entities/chat-image.entity';
+import { Order } from 'src/post/types/post-order.type';
 
 @Injectable()
 export class ChatService {
@@ -239,5 +240,18 @@ export class ChatService {
     });
 
     return fileUrl;
-  } 
+  }
+
+  async chatRoomSearch(title?: string) {
+
+    if(title) {
+      const findChatRoom = await this.chatRoomRepository.query(
+        `select id, user_id , title , created_at 
+        from chat_rooms
+        where title like '%${title}%';`
+      )
+      return findChatRoom
+      };
+
+    }
 }

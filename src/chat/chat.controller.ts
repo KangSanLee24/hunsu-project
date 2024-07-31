@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { JwtStrategy } from 'src/auth/guards/jwt.strategy';
@@ -6,6 +6,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/user/entities/user.entity';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Order } from 'src/post/types/post-order.type';
 
 //@UseGuards(JwtStrategy)
 @ApiTags('채팅 API')
@@ -48,6 +49,16 @@ export class ChatController {
   @Get(':chatRoomId/chat-time')
   async chatLastTime(@Param('chatRoomId') chatRoomId: string) {
     return await this.chatService.chatLastTime(+chatRoomId);
+  }
+
+  /**
+   * 채팅방 검색
+   * @param createChatDto
+   * @returns
+   */
+  @Get('search')
+  async chatRoomSearch(@Query('title') title?: string) {
+    return await this.chatService.chatRoomSearch(title);
   }
 
   /**
