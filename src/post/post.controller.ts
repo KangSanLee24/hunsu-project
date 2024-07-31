@@ -28,6 +28,7 @@ import { User } from 'src/user/entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Category } from './types/post-category.type';
 import { Order } from './types/post-order.type';
+import { FindAllPostsDto } from './dtos/find-all-posts.dto';
 
 @ApiTags('게시글 API')
 @Controller('posts')
@@ -62,13 +63,25 @@ export class PostController {
     required: false,
     enum: Order,
   })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+  })
   @Get()
-  async findAll(
-    @Query('category')
-    category?: Category,
-    @Query('sort') sort?: Order
-  ) {
-    const findAllPost = await this.postService.findAll(category, sort);
+  async findAll(@Query() findAllPostsDto?: FindAllPostsDto) {
+    const { page, limit, category, sort } = findAllPostsDto || {};
+    const findAllPost = await this.postService.findAll(
+      page,
+      limit,
+      category,
+      sort
+    );
 
     return {
       statusCode: HttpStatus.OK,
