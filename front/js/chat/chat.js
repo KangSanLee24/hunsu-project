@@ -58,7 +58,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 방 입장 시 서버에 'joinRoom' 이벤트 전송
-    socket.emit('joinRoom', { roomId });
+    socket.emit('joinRoom', { roomId, author: currentUser });
+
+    // 방 입장 시 'joinRoom' 이벤트 수신
+    socket.on('userJoined', (data) => {
+        const notification = document.createElement('div');
+        notification.classList.add('notification');
+        notification.textContent = data.message;
+        chatScroll.appendChild(notification);
+        chatScroll.scrollTop = chatScroll.scrollHeight; // 최신 메시지로 스크롤
+    });
 
     // 서버로부터 'chat' 이벤트 수신
     socket.on('chat', (newMessage) => {

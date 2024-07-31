@@ -34,10 +34,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   //입장
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(@MessageBody() { roomId }: { roomId: string }, @ConnectedSocket() socket: Socket) {
-    socket.join(roomId);
-    this.logger.log(`Socket ${socket.id} joined room: ${roomId}`);
-    // Optional: Notify the room when a new user joins
+  handleJoinRoom(@MessageBody() payload: { roomId: string; author: string; }, @ConnectedSocket() socket: Socket) {
+    socket.join(payload.roomId);  //유저를 룸에 추가
+    this.logger.log(`Socket ${socket.id} joined room: ${payload.roomId}`);
+
+    //유저가 들어왔음을 알림
+    this.server.to(payload.roomId).emit('userJoined', {message: `${payload.author} 님이 입장하셨습니다`});
   }
 
   //나가기
