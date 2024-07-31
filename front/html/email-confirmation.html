@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>로그인</title>
+    <title>이메일 인증</title>
     <link rel="stylesheet" href="/styles/log-in.css" />
-    <script type="module" src="/js/auth/log-in.js"></script>
+    <script type="module" src="/js/auth/email-confirmation.js"></script>
   </head>
   <body>
     <!-- 로그인 페이지 -->
     <div class="container">
-      <h1>로그인</h1>
-      <form id="login-form">
+      <h1>이메일 인증</h1>
+      <form id="verify-email-form">
         <label for="email">이메일 (Email)</label>
         <input
           type="email"
@@ -20,14 +20,10 @@
           required
         />
 
-        <label for="password">비밀번호 (Password)</label>
-        <input type="password" id="password" placeholder="********" required />
+        <label for="token">인증 번호</label>
+        <input type="token" id="token" placeholder="0000" required />
 
-        <button type="submit">로그인하기</button>
-        <p class="forgot-password">
-          비밀번호를 잊으셨나요?
-          <a href="./find-pw.html">찾기</a>
-        </p>
+        <button type="submit">인증하기</button>
       </form>
     </div>
   </body>

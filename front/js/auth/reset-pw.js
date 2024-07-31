@@ -11,7 +11,7 @@ const ResetPassword = () => {
     // 비밀번호 변경 로직 처리
     if (newPassword === confirmPassword) {
       console.log('비밀번호가 변경되었습니다:', newPassword);
-      // 여기에 API 호출 또는 비밀번호 변경 로직 추가
+      //
     } else {
       console.error('비밀번호가 일치하지 않습니다.');
     }

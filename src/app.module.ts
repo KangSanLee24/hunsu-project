@@ -40,7 +40,7 @@ import { join } from 'path';
     AwsModule,
     MailModule,
     ChatModule,
-    EventsModule
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AwsService],
