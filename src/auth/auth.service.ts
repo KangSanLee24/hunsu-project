@@ -299,7 +299,6 @@ export class AuthService {
     }
   }
 
-  // 흐에에에에
   /** 5. 이메일 인증 API **/
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
     // 0. dto에서 데이터 추출
