@@ -42,6 +42,10 @@ export class Post {
   @Column({ type: 'int', default: 0 })
   numLikes: number;
 
+  // 싫어요수 = numDislikes, int
+  @Column({ type: 'int', default: 0 })
+  numDislikes: number;
+
   // 생성일시 = createdAt, Date
   @CreateDateColumn()
   createdAt: Date;

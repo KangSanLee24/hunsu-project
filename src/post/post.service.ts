@@ -116,7 +116,7 @@ export class PostService {
   //   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 현재시간으로부터 일주일전
 
   //   const posts = await this.postRepository.find({
-  //     where: { createdAt: MoreThan(weekAgo) },
+  //     where: { createdAt: MoreThan(weekAgo) }, // 최근 일주일 이내에 생성된 게시물들 가져오가
   //     relations: ['user', 'postImages', 'comments', 'postLikes'],
   //     order: { numLikes: 'DESC' },
   //   });
@@ -126,6 +126,7 @@ export class PostService {
   async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
     const post = await this.postRepository.findOne({
       where: { id },
+      withDeleted: true,
     });
 
     // 게시글이 존재하는지 확인
@@ -145,6 +146,7 @@ export class PostService {
   async remove(id: number, userId: number) {
     const post = await this.postRepository.findOne({
       where: { id },
+      withDeleted: true,
     });
 
     // 게시글이 존재하는지 확인
