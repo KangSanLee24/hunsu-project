@@ -46,7 +46,7 @@ function renderBoardList(data) {
     row.innerHTML = `
             <td>${item.id}</td>
             <td>${item.category}</td>
-            <td>${item.title}</td>
+            <td><a href="post-detail.html?id=${item.id}">${item.title}</a></td>
             <td>${item.nickname}</td>
             <td>${new Date(item.createdAt).toLocaleString()}</td>
             <td>${item.numComments}</td>
