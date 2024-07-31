@@ -11,6 +11,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from 'src/user/entities/user.entity';
 import { Point } from 'src/user/entities/point.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { VerifyPassword } from './entities/verify-password.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { RefreshToken } from './entities/refresh-token.entity';
@@ -35,6 +36,7 @@ import { MailModule } from 'src/mail/mail.module';
       Comment,
       RefreshToken,
       VerifyEmail,
+      VerifyPassword,
     ]),
     ConfigModule,
     UserModule,
@@ -44,4 +46,4 @@ import { MailModule } from 'src/mail/mail.module';
   providers: [AuthService, JwtStrategy],
   exports: [AuthService, JwtStrategy],
 })
-export class AuthModule {}
+export class AuthModule { }

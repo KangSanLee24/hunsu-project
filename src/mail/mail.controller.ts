@@ -3,7 +3,7 @@ import { MailService } from './mail.service';
 
 @Controller('mails')
 export class MailController {
-  constructor(private readonly mailService: MailService) {}
+  constructor(private readonly mailService: MailService) { }
 
   /** 인증 메일 전송 API **/
   @Post('send-email')

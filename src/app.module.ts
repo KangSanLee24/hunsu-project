@@ -34,9 +34,9 @@ import { EventsModule } from './events/events.module';
     AwsModule,
     MailModule,
     ChatModule,
-    EventsModule
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AwsService],
 })
-export class AppModule {}
+export class AppModule { }

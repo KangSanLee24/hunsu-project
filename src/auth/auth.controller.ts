@@ -4,7 +4,9 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SignUpDto } from './dtos/sign-up.dto';
 import { LogInDto } from './dtos/log-in.dto';
 import { FindIdDto } from './dtos/find-id.dto';
-// import { RePasswordDto } from './dtos/re-password.dto';
+import { RePasswordDto } from './dtos/re-password.dto';
+import { VerifyEmailDto } from './dtos/verify-email.dto';
+import { UpdatePasswordDto } from './dtos/update-password.dto';
 
 import { AuthService } from './auth.service';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
@@ -12,7 +14,7 @@ import { User } from 'src/user/entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { Token } from 'src/decorators/token.decorator';
-import { VerifyEmailDto } from './dtos/verify-email.dto';
+import { VerifyPasswordDto } from './dtos/verify-password.dto copy';
 
 @ApiTags('1. AUTH API')
 @Controller('auth')
@@ -48,7 +50,7 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '3. 로그아웃(log-out) API' })
-  @Delete('log-out')
+  @Get('log-out')
   async logOut(@LogIn() user: User) {
     const data = await this.authService.logOut(user);
     return {
@@ -83,22 +85,45 @@ export class AuthController {
     };
   }
 
-  // /** 6. 비밀번호 바꾸기 API **/
-  // @ApiOperation({ summary: '비밀번호 바꾸기 API' })
-  // @Patch('re-password')
-  // async rePassword(
-  //   @Body() rePasswordDto: RePasswordDto
-  // ) {
-  //   const data = await this.authService.rePassword(rePasswordDto);
-  //   return {
-  //     status: HttpStatus.OK,
-  //     // message: AUTH_MESSAGES.UPDATE_ME.SUCCESS,
-  //     message: "비밀번호 바꾸기를 성공하셨습니다.",
-  //   };
-  // }
+  /** 6. 비밀번호 변경 요청 API **/
+  @ApiOperation({ summary: '6. 비밀번호 변경 요청 API' })
+  @Post('re-password')
+  async rePassword(
+    @Body() rePasswordDto: RePasswordDto
+  ) {
+    const data = await this.authService.rePassword(rePasswordDto);
+    return {
+      status: HttpStatus.OK,
+      message: AUTH_MESSAGES.RE_PASSWORD.SUCCESS,
+    };
+  }
 
-  /** 7. 아이디 찾기 API **/
-  @ApiOperation({ summary: '아이디 찾기 API' })
+  /** 7. 비밀번호 변경 인증 API **/
+  @ApiOperation({ summary: '7. 비밀번호 변경 인증 API' })
+  @Patch('verify-password')
+  async verifyPassword(@Body() verifyPasswordDto: VerifyPasswordDto) {
+    const data = await this.authService.verifyPassword(verifyPasswordDto);
+    return {
+      status: HttpStatus.OK,
+      message: AUTH_MESSAGES.VERIFY_PASSWORD.SUCCESS,
+      data: data,
+    };
+  }
+
+  /** 8. 비밀번호 변경 API **/
+  @ApiOperation({ summary: '8. 비밀번호 변경 API' })
+  @Post('update-password')
+  async updatePassword(@Body() updatePasswordDto: UpdatePasswordDto) {
+    const data = await this.authService.updatePassword(updatePasswordDto);
+    return {
+      status: HttpStatus.OK,
+      message: AUTH_MESSAGES.UPDATE_PASSWORD.SUCCESS,
+      data: data,
+    };
+  }
+
+  /** 9. 아이디 찾기 API **/
+  @ApiOperation({ summary: '9. 아이디 찾기 API' })
   @Get('find-id')
   async findId(@Query() findIdDto: FindIdDto) {
     const data = await this.authService.findId(findIdDto);
