@@ -19,6 +19,11 @@ export const POST_MESSAGE = {
     READ_DETAIL: {
       SUCCESS: '게시글 상세 조회에 성공하였습니다.',
     },
+
+    // 화제글 목록 조회
+    READ_HOT: {
+      SUCCESS: '화제글 목록 조회에 성공하습니다.',
+    },
     // 게시글 수정
     UPDATE: {
       SUCCESS: '게시글 수정에 성공하였습니다.',

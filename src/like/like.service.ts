@@ -89,7 +89,7 @@ export class LikeService {
     });
     if (!existingPost) {
       throw new BadRequestException('게시글이 존재하지 않습니다.');
-    } else if ((existingPost.userId = userId)) {
+    } else if (existingPost.userId == userId) {
       throw new BadRequestException(
         '자신의 게시글에 좋아요를 누를 수 없습니다.'
       );

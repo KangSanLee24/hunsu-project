@@ -5,14 +5,15 @@ import {
 } from '@nestjs/common';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
 import { User } from 'src/user/entities/user.entity';
 import { AwsService } from 'src/aws/aws.service';
 import { PostImage } from './entities/post-image.entity';
-// import { Category } from './types/postCategory.type';
+import { Category } from './types/post-category.type';
+import { Order } from './types/post-order.type';
 
 @Injectable()
 export class PostService {
@@ -56,10 +57,13 @@ export class PostService {
     };
   }
   /*게시글 목록 조회 API*/
-  async findAll() {
+  async findAll(category?: Category, sort?: Order) {
+    // 카테고리에 따른 정렬
+    const sortCategory = category ? { category } : {};
     const posts = await this.postRepository.find({
+      where: sortCategory,
       relations: ['user', 'comments'],
-      order: { createdAt: 'DESC' }, // 최신순 정렬
+      order: { createdAt: sort ? sort : 'DESC' }, // 정렬조건
     });
     return posts.map((post) => ({
       id: post.id,
@@ -107,15 +111,22 @@ export class PostService {
   }
 
   /*화제글 목록 조회 API*/
-  // [누적 좋아요]
-  // /posts/hot
-  // 화제글 목록 조회
-  // 주석처리하고 지금 기준으로 일주일 좋아요 많은 순으로
+  // async findHotPost() {
+  //   const now = new Date(); // 현재시간
+  //   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 현재시간으로부터 일주일전
+
+  //   const posts = await this.postRepository.find({
+  //     where: { createdAt: MoreThan(weekAgo) }, // 최근 일주일 이내에 생성된 게시물들 가져오가
+  //     relations: ['user', 'postImages', 'comments', 'postLikes'],
+  //     order: { numLikes: 'DESC' },
+  //   });
+  // }
 
   /*게시글 수정 API*/
   async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
     const post = await this.postRepository.findOne({
       where: { id },
+      withDeleted: true,
     });
 
     // 게시글이 존재하는지 확인
@@ -135,6 +146,7 @@ export class PostService {
   async remove(id: number, userId: number) {
     const post = await this.postRepository.findOne({
       where: { id },
+      withDeleted: true,
     });
 
     // 게시글이 존재하는지 확인

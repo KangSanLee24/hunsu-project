@@ -1,5 +1,21 @@
-import { Controller, Patch, Post, Body, HttpStatus, Get, UseGuards, Delete, Query } from '@nestjs/common';
+import {
+  HttpStatus,
+  Controller,
+  UseGuards,
+  Req,
+  Body,
+  Query,
+  Post,
+  Get,
+  Patch,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+
+import { AuthGuard } from '@nestjs/passport';
+import { AuthService } from './auth.service';
+import { ConfigService } from '@nestjs/config';
+
+import { User } from 'src/user/entities/user.entity';
 
 import { SignUpDto } from './dtos/sign-up.dto';
 import { LogInDto } from './dtos/log-in.dto';
@@ -8,18 +24,20 @@ import { RePasswordDto } from './dtos/re-password.dto';
 import { VerifyEmailDto } from './dtos/verify-email.dto';
 import { UpdatePasswordDto } from './dtos/update-password.dto';
 
-import { AuthService } from './auth.service';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
-import { User } from 'src/user/entities/user.entity';
-import { AuthGuard } from '@nestjs/passport';
+
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { Token } from 'src/decorators/token.decorator';
-import { VerifyPasswordDto } from './dtos/verify-password.dto copy';
+import { VerifyPasswordDto } from './dtos/verify-password.dto';
+import { LogInKakao } from 'src/decorators/log-in-kakao.decorator';
 
 @ApiTags('1. AUTH API')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(
+    private readonly authService: AuthService,
+    private configService: ConfigService
+  ) { }
 
   /** 1. 회원 가입(sign-up) API **/
   @ApiOperation({ summary: '1. 회원 가입(sign-up) API' })
@@ -85,7 +103,50 @@ export class AuthController {
     };
   }
 
-  /** 6. 비밀번호 변경 요청 API **/
+  /** 6. 소셜로그인 **/
+  /** 6-1-1. 소셜로그인 - 네이버 **/
+  @ApiOperation({ summary: '6-1. 로그인(log-in) Naver API' })
+  @UseGuards(AuthGuard('naver'))
+  @Get('log-in/naver')
+  async logInNaver() {
+    // 네이버 로그인 페이지 접속
+    console.log('1...... 여기까지는 오케이!!!!?');
+  }
+  /** 6-1-2. 소셜로그인 - 네이버 콜백 **/
+  @UseGuards(AuthGuard('naver'))
+  @Get('log-in/naver/cb')
+  async logInNaverCB(@Req() req: any) {
+    const data = await this.authService.logInNaver(req);
+    return {
+      status: HttpStatus.OK,
+      message: '네이버 로그인에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 6-2-1. 소셜로그인 - 구글 **/
+  @ApiOperation({ summary: '6-2. 로그인(log-in) Google API' })
+  @Get('log-in/google')
+  async logInGoogle() { }
+  /** 6-2-2. 소셜로그인 - 구글 콜백 **/
+  @Get('log-in/google/cb')
+  async logInGoogleCB() { }
+
+  /** 6-2. 소셜로그인 - 카카오 **/
+  // @UseGuards(AuthGuard('kakao'))
+  // @Get('log-in/kakao')
+  // async logInKakao(@LogInKakao() kakaoData) {
+  //   const { kakao, tokens } = kakaoData;
+  //   const { accessToken, refreshToken } = await this.authService.getJWT(
+  //     kakao.user.kakaoId
+  //   );
+  //   tokens.cookie('accessToken', accessToken, { httpOnly: true });
+  //   tokens.cookie('refreshToken', refreshToken, { httpOnly: true });
+  //   tokens.cookie('isLoggedIn', true, { httpOnly: false });
+  //   return tokens.redirect(this.configService.get('KAKAO_CLIENT_URL'));
+  // }
+
+  /** 7. 비밀번호 변경 요청 API **/
   @ApiOperation({ summary: '6. 비밀번호 변경 요청 API' })
   @Post('re-password')
   async rePassword(
@@ -98,7 +159,7 @@ export class AuthController {
     };
   }
 
-  /** 7. 비밀번호 변경 인증 API **/
+  /** 8. 비밀번호 변경 인증 API **/
   @ApiOperation({ summary: '7. 비밀번호 변경 인증 API' })
   @Patch('verify-password')
   async verifyPassword(@Body() verifyPasswordDto: VerifyPasswordDto) {
@@ -110,7 +171,7 @@ export class AuthController {
     };
   }
 
-  /** 8. 비밀번호 변경 API **/
+  /** 9. 비밀번호 변경 API **/
   @ApiOperation({ summary: '8. 비밀번호 변경 API' })
   @Post('update-password')
   async updatePassword(@Body() updatePasswordDto: UpdatePasswordDto) {
@@ -122,7 +183,7 @@ export class AuthController {
     };
   }
 
-  /** 9. 아이디 찾기 API **/
+  /** 10. 아이디 찾기 API **/
   @ApiOperation({ summary: '9. 아이디 찾기 API' })
   @Get('find-id')
   async findId(@Query() findIdDto: FindIdDto) {

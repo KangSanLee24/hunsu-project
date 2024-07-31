@@ -28,6 +28,7 @@ label {
 
 input[type='email'],
 input[type='password'],
+input[type='token'],
 input[type='text'] {
   width: 95%;
   padding: 10px;

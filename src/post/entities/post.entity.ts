@@ -13,7 +13,7 @@ import { PostImage } from './post-image.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { PostLike } from 'src/like/entities/post-like.entity';
 import { PostDislike } from 'src/dislike/entities/post-dislike.entity';
-import { Category } from '../types/postCategory.type';
+import { Category } from '../types/post-category.type';
 
 @Entity({ name: 'posts' })
 export class Post {
@@ -37,6 +37,14 @@ export class Post {
   // 내용 = content, text
   @Column({ type: 'text' })
   content: string;
+
+  // 좋아요수 = numLikes, int
+  @Column({ type: 'int', default: 0 })
+  numLikes: number;
+
+  // 싫어요수 = numDislikes, int
+  @Column({ type: 'int', default: 0 })
+  numDislikes: number;
 
   // 생성일시 = createdAt, Date
   @CreateDateColumn()
