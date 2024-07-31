@@ -39,7 +39,10 @@ export class PostController {
   @ApiBearerAuth()
   @ApiOperation({ summary: '게시글 생성 API' })
   @Post()
-  async create(@LogIn() user: User, @Body() createPostDto: CreatePostDto) {
+  async create(
+    @LogIn() user: User,
+    @Body() createPostDto: CreatePostDto
+  ) {
     const userId = user.id;
     const createdPost = await this.postService.create(createPostDto, userId);
 
@@ -79,9 +82,12 @@ export class PostController {
 
   /** 게시글 상세 조회 API **/
   @ApiOperation({ summary: '게시글 상세 조회 API' })
-  @Get(':id')
-  async findOne(@Param('id') id: number) {
-    const findOnePost = await this.postService.findOne(id);
+  @Get(':postId')
+  async findOne(
+    @Param('postId') postId: number
+  ) {
+    const findOnePost = await this.postService.findOne(postId);
+
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.READ_DETAIL.SUCCESS,
@@ -105,18 +111,19 @@ export class PostController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '게시글 수정 API' })
-  @Patch(':id')
+  @Patch(':postId')
   async update(
     @LogIn() user: User,
-    @Param('id') id: number,
+    @Param('postId') postId: number,
     @Body() updatePostDto: UpdatePostDto
   ) {
     const userId = user.id;
     const updatedPost = await this.postService.update(
-      id,
+      postId,
       updatePostDto,
       userId
     );
+
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.UPDATE.SUCCESS,
@@ -128,10 +135,14 @@ export class PostController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '게시글 삭제 API' })
-  @Delete(':id')
-  async remove(@LogIn() user: User, @Param('id') id: number) {
+  @Delete(':postId')
+  async remove(
+    @LogIn() user: User,
+    @Param('postId') postId: number
+  ) {
     const userId = user.id;
-    await this.postService.remove(id, userId);
+    await this.postService.remove(postId, userId);
+
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.DELETE.SUCCESS,
@@ -142,10 +153,14 @@ export class PostController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '게시글 강제 삭제 API' })
-  @Delete(':id/admin')
-  async forceRemove(@LogIn() user: User, @Param('id') id: number) {
+  @Delete(':postId/admin')
+  async forceRemove(
+    @LogIn() user: User,
+    @Param('id') id: number
+  ) {
     const userId = user.id;
     await this.postService.forceRemove(id, userId);
+
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.FORCE_DELETE.SUCCESS,
@@ -161,6 +176,7 @@ export class PostController {
     @UploadedFile() file: Express.Multer.File
   ) {
     const uploadedImageUrl = await this.postService.uploadPostImage(id, file);
+
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.IMAGE.UPLOAD.SUCCESS,
