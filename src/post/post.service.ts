@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
 import { User } from 'src/user/entities/user.entity';
+import { Role } from 'src/user/types/user-role.type';
 import { AwsService } from 'src/aws/aws.service';
 import { PostImage } from './entities/post-image.entity';
 import { Category } from './types/post-category.type';
@@ -23,11 +24,12 @@ export class PostService {
 
     @InjectRepository(PostImage)
     private readonly postImageRepository: Repository<PostImage>,
+
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
 
     private readonly awsService: AwsService
-  ) {}
+  ) { }
 
   /* 게시글 생성 API*/
   async create(createPostDto: CreatePostDto, userId: number) {
@@ -160,6 +162,31 @@ export class PostService {
     }
     return this.postRepository.remove(post);
   }
+
+  /*게시글 강제 삭제 API*/
+  async forceRemove(id: number, userId: number) {
+    // 
+    const post = await this.postRepository.findOne({
+      where: { id },
+      withDeleted: true,
+    });
+    const user = await this.userRepository.findOne({
+      where: { id: userId }
+    });
+
+    // 게시글이 존재하는지 확인
+    if (!post) {
+      throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
+    }
+
+    // user의 역할이 admin인지 확인
+    if (user.role !== Role.ADMIN) {
+      throw new ForbiddenException(POST_MESSAGE.POST.FORCE_DELETE.FAILURE.FORBIDDEN);
+    }
+
+    return this.postRepository.remove(post);
+  }
+
   /** 이미지 업로드 API **/
   async uploadPostImage(id: number, file: Express.Multer.File) {
     const post = await this.postRepository.findOne({ where: { id } });

@@ -131,11 +131,6 @@ export class UserService {
     return await this.userRepository.findOneBy({ email });
   }
 
-  // /** deletedAt으로 인증여부 확인하기(+) **/
-  // async findByDeletedAt(deletedAt: Date) {
-  //   return await this.userRepository.findOneBy({ deletedAt });
-  // }
-
   /** nickname으로 사용자 찾기(+) **/
   async findByNickname(nickname: string) {
     return await this.userRepository.findOneBy({ nickname });
