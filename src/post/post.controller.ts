@@ -32,7 +32,7 @@ import { Order } from './types/post-order.type';
 @ApiTags('게시글 API')
 @Controller('posts')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService) { }
 
   /** 게시글 생성 API **/
   @UseGuards(AuthGuard('jwt'))
@@ -137,6 +137,21 @@ export class PostController {
       message: POST_MESSAGE.POST.DELETE.SUCCESS,
     };
   }
+
+  /** 게시글 강제 삭제 API **/
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '게시글 강제 삭제 API' })
+  @Delete(':id/admin')
+  async forceRemove(@LogIn() user: User, @Param('id') id: number) {
+    const userId = user.id;
+    await this.postService.forceRemove(id, userId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.FORCE_DELETE.SUCCESS,
+    };
+  }
+
   /** 이미지 업로드 API **/
   @ApiOperation({ summary: '게시글 이미지 업로드 API' })
   @Post(':id/image')

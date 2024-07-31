@@ -1,5 +1,3 @@
-import { Delete } from '@nestjs/common';
-
 export const POST_MESSAGE = {
   POST: {
     NOT_FOUND: '게시글이 존재하지 않습니다.',
@@ -30,7 +28,14 @@ export const POST_MESSAGE = {
     },
     // 게시글 삭제
     DELETE: {
-      SUCCESS: '댓글 삭제에 성공하였습니다.',
+      SUCCESS: '게시글 삭제에 성공하였습니다.',
+    },
+    // 게시글 강제 삭제
+    FORCE_DELETE: {
+      SUCCESS: '게시글 강제 삭제에 성공하였습니다.',
+      FAILURE: {
+        FORBIDDEN: '관리자 계정이 아닙니다.',
+      },
     },
     // 이미지 업로드
     IMAGE: {
