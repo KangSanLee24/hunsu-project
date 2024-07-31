@@ -130,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 imagePreview.innerHTML = `<img src="${e.target.result}" alt="Image Preview" />`;
+                imagePreview.style.display = 'block'; // 이미지 미리보기 표시
             };
             reader.readAsDataURL(file);
         }
