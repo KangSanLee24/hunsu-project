@@ -18,7 +18,9 @@ export class ChatService {
     @InjectRepository(ChatMember)
     private readonly chatMemberRepository: Repository<ChatMember>,
     @InjectRepository(ChatLog)
-    private readonly chatLogRepository: Repository<ChatLog>
+    private readonly chatLogRepository: Repository<ChatLog>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) {}
   
   //채팅방 생성자 (채팅방 오너) 체크
@@ -192,21 +194,22 @@ export class ChatService {
   }
 
   //채팅방 채팅 내역 저장
-  async sendChatRoom(chatRoomId: number, user: User) {
+  async sendChatRoom(chatRoomId: number, author: string, message: string) {
+
+    const findUser = await this.userRepository.findOne({
+      where: {nickname: author},
+      select: {id : true}
+    });
     
+    const newChat = await this.chatLogRepository.save({
+      roomId: chatRoomId,
+      content: message,
+      memberId: 1   //임시
+    });
   }
 
   //채팅방 이미지 전송
   async sendImageRoom(chatRoomId: number, user: User) {
 
   }
-
-  // async findChatting(chatRoomId: number) {
-    
-  //   const findChatting = await this.chatRoomRepository.findOne({
-  //     where: {id: chatRoomId}
-  //   });
-
-  //   return { 'message' : findChatting.title}
-  // }
 }

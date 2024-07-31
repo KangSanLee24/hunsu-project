@@ -9,6 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
+import { ChatService } from '../chat/chat.service';
 
 @WebSocketGateway({
   cors: {
@@ -21,6 +22,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   private logger = new Logger('ChatGateway');
+
+  constructor(private readonly chatService: ChatService) {}
 
   @SubscribeMessage('joinRoom')
   handleJoinRoom(@MessageBody() { roomId }: { roomId: string }, @ConnectedSocket() socket: Socket) {
@@ -37,8 +40,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // }
 
   @SubscribeMessage('chat')
-  handleMessage(@MessageBody() payload: { roomId: string; author: string; body: string }, socket: Socket) {
+  async handleMessage(@MessageBody() payload: { roomId: string; author: string; body: string }, socket: Socket) {
     this.logger.log(`Message received: ${payload.body}`);
+
+    await this.chatService.sendChatRoom(+payload.roomId, payload.author, payload.body);
+
     this.server.to(payload.roomId).emit('chat', {author: payload.author, body: payload.body});
     return payload;
   }
