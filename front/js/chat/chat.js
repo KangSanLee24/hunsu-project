@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                imagePreview.innerHTML = `<img src="${event.target.result}" alt="Image Preview" />`;
+                imagePreview.innerHTML = `<img src="${e.target.result}" alt="Image Preview" />`;
             };
             reader.readAsDataURL(file);
         }
