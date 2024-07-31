@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config/config.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
   if (loginForm) {
@@ -7,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
 
-      const response = await fetch('http://localhost:4000/api/auth/log-in', {
+      const response = await fetch(`${API_BASE_URL}/auth/log-in`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
