@@ -243,6 +243,7 @@ export class ChatService {
     return fileUrl;
   }
 
+  //채팅방 검색
   async chatRoomSearch(title: string) {
 
       const findChatRoom = await this.chatRoomRepository.query(
@@ -252,5 +253,5 @@ export class ChatService {
       );
 
       return findChatRoom;
-    }
+  }
 }
