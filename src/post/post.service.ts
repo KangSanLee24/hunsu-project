@@ -14,6 +14,7 @@ import { AwsService } from 'src/aws/aws.service';
 import { PostImage } from './entities/post-image.entity';
 import { Category } from './types/post-category.type';
 import { Order } from './types/post-order.type';
+import { paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class PostService {
@@ -57,24 +58,41 @@ export class PostService {
     };
   }
   /*게시글 목록 조회 API*/
-  async findAll(category?: Category, sort?: Order) {
+  async findAll(
+    page: number,
+    limit: number,
+    category?: Category,
+    sort?: Order
+  ) {
     // 카테고리에 따른 정렬
     const sortCategory = category ? { category } : {};
-    const posts = await this.postRepository.find({
-      where: sortCategory,
-      relations: ['user', 'comments'],
-      order: { createdAt: sort ? sort : 'DESC' }, // 정렬조건
-    });
-    return posts.map((post) => ({
-      id: post.id,
-      userId: post.userId,
-      nickname: post.user.nickname,
-      title: post.title,
-      numComments: post.comments.length, // 댓글 수 배열로 표현됨
-      category: post.category,
-      createdAt: post.createdAt,
-      updatedAt: post.updatedAt,
-    }));
+
+    const { items, meta } = await paginate<Post>(
+      this.postRepository,
+      {
+        page,
+        limit,
+      },
+      {
+        where: sortCategory,
+        relations: ['user', 'comments'],
+        order: { createdAt: sort ? sort : 'DESC' }, // 정렬조건
+      }
+    );
+
+    return {
+      posts: items.map((post) => ({
+        id: post.id,
+        userId: post.userId,
+        nickname: post.user.nickname,
+        title: post.title,
+        numComments: post.comments.length, // 댓글 수 배열로 표현됨
+        category: post.category,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+      })),
+      meta,
+    };
   }
 
   /* 게시글 상세 조회 API*/

@@ -6,7 +6,7 @@ import { Category } from '../types/post-category.type';
 export class CreatePostDto {
   @IsString()
   @IsNotEmpty({ message: POST_MESSAGE.POST.CREATE.TITLE_EMPTY })
-  @ApiProperty({ example: '내 옷 어떄? 별로야?' })
+  @ApiProperty({ example: '내 옷 어때? 별로야?' })
   title: string;
 
   @IsString()
