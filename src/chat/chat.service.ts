@@ -70,7 +70,8 @@ export class ChatService {
         },
         title: true,
         createdAt: true,
-      }
+      },
+      order: {createdAt: 'DESC'}
     });
 
     const chatRoomsFormatted = chatRooms.map((room) => ({
@@ -242,16 +243,14 @@ export class ChatService {
     return fileUrl;
   }
 
-  async chatRoomSearch(title?: string) {
+  async chatRoomSearch(title: string) {
 
-    if(title) {
       const findChatRoom = await this.chatRoomRepository.query(
         `select id, user_id , title , created_at 
         from chat_rooms
         where title like '%${title}%';`
-      )
-      return findChatRoom
-      };
-
+      );
+      
+      return findChatRoom;
     }
 }

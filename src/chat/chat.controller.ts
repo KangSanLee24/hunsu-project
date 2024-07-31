@@ -57,7 +57,7 @@ export class ChatController {
    * @returns
    */
   @Get('search')
-  async chatRoomSearch(@Query('title') title?: string) {
+  async chatRoomSearch(@Query('title') title: string) {
     return await this.chatService.chatRoomSearch(title);
   }
 
