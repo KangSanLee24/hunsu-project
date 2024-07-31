@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config/config.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   const signUpForm = document.querySelector('form');
   if (!signUpForm) {
