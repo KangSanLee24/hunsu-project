@@ -16,6 +16,8 @@ import { Post } from 'src/post/entities/post.entity';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { VerifyEmail } from 'src/mail/entities/verify-email.entity';
 import { MailModule } from 'src/mail/mail.module';
+// import { KakaoStrategy } from './guards/kakao.strategy';
+import { NaverStrategy } from './guards/naver.strategy';
 
 @Module({
   imports: [
@@ -41,7 +43,7 @@ import { MailModule } from 'src/mail/mail.module';
     MailModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, NaverStrategy],
+  exports: [AuthService, JwtStrategy, NaverStrategy],
 })
 export class AuthModule {}

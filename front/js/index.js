@@ -1,5 +1,5 @@
 // src/index.js
-import io from 'socket.io-client';
+
 import '../styles/style.css';
 
 console.log('Main Page');

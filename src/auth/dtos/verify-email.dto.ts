@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber } from 'class-validator';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
 
 export class VerifyEmailDto {

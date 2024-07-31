@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessage(newMessage);
     });
 
-    // 메시지 전송 버튼 클릭 이벤트 처리
+    // 메시지 전송 버튼 클릭 이벤트 처리   
     sendButton.addEventListener('click', () => {
         const inputValue = messageInput.value.trim();
         if (inputValue.length === 0) return;
