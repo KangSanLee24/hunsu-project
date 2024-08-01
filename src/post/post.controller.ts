@@ -28,6 +28,7 @@ import { User } from 'src/user/entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Category } from './types/post-category.type';
 import { Order } from './types/post-order.type';
+import { FindAllPostsDto } from './dtos/find-all-posts.dto';
 
 @ApiTags('3. POST API')
 @Controller('posts')
@@ -62,13 +63,25 @@ export class PostController {
     required: false,
     enum: Order,
   })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+  })
   @Get()
-  async findAll(
-    @Query('category')
-    category?: Category,
-    @Query('sort') sort?: Order
-  ) {
-    const findAllPost = await this.postService.findAll(category, sort);
+  async findAll(@Query() findAllPostsDto?: FindAllPostsDto) {
+    const { page, limit, category, sort } = findAllPostsDto || {};
+    const findAllPost = await this.postService.findAll(
+      page,
+      limit,
+      category,
+      sort
+    );
 
     return {
       statusCode: HttpStatus.OK,
@@ -79,9 +92,10 @@ export class PostController {
 
   /** 게시글 상세 조회 API **/
   @ApiOperation({ summary: '3. 게시글 상세 조회 API' })
-  @Get(':id')
-  async findOne(@Param('id') id: number) {
-    const findOnePost = await this.postService.findOne(id);
+  @Get(':postId')
+  async findOne(@Param('postId') postId: number) {
+    const findOnePost = await this.postService.findOne(postId);
+
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.READ_DETAIL.SUCCESS,
@@ -105,18 +119,19 @@ export class PostController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '4. 게시글 수정 API' })
-  @Patch(':id')
+  @Patch(':postId')
   async update(
     @LogIn() user: User,
-    @Param('id') id: number,
+    @Param('postId') postId: number,
     @Body() updatePostDto: UpdatePostDto
   ) {
     const userId = user.id;
     const updatedPost = await this.postService.update(
-      id,
+      postId,
       updatePostDto,
       userId
     );
+
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.UPDATE.SUCCESS,
@@ -128,15 +143,32 @@ export class PostController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '5. 게시글 삭제 API' })
-  @Delete(':id')
-  async remove(@LogIn() user: User, @Param('id') id: number) {
+  @Delete(':postId')
+  async remove(@LogIn() user: User, @Param('postId') postId: number) {
     const userId = user.id;
-    await this.postService.remove(id, userId);
+    await this.postService.remove(postId, userId);
+
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.DELETE.SUCCESS,
     };
   }
+
+  /** 게시글 강제 삭제 API **/
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '게시글 강제 삭제 API' })
+  @Delete(':postId/admin')
+  async forceRemove(@LogIn() user: User, @Param('id') id: number) {
+    const userId = user.id;
+    await this.postService.forceRemove(id, userId);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.FORCE_DELETE.SUCCESS,
+    };
+  }
+
   /** 이미지 업로드 API **/
   @ApiOperation({ summary: '6. 게시글 이미지 업로드 API' })
   @Post(':id/image')
@@ -146,6 +178,7 @@ export class PostController {
     @UploadedFile() file: Express.Multer.File
   ) {
     const uploadedImageUrl = await this.postService.uploadPostImage(id, file);
+
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.IMAGE.UPLOAD.SUCCESS,

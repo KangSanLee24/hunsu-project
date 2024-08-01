@@ -3,12 +3,15 @@ import { CreateChatDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { ChatRoom } from './entities/chat-room.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Like, Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { ChatMember } from './entities/chat-member.entity';
 import moment from 'moment';
 import { format, isSameDay } from 'date-fns';
 import { ChatLog } from './entities/chat-log.entity';
+import { AwsService } from 'src/aws/aws.service';
+import { ChatImage } from './entities/chat-image.entity';
+import { Order } from 'src/post/types/post-order.type';
 
 @Injectable()
 export class ChatService {
@@ -18,7 +21,13 @@ export class ChatService {
     @InjectRepository(ChatMember)
     private readonly chatMemberRepository: Repository<ChatMember>,
     @InjectRepository(ChatLog)
-    private readonly chatLogRepository: Repository<ChatLog>
+    private readonly chatLogRepository: Repository<ChatLog>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(ChatImage)
+    private readonly chatImageRepository: Repository<ChatImage>,
+    private readonly awsService: AwsService,
+    private entityManager: EntityManager,
   ) {}
   
   //채팅방 생성자 (채팅방 오너) 체크
@@ -37,13 +46,13 @@ export class ChatService {
   async createChatRoom(user: User, createChatDto: CreateChatDto) {
     
     const newChatRoom = await this.chatRoomRepository.save({
-      userId: user.id,
+      userId: 1, //user.id,임시
       title: createChatDto.title
     });
 
     await this.chatMemberRepository.save({
       roomId: newChatRoom.id,
-      userId: user.id
+      userId: 1//user.id
     });
 
     return newChatRoom;
@@ -62,7 +71,8 @@ export class ChatService {
         },
         title: true,
         createdAt: true,
-      }
+      },
+      order: {createdAt: 'DESC'}
     });
 
     const chatRoomsFormatted = chatRooms.map((room) => ({
@@ -161,15 +171,31 @@ export class ChatService {
       order: {createdAt: 'DESC'}
     });
 
-    if(!chatLastTime) {
-      return { 'message' : ' ' };
-    }
+    const chatImageLastTime = await this.chatImageRepository.findOne({
+      where: {roomId: chatRoomId},
+      select: {createdAt: true},
+      order: {createdAt: 'DESC'}
+    });
 
-    const formatTime = format(new Date(chatLastTime.createdAt), 'yyyy-MM-dd HH:mm');
+    //아무 채팅 없음
+    if(!chatLastTime && !chatImageLastTime) {
+      return { 'message' : ' ' };
+    };
+
+    let formatTime: any;
+
+    if(chatLastTime && !chatImageLastTime) {
+      formatTime = format(new Date(chatLastTime.createdAt), 'yyyy-MM-dd HH:mm');
+    } else if (!chatLastTime && chatImageLastTime) {
+      formatTime = format(new Date(chatImageLastTime.createdAt), 'yyyy-MM-dd HH:mm');
+    } else if (chatLastTime && chatImageLastTime) {
+      const diffTime = chatLastTime.createdAt < chatImageLastTime.createdAt ? chatImageLastTime.createdAt : chatLastTime.createdAt;
+      formatTime = format(new Date(diffTime), 'yyyy-MM-dd HH:mm');
+    }
 
     //오늘인지 확인
 
-    const chatDate = new Date(chatLastTime.createdAt);
+    const chatDate = new Date(formatTime);
     const nowDate = new Date();
 
     const isToday = isSameDay(chatDate, nowDate);
@@ -192,21 +218,72 @@ export class ChatService {
   }
 
   //채팅방 채팅 내역 저장
-  async sendChatRoom(chatRoomId: number, user: User) {
+  async sendChatRoom(chatRoomId: number, author: string, message: string) {
+
+    const findUser = await this.userRepository.findOne({
+      where: {nickname: author},
+      select: {id : true}
+    });
     
+    await this.chatLogRepository.save({
+      roomId: chatRoomId,
+      content: message,
+      memberId: 1   //임시
+    });
   }
 
-  //채팅방 이미지 전송
-  async sendImageRoom(chatRoomId: number, user: User) {
+  //채팅방 이미지 저장
+  async sendImageRoom(chatRoomId: number, author: string, file: Express.Multer.File) {
 
+    const findUser = await this.userRepository.findOne({
+      where: {nickname: author},
+      select: {id : true}
+    });
+
+    const [fileName, fileExt] = file.originalname.split('.');
+
+    const fileUrl = await this.awsService.imageUploadToS3(
+      // 업로드
+      `${Date.now()}_${fileName}`, 
+      'chats',
+      file,
+      fileExt
+    );
+
+    //디비 저장
+    await this.chatImageRepository.save({
+      roomId: chatRoomId,
+      userId: 1, //임시
+      imgUrl: fileUrl
+    });
+
+    return fileUrl;
   }
 
-  // async findChatting(chatRoomId: number) {
-    
-  //   const findChatting = await this.chatRoomRepository.findOne({
-  //     where: {id: chatRoomId}
-  //   });
+  //채팅방 검색
+  async chatRoomSearch(title: string) {
 
-  //   return { 'message' : findChatting.title}
-  // }
+    const findChatRoom = await this.chatRoomRepository.find({
+      relations: ['user'],
+      select: {
+        id: true,
+        user: {
+          nickname: true,
+        },
+        title: true,
+        createdAt: true,
+      },
+      where: {
+        title: Like(`%${title}%`)
+      },
+      order: {createdAt: 'DESC'}
+    });
+
+    const chatRoomsFormatted = findChatRoom.map((room) => ({
+      ...room,
+      createdAt: format(new Date(room.createdAt), 'yyyy-MM-dd HH:mm')
+    }));
+
+    return chatRoomsFormatted;
+  }
 }

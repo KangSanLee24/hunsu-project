@@ -51,10 +51,36 @@ export const AUTH_MESSAGES = {
     },
   },
   RE_PASSWORD: {
-    SUCCESS: '비밀번호 바꾸기에 성공했습니다.',
+    SUCCESS: '비밀번호 변경 인증번호를 전송했습니다.',
     FAILURE: {
+      NO_USER: '존재하지 않는 유저입니다.',
       NO_PASSWORD: '비밀번호를 입력해 주세요.',
+      NOT_VERIFIED: '가입이 완료되지 않아 비밀번호 변경을 진행할 수 없습니다.',
     },
+  },
+  VERIFY_PASSWORD: {
+    SUCCESS: '비밀번호 변경 이메일 인증에 성공했습니다.',
+    FAILURE: {
+      WRONG_EMAIL:
+        '이메일을 잘못 입력하셨습니다. 다시 확인해 주세요.',
+      WRONG_CERTIFICATION:
+        '인증번호를 잘못 입력하셨습니다. 다시 확인해 주세요.',
+      SEND_ERROR: '인증 메일 전송 중 오류가 발생했습니다. 다시 시도해 주세요.',
+      TIME_OUT: '이메일 인증 제한시간이 초과되었습니다. 다시 시도해 주세요.',
+      NO_EMAIL: '인증할 이메일을 입력해 주세요.',
+      NO_CERTIFICATION: '인증번호 4자리를 입력해 주세요.',
+    },
+  },
+  UPDATE_PASSWORD: {
+    SUCCESS: '비밀번호 변경에 성공하였습니다!',
+    FAILURE: {
+      NO_VERYFYING: '비밀번호 변경 인증이 진행중이지 않은 이메일입니다.',
+      NO_CERTIFIED: '비밀번호 변경 인증이 완료되지 않았습니다.',
+      PASSWORD_MISMATCH: '입력하신 비밀번호와 비밀번호확인이 일치하지 않습니다.',
+      NO_EMAIL: '이메일을 입력해주세요.',
+      NO_PASSWORD: '비밀번호를 입력해 주세요.',
+      NO_PASSWORD_CONFIRM: '비밀번호 확인을 입력해 주세요.',
+    }
   },
   JWT: {
     FAILURE: {

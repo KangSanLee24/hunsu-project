@@ -5,7 +5,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 @ApiTags('8. MAIL API')
 @Controller('mails')
 export class MailController {
-  constructor(private readonly mailService: MailService) {}
+  constructor(private readonly mailService: MailService) { }
 
   /** 인증 메일 전송 API **/
   @ApiOperation({ summary: '1. 인증 번호 메일 전송' })

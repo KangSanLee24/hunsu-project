@@ -32,6 +32,27 @@ header {
   z-index: 1000; /* 다른 요소 위에 표시 */
 }
 
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+}
+
+nav li:hover {
+  background-color: #ffffff;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+nav a {
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 18px;
+}
+
 header .logo {
   font-size: 24px;
   font-weight: bold;
@@ -40,6 +61,7 @@ header .logo {
 
 main {
   padding-top: 80px; /* 헤더 높이에 맞춰 여백 추가 */
+  padding-bottom: 80px; /* 푸터 높이에 맞춰 여백 추가 */
 }
 
 footer {
@@ -57,6 +79,16 @@ footer {
   justify-content: space-around;
   background-color: #000000;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+footer button {
+  background-color: #000000;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
 }
 
 /* 반응형 디자인 */

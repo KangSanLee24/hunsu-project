@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { JwtStrategy } from 'src/auth/guards/jwt.strategy';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/user/entities/user.entity';
 import { LogIn } from 'src/decorators/log-in.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Order } from 'src/post/types/post-order.type';
 
 //@UseGuards(JwtStrategy)
 @ApiTags('채팅 API')
@@ -31,15 +33,6 @@ export class ChatController {
     return await this.chatService.findChatRooms();
   }
 
-  // /**
-  //  * 채팅방 내역 조회
-  //  * @returns
-  //  */
-  // @Get(':chatRoomId')
-  // async findChatting(@Param('chatRoomId') chatRoomId: string) {
-  //   return await this.chatService.findChatting(+chatRoomId);
-  // }
-
   /**
    * 채팅방 인원 계산
    * @returns
@@ -59,6 +52,15 @@ export class ChatController {
   }
 
   /**
+   * 채팅방 검색
+   * @returns
+   */
+  @Get('search')
+  async chatRoomSearch(@Query('title') title: string) {
+    return await this.chatService.chatRoomSearch(title);
+  }
+
+  /**
    * 채팅방 입장
    * @returns
    */
@@ -68,21 +70,15 @@ export class ChatController {
   }
 
   /**
-   * 채팅방 채팅 내역 저장
-   * @returns
-   */
-  @Post(':chatRoomId/chatting')
-  async sendChatRoom(@Param('chatRoomId') chatRoomId: string, @LogIn() user: User) {
-    return await this.chatService.sendChatRoom(+chatRoomId, user);
-  }
-
-  /**
    * 채팅방 이미지 전송
    * @returns
    */
   @Post(':chatRoomId/image')
-  async sendImageRoom(@Param('chatRoomId') chatRoomId: string, @LogIn() user: User) {
-    return await this.chatService.sendImageRoom(+chatRoomId, user);
+  @UseInterceptors(FileInterceptor('file'))
+  async sendImageRoom(@Param('chatRoomId') chatRoomId: string, @UploadedFile() file: Express.Multer.File, @Body() body) {
+    const { author } = body;
+    const fileUrl = await this.chatService.sendImageRoom(+chatRoomId, author, file);
+    return { fileUrl };
   }
 
   /**
