@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
@@ -33,15 +34,20 @@ export class PostService {
   ) { }
 
   /* 게시글 생성 API*/
-  async create(createPostDto: CreatePostDto, userId: number) {
+  async create(
+    createPostDto: CreatePostDto,
+    userId: number
+  ) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       withDeleted: true,
     });
 
+    // 권한 확인
     if (!user) {
-      throw new NotFoundException('사용자를 찾지 못하였습니다.');
+      throw new UnauthorizedException(POST_MESSAGE.POST.UNAUTHORIZED);
     }
+
     const createdPost = this.postRepository.create({
       ...createPostDto,
       userId,
@@ -143,7 +149,10 @@ export class PostService {
   // }
 
   /*게시글 수정 API*/
-  async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
+  async update(
+    id: number,
+    updatePostDto: UpdatePostDto,
+    userId: number) {
     const post = await this.postRepository.findOne({
       where: { id },
       withDeleted: true,
@@ -155,15 +164,19 @@ export class PostService {
     }
 
     // 작성자 본인인지 확인
-    if (post.userId !== userId) {
-      throw new ForbiddenException('권한이 없습니다.');
+    else if (post.userId !== userId) {
+      throw new ForbiddenException(POST_MESSAGE.POST.UPDATE.FAILURE.FORBIDDEN);
     }
+
     await this.postRepository.update({ id }, updatePostDto);
     return await this.postRepository.findOneBy({ id });
   }
 
   /*게시글 삭제 API*/
-  async remove(id: number, userId: number) {
+  async remove(
+    id: number, // post.id
+    userId: number // user.id
+  ) {
     const post = await this.postRepository.findOne({
       where: { id },
       withDeleted: true,
@@ -175,9 +188,10 @@ export class PostService {
     }
 
     // 작성자 본인인지 확인
-    if (post.userId !== userId) {
-      throw new ForbiddenException('권한이 없습니다.');
+    else if (post.userId !== userId) {
+      throw new ForbiddenException(POST_MESSAGE.POST.DELETE.FAILURE.FORBIDDEN);
     }
+
     return this.postRepository.remove(post);
   }
 
@@ -213,13 +227,15 @@ export class PostService {
       throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
     }
     const [fileName, fileExt] = file.originalname.split('.');
+
+    // 업로드
     const fileUrl = await this.awsService.imageUploadToS3(
-      // 업로드
       `${Date.now()}_${fileName}`, // 이미지 이름과 URL이 같고 이미지는 다르게 되는 경우를 방지하고자 날짜를 넣음
       'posts',
       file,
       fileExt
     );
+
     // url db에 저장하는 코드 추가
     const postImage = this.postImageRepository.create({
       imgUrl: fileUrl,
