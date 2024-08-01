@@ -12,7 +12,7 @@ export const POST_MESSAGE = {
 
     // 게시글 목록 조회
     READ_ALL: {
-      SUCCESS: '게시글 목록 조회에 성공하습니다.',
+      SUCCESS: '게시글 목록 조회에 성공하였습니다.',
     },
     // 게시글 상세 조회
     READ_DETAIL: {
@@ -28,14 +28,14 @@ export const POST_MESSAGE = {
       SUCCESS: '게시글 수정에 성공하였습니다.',
       FAILURE: {
         FORBIDDEN: '해당 댓글을 수정할 권한이 없습니다.',
-      }
+      },
     },
     // 게시글 삭제
     DELETE: {
       SUCCESS: '게시글 삭제에 성공하였습니다.',
       FAILURE: {
         FORBIDDEN: '해당 게시글을 삭제할 권한이 없습니다.',
-      }
+      },
     },
     // 게시글 강제 삭제
     FORCE_DELETE: {
