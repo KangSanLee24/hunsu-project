@@ -143,6 +143,6 @@ export class AlarmController {
   @Sse(':userId')
   newEventAlarm(@Param('userId') userId: number) {
     const data = this.alarmService.newEventAlarm(userId);
-    return;
+    return data;
   }
 }

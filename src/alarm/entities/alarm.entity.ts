@@ -4,27 +4,29 @@ import {
   DeleteDateColumn,
   Entity,
   PrimaryColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { AlarmFromType } from '../types/alarm-from.type';
 
 @Entity('alarms')
 export class Alarm {
-  @PrimaryColumn({ unsigned: true })
+  @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  @Column()
+  @Column({ unsigned: true })
   userId: number;
 
   @Column()
-  fromType: string;
+  fromType: AlarmFromType;
 
-  @Column()
+  @Column({ unsigned: true })
   fromNumber: number;
 
   @Column()
   notification: string;
 
-  @Column()
+  @Column({ default: false })
   isChecked: boolean;
 
   @CreateDateColumn()

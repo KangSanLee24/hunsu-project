@@ -43,7 +43,6 @@ import { AlarmModule } from './alarm/alarm.module';
     ChatModule,
     EventsModule,
     AlarmModule,
-    ,
   ],
   controllers: [AppController],
   providers: [AwsService],
