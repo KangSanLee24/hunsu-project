@@ -13,15 +13,16 @@ import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiOperation,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { User } from 'src/user/entities/user.entity';
+import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
+import { POST_MESSAGE } from 'src/constants/post-message.constant';
 
 @Controller('')
 export class LikeController {
-  constructor(private readonly likeService: LikeService) {}
+  constructor(private readonly likeService: LikeService) { }
 
   @ApiTags('댓글 API')
   @ApiOperation({ summary: '댓글 좋아요 조회 API' })
@@ -31,7 +32,7 @@ export class LikeController {
 
     return {
       status: HttpStatus.OK,
-      message: '댓글 좋아요 조회에 성공했습니다.',
+      message: COMMENT_MESSAGE.LIKE.FIND.SUCCESS,
       data,
     };
   }
@@ -50,7 +51,7 @@ export class LikeController {
 
     return {
       status: HttpStatus.OK,
-      message: '댓글 좋아요 생성에 성공했습니다.',
+      message: COMMENT_MESSAGE.LIKE.CREATE.SUCCESS,
     };
   }
 
@@ -68,7 +69,7 @@ export class LikeController {
 
     return {
       status: HttpStatus.OK,
-      message: '댓글 좋아요 삭제에 성공했습니다.',
+      message: COMMENT_MESSAGE.LIKE.DELETE.SUCCESS,
     };
   }
 
@@ -80,7 +81,7 @@ export class LikeController {
 
     return {
       status: HttpStatus.OK,
-      message: '게시글 좋아요 조회에 성공했습니다.',
+      message: POST_MESSAGE.LIKE.FIND.SUCCESS,
       data,
     };
   }
@@ -99,7 +100,7 @@ export class LikeController {
 
     return {
       status: HttpStatus.OK,
-      message: '게시글 좋아요 생성에 성공했습니다.',
+      message: POST_MESSAGE.LIKE.CREATE.SUCCESS,
     };
   }
 
@@ -117,7 +118,7 @@ export class LikeController {
 
     return {
       status: HttpStatus.OK,
-      message: '게시글 좋아요 삭제에 성공했습니다.',
+      message: POST_MESSAGE.LIKE.DELETE.SUCCESS,
     };
   }
 }

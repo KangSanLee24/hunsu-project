@@ -12,7 +12,6 @@ import { IsNull, Repository } from 'typeorm';
 import { Post } from 'src/post/entities/post.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Role } from 'src/user/types/user-role.type';
-import { POST_MESSAGE } from 'src/constants/post-message.constant';
 import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
 
 
