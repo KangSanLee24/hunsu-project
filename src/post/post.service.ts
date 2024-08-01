@@ -156,7 +156,7 @@ export class PostService {
 
     // 작성자 본인인지 확인
     if (post.userId !== userId) {
-      throw new ForbiddenException('권한이 없습니다.');
+      throw new ForbiddenException(POST_MESSAGE.POST.UPDATE.FAILURE.FORBIDDEN);
     }
     await this.postRepository.update({ id }, updatePostDto);
     return await this.postRepository.findOneBy({ id });
@@ -166,6 +166,7 @@ export class PostService {
   async remove(id: number, userId: number) {
     const post = await this.postRepository.findOne({
       where: { id },
+      relations: ['postImages'],
       withDeleted: true,
     });
 
@@ -176,9 +177,16 @@ export class PostService {
 
     // 작성자 본인인지 확인
     if (post.userId !== userId) {
-      throw new ForbiddenException('권한이 없습니다.');
+      throw new ForbiddenException(POST_MESSAGE.POST.DELETE.FAILURE.FORBIDDEN);
     }
-    return this.postRepository.remove(post);
+    // AWS S3에서 이미지 삭제
+    // for문으로 s3 서비스의 삭제 메소드 이용해서 게시글에 속한 이미지 하나씩 삭제
+    for (const image of post.postImages) {
+      this.awsService.deleteFileFromS3(image.imgUrl);
+    }
+
+    // DB에서 게시글 삭제
+    this.postRepository.remove(post);
   }
 
   /*게시글 강제 삭제 API*/

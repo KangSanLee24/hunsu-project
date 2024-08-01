@@ -1,7 +1,11 @@
 // aws.service.ts
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 
 @Injectable()
 export class AwsService {
@@ -44,13 +48,13 @@ export class AwsService {
     return fileUrl;
   }
 
-  // // 첨부 파일 삭제
-  // async deleteFileFromS3(fileUrl: string) {
-  //   const fileName = fileUrl.split('/').pop();
-  //   const command = new DeleteObjectCommand({
-  //     Bucket: this.awsS3Bucket,
-  //     Key: fileName,
-  //   });
-  //   await this.s3Client.send(command);
-  // }
+  // 첨부 파일 삭제
+  async deleteFileFromS3(fileUrl: string) {
+    const fileName = fileUrl.split('/').slice(-2).join('/');
+    const command = new DeleteObjectCommand({
+      Bucket: this.configService.get('AWS_S3_BUCKET_NAME'), // S3 버킷 이름
+      Key: fileName, // 삭제될 파일의 이름
+    });
+    await this.s3Client.send(command);
+  }
 }
