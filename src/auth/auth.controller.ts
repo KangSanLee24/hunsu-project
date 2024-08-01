@@ -105,14 +105,14 @@ export class AuthController {
   /** 6. 소셜로그인 **/
 
   /** 6-1-1. 소셜로그인 - 네이버 **/
-  @ApiOperation({ summary: '6-1. 로그인(log-in) Naver API' })
+  @ApiOperation({ summary: '6-1A. 로그인(log-in) Naver API' })
   @UseGuards(AuthGuard('naver'))
   @Get('log-in/naver')
   async logInNaver() {
     // 네이버 로그인 페이지 접속
-    console.log('1...... 여기까지는 오케이!!!!?');
   }
   /** 6-1-2. 소셜로그인 - 네이버 콜백 **/
+  @ApiOperation({ summary: '6-1B. 로그인(log-in) Naver 콜백 API' })
   @UseGuards(AuthGuard('naver'))
   @Get('log-in/naver/cb')
   async logInNaverCB(@Req() req: any) {
@@ -125,10 +125,11 @@ export class AuthController {
   }
 
   /** 6-2-1. 소셜로그인 - 구글 **/
-  @ApiOperation({ summary: '6-2. 로그인(log-in) Google API' })
+  @ApiOperation({ summary: '6-2A. 로그인(log-in) Google API' })
   @Get('log-in/google')
   async logInGoogle() {}
   /** 6-2-2. 소셜로그인 - 구글 콜백 **/
+  @ApiOperation({ summary: '6-2B. 로그인(log-in) Google 콜백 API' })
   @Get('log-in/google/cb')
   async logInGoogleCB() {}
 

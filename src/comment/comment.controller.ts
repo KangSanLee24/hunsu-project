@@ -23,7 +23,7 @@ import { User } from 'src/user/entities/user.entity';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { AuthGuard } from '@nestjs/passport';
 
-@ApiTags('댓글 API')
+@ApiTags('4. COMMENT API')
 @Controller('/posts/:postId/comments')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
@@ -31,7 +31,7 @@ export class CommentController {
   /** 댓글 생성 **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '댓글 생성 API' })
+  @ApiOperation({ summary: '1. 댓글 생성 API' })
   @ApiResponse({ status: HttpStatus.CREATED })
   @Post()
   async create(
@@ -55,7 +55,7 @@ export class CommentController {
   }
 
   /** 댓글 목록 조회 **/
-  @ApiOperation({ summary: '댓글 목록 조회 API' })
+  @ApiOperation({ summary: '2. 댓글 목록 조회 API' })
   @Get()
   async findAll(@Param('postId', ParseIntPipe) postId: number) {
     const data = await this.commentService.findCommentsByPostId(postId);
@@ -69,7 +69,7 @@ export class CommentController {
   /** 댓글 수정**/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '댓글 수정 API' })
+  @ApiOperation({ summary: '3. 댓글 수정 API' })
   @Patch(':commentId')
   async update(
     @LogIn() user: User,
@@ -96,7 +96,7 @@ export class CommentController {
   /** 댓글 삭제 **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '댓글 삭제 API' })
+  @ApiOperation({ summary: '4. 댓글 삭제 API' })
   @Delete(':commentId')
   async remove(
     @LogIn() user: User,

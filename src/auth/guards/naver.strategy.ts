@@ -32,7 +32,6 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
   ): Promise<any> {
     try {
       // 1. 유저정보
-      console.log(profile);
       const { _json } = profile;
       const user = {
         id: _json.id,

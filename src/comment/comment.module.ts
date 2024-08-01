@@ -8,6 +8,7 @@ import { Post } from 'src/post/entities/post.entity';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { LikeModule } from 'src/like/like.module';
+import { AlarmModule } from 'src/alarm/alarm.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { LikeModule } from 'src/like/like.module';
     UserModule,
     AuthModule,
     LikeModule,
+    AlarmModule,
   ],
   controllers: [CommentController],
   providers: [CommentService],

@@ -408,16 +408,6 @@ export class AuthService {
   /** 6-2. 소셜로그인 - 구글 **/
   async logInGoogle() {}
 
-  // /** 토큰 발급 **/
-  // async createToken(user, refresh) {
-  //   const payload = {
-  //     type: refresh ? 'RF' : 'AC',
-  //     email: user.email,
-  //     sub: user.id,
-  //   };
-  //   const key = refresh ?
-  // }
-
   // /** 6. 비밀번호 바꾸기 API **/
   // async rePassword(rePasswordDto: RePasswordDto) {
   //   // 0. dto에서 데이터 꺼내기
@@ -461,4 +451,7 @@ export class AuthService {
       greeting: `당신의 아이디는 ${user.email} 입니다!`,
     };
   }
+
+  /** 0. Token 발급기 **/
+  async tokenMaker(payload, refresh: boolean) {}
 }
