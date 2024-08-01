@@ -34,14 +34,12 @@ import { FindAllPostsDto } from './dtos/find-all-posts.dto';
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
-  constructor(private readonly postService: PostService) {}
 
   /** 게시글 생성 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '1. 게시글 생성 API' })
   @Post()
-  async create(@LogIn() user: User, @Body() createPostDto: CreatePostDto) {
   async create(@LogIn() user: User, @Body() createPostDto: CreatePostDto) {
     const userId = user.id;
     const createdPost = await this.postService.create(createPostDto, userId);
@@ -96,7 +94,6 @@ export class PostController {
   @ApiOperation({ summary: '3. 게시글 상세 조회 API' })
   @Get(':postId')
   async findOne(@Param('postId') postId: number) {
-  async findOne(@Param('postId') postId: number) {
     const findOnePost = await this.postService.findOne(postId);
 
     return {
@@ -148,7 +145,6 @@ export class PostController {
   @ApiOperation({ summary: '5. 게시글 삭제 API' })
   @Delete(':postId')
   async remove(@LogIn() user: User, @Param('postId') postId: number) {
-  async remove(@LogIn() user: User, @Param('postId') postId: number) {
     const userId = user.id;
     await this.postService.remove(postId, userId);
 
@@ -163,7 +159,6 @@ export class PostController {
   @ApiBearerAuth()
   @ApiOperation({ summary: '게시글 강제 삭제 API' })
   @Delete(':postId/admin')
-  async forceRemove(@LogIn() user: User, @Param('id') id: number) {
   async forceRemove(@LogIn() user: User, @Param('id') id: number) {
     const userId = user.id;
     await this.postService.forceRemove(id, userId);
