@@ -53,7 +53,6 @@ export class ChatController {
 
   /**
    * 채팅방 검색
-   * @param createChatDto
    * @returns
    */
   @Get('search')

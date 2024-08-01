@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/styles/style.css" />
     <link rel="stylesheet" href="../styles/chat-list.css" />
   </head>
+
   <body>
     <header>
       <div class="logo">5ZIRAP</div>
@@ -44,11 +45,8 @@
         <input type="text" id="roomName" name="roomName" />
         <button id="createButton">채팅방 생성하기</button>
       </div>
-
-      <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
-      <script type="module" src="../js/chat/chat-list.js"></script>
-      <script type="module" src="../js/chat/chat-create.js"></script>
     </main>
+
     <footer>
       <div class="footer-menu">
         <button onclick="window.location.href='./chat-list.html'">
@@ -64,5 +62,10 @@
         </button>
       </div>
     </footer>
+
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+    <script type="module" src="../js/chat/chat-list.js"></script>
+    <script type="module" src="../js/chat/chat-create.js"></script>
+    <script type="module" src="../js/chat/chat-search.js"></script>
   </body>
 </html>

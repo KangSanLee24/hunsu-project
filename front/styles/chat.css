@@ -197,3 +197,22 @@ code {
   display: none;
 }
 
+.message, .notification {
+  margin-bottom: 10px;
+}
+
+.message {
+  padding: 10px;
+  background-color: #e1e1e1;
+  border-radius: 5px;
+  position: relative;
+}
+
+.notification {
+  color: #555;
+  font-style: italic;
+  background-color: #f9f9f9;
+  padding: 10px;
+  font-size: 0.91em;
+  text-align: center;
+}
