@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>게시글 상세</title>
+    <link rel="stylesheet" href="/styles/style.css" />
+    <link rel="stylesheet" href="/styles/post-detail.css" />
+    <script type="module" src="/js/post/post-detail.js"></script>
+  </head>
+
+  <body>
+    <header>
+      <div class="logo">5ZIRAP</div>
+      <nav>
+        <ul>
+          <li><a href="./log-in.html">로그인</a></li>
+          <li><a href="./sign-up.html">회원가입</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <div class="post-detail">
+        <div class="post-info">
+          <span class="category"
+            >카테고리: <span id="post-category"></span
+          ></span>
+          <span class="nickname"
+            >| 작성자: <span id="post-nickname"></span
+          ></span>
+          <span class="date">| 작성일: <span id="post-date"></span></span>
+          <span class="like">| 좋아요: <span id="post-likes"></span></span>
+          <span class="dislike"
+            >| 싫어요: <span id="post-dislikes"></span
+          ></span>
+          <h2 id="post-title">게시글 제목</h2>
+          <img id="post-image" src="" alt="" />
+          <p id="post-content">게시글 내용</p>
+        </div>
+        <div class="comments">
+          <h3>댓글</h3>
+          <ul id="comment-list"></ul>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="footer-menu">
+        <button onclick="window.location.href='./chat-list.html'">
+          Live Chat
+        </button>
+        <button onclick="window.location.href='./post-list.html'">
+          게시판
+        </button>
+        <button onclick="window.location.href='./main.html'">홈으로</button>
+        <button>좋아요</button>
+        <button onclick="window.location.href='./my-page.html'">
+          마이페이지
+        </button>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -18,8 +18,21 @@ const postsPerPage = 20; // 페이지 당 게시글 수
 async function fetchBoardData(category, sort, page) {
   // async function fetchBoardData(category, sort, page, keyword) {
   try {
+    // API 호출 시 비어 있는 값을 포함하지 않도록 URL 구성
+    const queryParams = new URLSearchParams({
+      page: page,
+      limit: postsPerPage,
+    });
+
+    if (category) {
+      queryParams.append('category', category);
+    }
+    if (sort) {
+      queryParams.append('sort', sort);
+    }
+
     const response = await fetch(
-      `${API_BASE_URL}/posts?category=${category}&sort=${sort}&page=${page}&limit=${postsPerPage}}`
+      `${API_BASE_URL}/posts?${queryParams.toString()}`
     );
     // const response = await fetch(
     //   `${API_BASE_URL}/posts?category=${category}&sort=${sort}&page=${page}&limit=${postsPerPage}&keyword=${encodeURIComponent(keyword)}`
@@ -27,9 +40,17 @@ async function fetchBoardData(category, sort, page) {
     const result = await response.json();
 
     if (result.statusCode === 200) {
-      renderBoardList(result.data);
-      totalPages = result.totalPages; // 총 페이지 수 업데이트
-      updatePagination();
+      // data.posts가 배열인지 확인
+      if (Array.isArray(result.data.posts)) {
+        renderBoardList(result.data.posts); // posts 배열을 전달
+        totalPages = result.data.meta.totalPages; // 총 페이지 수 업데이트
+        updatePagination();
+      } else {
+        console.error(
+          '게시글 데이터 형식이 잘못되었습니다:',
+          result.data.posts
+        );
+      }
     } else {
       console.error('게시글 목록 조회 실패:', result.message);
     }
@@ -46,7 +67,7 @@ function renderBoardList(data) {
     row.innerHTML = `
             <td>${item.id}</td>
             <td>${item.category}</td>
-            <td>${item.title}</td>
+            <td><a href="post-detail.html?id=${item.id}">${item.title}</a></td>
             <td>${item.nickname}</td>
             <td>${new Date(item.createdAt).toLocaleString()}</td>
             <td>${item.numComments}</td>
@@ -62,15 +83,21 @@ function updatePagination() {
     const pageButton = document.createElement('button');
     pageButton.textContent = i;
     pageButton.className = i === currentPage ? 'active' : '';
-    pageButton.addEventListener('click', () => {
-      currentPage = i;
-      fetchBoardData(categorySelect.value, sortSelect.value, currentPage);
-    });
+
+    // 현재 페이지인 경우 클릭 이벤트 비활성화
+    if (i === currentPage) {
+      pageButton.disabled = true; // 현재 페이지 버튼 비활성화
+    } else {
+      pageButton.addEventListener('click', () => {
+        currentPage = i;
+        fetchBoardData(categorySelect.value, sortSelect.value, currentPage);
+      });
+    }
+
     pageNumbersElement.appendChild(pageButton);
   }
   prevButton.disabled = currentPage === 1;
   nextButton.disabled = currentPage === totalPages;
-  currentPageLabel.textContent = `현재 페이지: ${currentPage}`;
 }
 
 // 필터 버튼 클릭 시 API 호출

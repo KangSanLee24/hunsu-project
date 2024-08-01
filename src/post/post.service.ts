@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
@@ -39,9 +40,11 @@ export class PostService {
       withDeleted: true,
     });
 
+    // 권한 확인
     if (!user) {
-      throw new NotFoundException('사용자를 찾지 못하였습니다.');
+      throw new UnauthorizedException(POST_MESSAGE.POST.UNAUTHORIZED);
     }
+
     const createdPost = this.postRepository.create({
       ...createPostDto,
       userId,
@@ -158,12 +161,16 @@ export class PostService {
     if (post.userId !== userId) {
       throw new ForbiddenException(POST_MESSAGE.POST.UPDATE.FAILURE.FORBIDDEN);
     }
+
     await this.postRepository.update({ id }, updatePostDto);
     return await this.postRepository.findOneBy({ id });
   }
 
   /*게시글 삭제 API*/
-  async remove(id: number, userId: number) {
+  async remove(
+    id: number, // post.id
+    userId: number // user.id
+  ) {
     const post = await this.postRepository.findOne({
       where: { id },
       relations: ['postImages'],
