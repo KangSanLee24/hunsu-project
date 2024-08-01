@@ -134,7 +134,14 @@ export class ChatService {
 
   async outChatRoom(chatRoomId: number, user: User) {
 
-    //채팅방 생성자는 어떻게 할지?
+    //채팅방 방장이면 나가기 -> 채팅방 삭제 로직으로 이동
+    //즉 방장이 나가면 채팅방 폭파
+
+    const checkChatOwner = this.checkChatOwner(user.id);
+    if(checkChatOwner) {
+      const removeChat = this.removeChatRoom(chatRoomId, user);
+      return removeChat;
+    };
 
     const chatRoom = await this.chatRoomRepository.findOne({
       where: {id: chatRoomId}
