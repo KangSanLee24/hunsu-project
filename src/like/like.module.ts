@@ -8,6 +8,7 @@ import { Post } from 'src/post/entities/post.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { PostLike } from './entities/post-like.entity';
 import { CommentLike } from './entities/comment-like.entity';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Post, Comment, PostLike, CommentLike]),
@@ -15,4 +16,4 @@ import { CommentLike } from './entities/comment-like.entity';
   controllers: [LikeController],
   providers: [LikeService],
 })
-export class LikeModule {}
+export class LikeModule { }
