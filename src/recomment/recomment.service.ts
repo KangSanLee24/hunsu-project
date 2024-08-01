@@ -9,12 +9,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Not, Repository } from 'typeorm';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { User } from 'src/user/entities/user.entity';
+import { AlarmService } from 'src/alarm/alarm.service';
+import { AlarmFromType } from 'src/alarm/types/alarm-from.type';
 
 @Injectable()
 export class RecommentService {
   constructor(
     @InjectRepository(Comment)
-    private commentRepository: Repository<Comment>
+    private commentRepository: Repository<Comment>,
+
+    private readonly alarmService: AlarmService
   ) {}
 
   //대댓글 찾기
@@ -51,6 +55,12 @@ export class RecommentService {
       userId: user.id,
       content: createRecommentDto.content,
     });
+
+    await this.alarmService.createAlarm(
+      findPost.userId, // 댓글 글쓴이에게
+      AlarmFromType.COMMENT, // 유형은 COMMENT
+      newRecomment.parentId // commentId 댓글에 새로운 대댓글이 달렸다고 전달
+    );
 
     return newRecomment;
   }

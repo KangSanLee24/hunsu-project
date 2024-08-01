@@ -23,11 +23,11 @@ export class PostDislike {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => Post, (post) => post.postDislikes)
+  @ManyToOne(() => Post, (post) => post.postDislikes, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'post_id', referencedColumnName: 'id' })
   post: Post;
 
-  @ManyToOne(() => User, (user) => user.postDislikes)
+  @ManyToOne(() => User, (user) => user.postDislikes, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: User;
 }

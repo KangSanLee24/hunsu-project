@@ -1,0 +1,33 @@
+.user-info {
+  float: right;
+}
+
+.post-detail {
+  padding: 20px;
+}
+
+.post-info {
+  margin-bottom: 20px;
+}
+
+.post-info img {
+  max-width: 100%;
+  height: auto;
+  margin: 10px 0;
+}
+
+.comments {
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+}
+
+.comments ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.comments li {
+  margin: 5px 0;
+  border-bottom: 1px solid #ccc;
+  padding: 5px 0;
+}
