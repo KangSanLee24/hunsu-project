@@ -15,6 +15,8 @@ import { CommentLike } from 'src/like/entities/comment-like.entity';
 import { CommentDislike } from 'src/dislike/entities/comment-dislike.entity';
 import { Role } from 'src/user/types/user-role.type';
 import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
+import { AlarmService } from 'src/alarm/alarm.service';
+import { AlarmFromType } from 'src/alarm/types/alarm-from.type';
 
 @Injectable()
 export class CommentService {
@@ -23,6 +25,8 @@ export class CommentService {
     private readonly commentRepository: Repository<Comment>,
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
+
+    private readonly alarmService: AlarmService,
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @InjectRepository(CommentLike)
@@ -60,6 +64,12 @@ export class CommentService {
       postId,
       ...createCommentDto,
     });
+
+    await this.alarmService.createAlarm(
+      post.userId, // 게시글 글쓴이에게
+      AlarmFromType.POST, // 유형은 POST
+      post.id // postId 게시글에 새로운 댓글이 달렸다고 전달
+    );
 
     return data;
   }

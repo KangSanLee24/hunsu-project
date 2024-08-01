@@ -30,7 +30,7 @@ import { Category } from './types/post-category.type';
 import { Order } from './types/post-order.type';
 import { FindAllPostsDto } from './dtos/find-all-posts.dto';
 
-@ApiTags('게시글 API')
+@ApiTags('3. POST API')
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
@@ -38,7 +38,7 @@ export class PostController {
   /** 게시글 생성 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '게시글 생성 API' })
+  @ApiOperation({ summary: '1. 게시글 생성 API' })
   @Post()
   async create(@LogIn() user: User, @Body() createPostDto: CreatePostDto) {
     const userId = user.id;
@@ -52,7 +52,7 @@ export class PostController {
   }
 
   /** 게시글 목록 조회 API **/
-  @ApiOperation({ summary: '게시글 목록 조회 API' })
+  @ApiOperation({ summary: '2. 게시글 목록 조회 API' })
   @ApiQuery({
     name: 'category',
     required: false,
@@ -91,7 +91,7 @@ export class PostController {
   }
 
   /** 게시글 상세 조회 API **/
-  @ApiOperation({ summary: '게시글 상세 조회 API' })
+  @ApiOperation({ summary: '3. 게시글 상세 조회 API' })
   @Get(':postId')
   async findOne(@Param('postId') postId: number) {
     const findOnePost = await this.postService.findOne(postId);
@@ -118,7 +118,7 @@ export class PostController {
   /** 게시글 수정 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '게시글 수정 API' })
+  @ApiOperation({ summary: '4. 게시글 수정 API' })
   @Patch(':postId')
   async update(
     @LogIn() user: User,
@@ -142,7 +142,7 @@ export class PostController {
   /** 게시글 삭제 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '게시글 삭제 API' })
+  @ApiOperation({ summary: '5. 게시글 삭제 API' })
   @Delete(':postId')
   async remove(@LogIn() user: User, @Param('postId') postId: number) {
     const userId = user.id;
@@ -170,7 +170,7 @@ export class PostController {
   }
 
   /** 이미지 업로드 API **/
-  @ApiOperation({ summary: '게시글 이미지 업로드 API' })
+  @ApiOperation({ summary: '6. 게시글 이미지 업로드 API' })
   @Post(':id/images')
   @UseInterceptors(FilesInterceptor('files'))
   async uploadFiles(
