@@ -17,9 +17,10 @@ async function createChatRoom(roomName) {
             console.log('채팅방 생성 성공:', data);
             closeModal();
 
-            //새로고침
-            const chatRooms = await fetchChatRooms();
-            renderChatRooms(chatRooms);
+            const roomId = data.roomId;
+            const title = data.title;
+            //채팅방으로 이동
+            window.location.href = `/html/chat.html?roomId=${roomId}&roomName=${encodeURIComponent(title)}`;
         } else {
             console.error('채팅방 생성 실패:', data);
         }

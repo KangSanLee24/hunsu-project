@@ -50,6 +50,7 @@ export class ChatService {
       title: createChatDto.title
     });
 
+    //멤버에 방장 추가
     await this.chatMemberRepository.save({
       roomId: newChatRoom.id,
       userId: 1//user.id
