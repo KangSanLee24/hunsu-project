@@ -293,4 +293,32 @@ export class ChatService {
 
     return chatRoomsFormatted;
   }
+
+  //채팅방 진짜 삭제
+  async deleteChatRoom() {
+
+    //조인
+    const findDeleteChat = await this.chatRoomRepository.find({
+      relations: ['chatImages'],
+      where: {isDeleted: true},
+      select: {
+       id: true,
+       chatImages: {
+        imgUrl: true,
+       },
+      }
+,    });
+
+    //s3삭제
+    for (const chat of findDeleteChat) {
+      for(const image of chat.chatImages) {
+        this.awsService.deleteImageFromS3(image.imgUrl);
+      }
+    };
+
+    //ondelete로 채팅방 -> 내역/이미지/멤버 모두 삭제 됨
+    await this.chatRoomRepository.delete(
+      {isDeleted: true}
+    );
+  }
 }
