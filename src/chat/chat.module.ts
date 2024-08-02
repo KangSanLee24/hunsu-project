@@ -14,6 +14,7 @@ import { AwsModule } from 'src/aws/aws.module';
 @Module({
   imports: [TypeOrmModule.forFeature([ChatRoom, ChatMember, ChatLog, User, ChatImage]), UserModule, AuthModule, AwsModule],
   controllers: [ChatController],
-  providers: [ChatService]
+  providers: [ChatService],
+  exports: [ChatService]
 })
 export class ChatModule {}

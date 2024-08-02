@@ -21,7 +21,6 @@ import { join } from 'path';
 import { AlarmModule } from './alarm/alarm.module';
 import { PointModule } from './point/point.module';
 import { HashtagModule } from './hashtag/hashtag.module';
-import { ScheduleModule } from '@nestjs/schedule';
 import { ScheduleModule } from './schedule/schedule.module';
 
 @Module({
@@ -35,7 +34,6 @@ import { ScheduleModule } from './schedule/schedule.module';
       validationSchema: configValidationSchema,
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
-    ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
     PostModule,
