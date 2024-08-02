@@ -19,6 +19,8 @@ import { MailModule } from 'src/mail/mail.module';
 // import { KakaoStrategy } from './guards/kakao.strategy';
 import { NaverStrategy } from './guards/naver.strategy';
 import { Point } from 'src/point/entities/point.entity';
+import { PointModule } from 'src/point/point.module';
+import { PointLog } from 'src/point/entities/point-log.entity';
 
 @Module({
   imports: [
@@ -39,10 +41,12 @@ import { Point } from 'src/point/entities/point.entity';
       RefreshToken,
       VerifyEmail,
       VerifyPassword,
+      PointLog,
     ]),
     ConfigModule,
     UserModule,
     MailModule,
+    PointModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, NaverStrategy],

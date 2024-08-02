@@ -32,6 +32,8 @@ import { VerifyPassword } from './entities/verify-password.entity';
 import { VerifyEmail } from 'src/mail/entities/verify-email.entity';
 import { MailService } from 'src/mail/mail.service';
 import { SocialType } from 'src/user/types/social-type.type';
+import { PointService } from 'src/point/point.service';
+import { PointType } from 'src/point/types/point.type';
 
 @Injectable()
 export class AuthService {
@@ -43,6 +45,7 @@ export class AuthService {
     private userService: UserService,
     private mailService: MailService,
     private readonly jwtService: JwtService,
+    private pointService: PointService,
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -112,14 +115,21 @@ export class AuthService {
       // 4-3-성공시. 트랜잭션 된 상태를 release하면서 트랜잭션 최종완료
       await queryRunner.release();
 
-      // 5. 데이터 가공
+      // 5. 회원가입 point 50 추가
+      await this.pointService.savePointLog(
+        newMember.id,
+        PointType.SIGN_UP,
+        true
+      );
+
+      // 6. 데이터 가공
       const newMemberData = {
         email: newMember.email,
         nickname: newMember.nickname,
         role: newMember.role,
         point: newPoint.accPoint,
       };
-      // 6. 리턴
+      // 7. 리턴
       return newMemberData;
     } catch (err) {
       // 4-2-4. 실패: 도중에 에러 발생시: rollback
@@ -361,6 +371,8 @@ export class AuthService {
       });
       // 1-1. 가입한 회원이 아니라면 소셜계정으로 회원가입
 
+      let newMember: User;
+
       if (!isExistingUser) {
         // 2. 트랜잭션 시작
         const queryRunner = this.dataSource.createQueryRunner();
@@ -369,7 +381,7 @@ export class AuthService {
         // 3. 트랜잭션 묶기
         try {
           // 3-1. 신규 회원 데이터 생성 (회원 가입)
-          const newMember = await queryRunner.manager.save(User, {
+          newMember = await queryRunner.manager.save(User, {
             email: user.email,
             nickname: user.nickname,
             password: user.password,
@@ -407,7 +419,14 @@ export class AuthService {
       };
       const data = await this.logIn(logInDto);
 
-      // 5. 반환
+      // 5. 회원가입 point 50 추가
+      await this.pointService.savePointLog(
+        newMember.id,
+        PointType.SIGN_UP,
+        true
+      );
+
+      // 6. 반환
       return data;
     } catch (err) {
       throw err;
@@ -499,7 +518,7 @@ export class AuthService {
     // 1-1. 해당 user가 없다면 에러메시지(404)
     if (_.isNil(verifyPassword)) {
       throw new NotFoundException(
-        AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.NO_VERYFYING
+        AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.NO_VERIFYING
       );
     }
 

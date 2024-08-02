@@ -10,5 +10,6 @@ import { PointLog } from './entities/point-log.entity';
   imports: [TypeOrmModule.forFeature([User, Point, PointLog])],
   controllers: [PointController],
   providers: [PointService],
+  exports: [PointService],
 })
 export class PointModule {}
