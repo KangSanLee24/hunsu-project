@@ -38,7 +38,7 @@ export class ChatService {
       where: {userId: id}
     });
 
-    return chatOwner
+    return chatOwner ? true : false
   };
 
   //채팅방 생성
@@ -87,11 +87,11 @@ export class ChatService {
 
   //채팅방 삭제
 
-  async removeChatRoom(chatRoomId: number, user: User) {
+  async removeChatRoom(chatRoomId: number, authorId: number) {
 
-    const checkChatOwner = this.checkChatOwner(user.id);
+    const checkChatOwner = await this.checkChatOwner(authorId);
 
-    if(!checkChatOwner) {
+    if(checkChatOwner == false) {
       throw new ForbiddenException(
         '채팅방 삭제 권한이 없습니다.'
       )
@@ -131,14 +131,14 @@ export class ChatService {
 
   //채팅방 나가기
 
-  async outChatRoom(chatRoomId: number, user: User) {
+  async outChatRoom(chatRoomId: number, authorId: number) {
 
     //채팅방 방장이면 나가기 -> 채팅방 삭제 로직으로 이동
     //즉 방장이 나가면 채팅방 폭파
 
-    const checkChatOwner = this.checkChatOwner(user.id);
-    if(checkChatOwner) {
-      const removeChat = this.removeChatRoom(chatRoomId, user);
+    const checkChatOwner = await this.checkChatOwner(authorId);
+    if(checkChatOwner == true) {
+      const removeChat = this.removeChatRoom(chatRoomId, authorId);
       return removeChat;
     };
 
@@ -147,7 +147,7 @@ export class ChatService {
     });
 
     const outChatMember = await this.chatMemberRepository.delete(
-      {id:chatRoom.id, userId: user.id}
+      {id:chatRoom.id, userId: authorId}
     );
 
     return outChatMember;
@@ -299,8 +299,8 @@ export class ChatService {
 
     //조인
     const findDeleteChat = await this.chatRoomRepository.find({
-      relations: ['chatImages'],
       where: {isDeleted: true},
+      relations: ['chatImages'],
       select: {
        id: true,
        chatImages: {
@@ -309,16 +309,19 @@ export class ChatService {
       }
 ,    });
 
-    //s3삭제
-    for (const chat of findDeleteChat) {
-      for(const image of chat.chatImages) {
-        this.awsService.deleteImageFromS3(image.imgUrl);
-      }
+    //ondelete로 채팅방 -> 내역/이미지/멤버 모두 삭제 됨
+    for (const room of findDeleteChat) {
+      await this.chatLogRepository.delete({roomId: room.id});
+      await this.chatImageRepository.delete({roomId: room.id});
+      await this.chatMemberRepository.delete({roomId: room.id});
+      await this.chatRoomRepository.delete({id: room.id});
     };
 
-    //ondelete로 채팅방 -> 내역/이미지/멤버 모두 삭제 됨
-    await this.chatRoomRepository.delete(
-      {isDeleted: true}
-    );
+    //s3삭제
+    for (const chat of findDeleteChat) {
+        for(const image of chat.chatImages) {
+        await this.awsService.deleteImageFromS3(image.imgUrl);
+      }
+    };
   }
 }
