@@ -66,8 +66,9 @@ export class ChatController {
    * @returns
    */
   @Post(':chatRoomId/join')
-  async joinChatRoom(@Param('chatRoomId') chatRoomId: string, @LogIn() user: User) {
-    return await this.chatService.joinChatRoom(+chatRoomId, user);
+  async joinChatRoom(@Param('chatRoomId') chatRoomId: string, @Body() body) {
+    const { authorId } = body;
+    return await this.chatService.joinChatRoom(+chatRoomId, authorId);
   }
 
   /**

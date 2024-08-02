@@ -14,8 +14,9 @@ async function getAuthor() {
     
           const result = await response.json();
           const author = result.data.nickname;
+          const authorId = result.data.id;
 
-          return author;
+          return { author, authorId } ;
     }catch {
         console.error('Error:', error);
         throw error;
@@ -39,8 +40,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     let file = null; // 파일 변수 초기화
 
     let currentUser;
+    let currentUserId;
     try{
-        currentUser = await getAuthor();
+        currentUser = (await getAuthor()).author;
+        currentUserId = (await getAuthor()).authorId;
     } catch(error){
         console.error('Failed to get author:', error);
     }
@@ -79,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 방 입장 시 서버에 'joinRoom' 이벤트 전송
-    socket.emit('joinRoom', { roomId, author: currentUser });
+    socket.emit('joinRoom', { roomId, author: currentUser, authorId: currentUserId});
 
     // 방 입장 시 'userJoined' 이벤트 수신
     socket.on('userJoined', (data) => {

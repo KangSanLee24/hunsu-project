@@ -106,7 +106,7 @@ export class ChatService {
 
   //채팅방 입장
 
-  async joinChatRoom(chatRoomId: number, user: User) {
+  async joinChatRoom(chatRoomId: number, authorId: number) {
 
     //100명 제한
     const checkJoin = await this.memberCount(chatRoomId);
@@ -123,16 +123,10 @@ export class ChatService {
 
     const newChatMember = await this.chatMemberRepository.save({
       roomId: chatRoom.id,
-      userId: user.id,
+      userId: authorId,
     });
 
-    const resChat = {
-      chatName: chatRoom.title,
-      roomId: newChatMember.roomId,
-      memberNickname: newChatMember.user.nickname
-    };
-
-    return resChat;
+    return chatRoom;
   }
 
   //채팅방 나가기
