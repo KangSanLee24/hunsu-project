@@ -10,10 +10,10 @@ export class HashtagController {
   constructor(private readonly hashtagService: HashtagService) {}
 
 /**
- * 해시태그 카운트 계산
+ * 해시태그 출력 및 카운트 계산
  * @returns
  */
-  @Get('counts')
+  @Get()
   async hashtagCount() {
     return await this.hashtagService.hashtagCount();
   }

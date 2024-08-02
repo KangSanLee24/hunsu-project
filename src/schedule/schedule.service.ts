@@ -10,6 +10,8 @@ export class ScheduleService {
         private readonly chatService: ChatService,
         ) {}
 
+    /** 채팅방 , 해시태그 관련 스케줄러 **/
+
     //task1. 1분에 한번씩 채팅 내역 -> 해시태그로 이동
     //task2. 삭제 대상 채팅방 테이블 삭제
 
@@ -20,10 +22,11 @@ export class ScheduleService {
       }
       
     async task1() {
-        this.hashtagService.createHashtags();
+        await this.hashtagService.createHashtags();
     }
 
     async task2() {
-        this.chatService.deleteChatRoom();
+        await this.chatService.deleteChatRoom();
     }
+
 }
