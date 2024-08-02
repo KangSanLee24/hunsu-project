@@ -14,7 +14,7 @@ import _ from 'lodash';
 
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
-import { Point } from 'src/user/entities/point.entity';
+import { Point } from 'src/point/entities/point.entity';
 
 import { SignUpDto } from './dtos/sign-up.dto';
 import { LogInDto } from './dtos/log-in.dto';
@@ -55,7 +55,7 @@ export class AuthService {
 
     @InjectRepository(VerifyPassword)
     private verifyPasswordRepository: Repository<VerifyPassword>
-  ) { }
+  ) {}
 
   /** 1. 회원 가입(sign-up) API **/
   async signUp(signUpDto: SignUpDto) {
@@ -415,17 +415,7 @@ export class AuthService {
   }
 
   /** 6-2. 소셜로그인 - 구글 **/
-  async logInGoogle() { }
-
-  // /** 토큰 발급 **/
-  // async createToken(user, refresh) {
-  //   const payload = {
-  //     type: refresh ? 'RF' : 'AC',
-  //     email: user.email,
-  //     sub: user.id,
-  //   };
-  //   const key = refresh ?
-  // }
+  async logInGoogle() {}
 
   /** 7. 비밀번호 변경 요청 API **/
   async rePassword(rePasswordDto: RePasswordDto) {
@@ -456,7 +446,6 @@ export class AuthService {
     // 0. dto에서 데이터 추출
     const { email, certification } = verifyPasswordDto;
 
-
     // 1. 해당 email로 인증번호를 받은 것이 맞는지 확인
     const isExistingEmail = await this.verifyPasswordRepository.findOneBy({
       email,
@@ -479,7 +468,9 @@ export class AuthService {
     await this.verifyEmailRepository.delete({ email });
 
     // 4. 해당 email에 대한 인증여부를 true로 변경
-    const verifyPassword = await this.verifyPasswordRepository.findOneBy({ email });
+    const verifyPassword = await this.verifyPasswordRepository.findOneBy({
+      email,
+    });
     if (!verifyPassword.isCertified) {
       await this.verifyPasswordRepository.update(
         { email },
@@ -501,11 +492,15 @@ export class AuthService {
     const { email, password, passwordConfirm } = updatePasswordDto;
 
     // 1. 해당 email로 가입된 사용자가 있는지 확인
-    const verifyPassword = await this.verifyPasswordRepository.findOneBy({ email });
+    const verifyPassword = await this.verifyPasswordRepository.findOneBy({
+      email,
+    });
 
     // 1-1. 해당 user가 없다면 에러메시지(404)
     if (_.isNil(verifyPassword)) {
-      throw new NotFoundException(AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.NO_VERYFYING);
+      throw new NotFoundException(
+        AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.NO_VERYFYING
+      );
     }
 
     // 2. 비밀번호 변경 인증을 완료한지 확인
@@ -571,4 +566,7 @@ export class AuthService {
       greeting: `당신의 아이디는 ${user.email} 입니다!`,
     };
   }
+
+  /** 0. Token 발급기 **/
+  async tokenMaker(payload, refresh: boolean) {}
 }

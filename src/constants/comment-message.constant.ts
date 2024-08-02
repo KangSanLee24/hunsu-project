@@ -11,7 +11,7 @@ export const COMMENT_MESSAGE = {
 
         // 댓글 조회
         READ: {
-            SUCCESS: '댓글 목록 조회에 성공하습니다.',
+            SUCCESS: '댓글 목록 조회에 성공하였습니다.',
         },
         // 댓글 수정
         UPDATE: {
@@ -37,8 +37,52 @@ export const COMMENT_MESSAGE = {
         // 이미지 업로드
         IMAGE: {
             UPLOAD: {
-                SUCCESS: '이미지 업로드에 성공하습니다.',
+                SUCCESS: '이미지 업로드에 성공하였습니다.',
             },
+        },
+    },
+    // 댓글 좋아요
+    LIKE: {
+        // 댓글 좋아요 조회
+        FIND: {
+            SUCCESS: '댓글 좋아요 조회에 성공하였습니다.',
+        },
+        // 댓글 좋아요 생성
+        CREATE: {
+            SUCCESS: '댓글 좋아요 생성에 성공하였습니다.',
+            FAILURE: {
+                NO_SELF: '자신의 댓글에 좋아요를 누를 수 없습니다.',
+                ALREADY: '이미 좋아요를 누른 댓글입니다.',
+            }
+        },
+        // 댓글 좋아요 삭제
+        DELETE: {
+            SUCCESS: '댓글 좋아요 삭제에 성공하였습니다.',
+            FAILURE: {
+                NO_LIKE: '삭제할 좋아요가 존재하지 않습니다.',
+            }
+        },
+    },
+    // 댓글 싫어요
+    DISLIKE: {
+        // 댓글 싫어요 조회
+        FIND: {
+            SUCCESS: '댓글 싫어요 조회에 성공하였습니다.',
+        },
+        // 댓글 싫어요 생성
+        CREATE: {
+            SUCCESS: '댓글 싫어요 생성에 성공하였습니다.',
+            FAILURE: {
+                NO_SELF: '자신의 댓글에 싫어요를 누를 수 없습니다.',
+                ALREADY: '이미 싫어요를 누른 댓글입니다.',
+            }
+        },
+        // 댓글 싫어요 삭제
+        DELETE: {
+            SUCCESS: '댓글 싫어요 삭제에 성공하였습니다.',
+            FAILURE: {
+                NO_DISLIKE: '삭제할 싫어요가 존재하지 않습니다.',
+            }
         },
     },
 };

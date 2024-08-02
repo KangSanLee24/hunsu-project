@@ -11,6 +11,7 @@ import { LikeModule } from 'src/like/like.module';
 import { DislikeModule } from 'src/dislike/dislike.module';
 import { CommentLike } from 'src/like/entities/comment-like.entity';
 import { CommentDislike } from 'src/dislike/entities/comment-dislike.entity';
+import { AlarmModule } from 'src/alarm/alarm.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CommentDislike } from 'src/dislike/entities/comment-dislike.entity';
     AuthModule,
     LikeModule,
     DislikeModule,
+    AlarmModule,
   ],
   controllers: [CommentController],
   providers: [CommentService],

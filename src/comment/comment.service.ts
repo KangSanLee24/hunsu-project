@@ -15,6 +15,8 @@ import { CommentLike } from 'src/like/entities/comment-like.entity';
 import { CommentDislike } from 'src/dislike/entities/comment-dislike.entity';
 import { Role } from 'src/user/types/user-role.type';
 import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
+import { AlarmService } from 'src/alarm/alarm.service';
+import { AlarmFromType } from 'src/alarm/types/alarm-from.type';
 
 @Injectable()
 export class CommentService {
@@ -23,6 +25,8 @@ export class CommentService {
     private readonly commentRepository: Repository<Comment>,
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
+
+    private readonly alarmService: AlarmService,
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @InjectRepository(CommentLike)
@@ -61,7 +65,19 @@ export class CommentService {
       ...createCommentDto,
     });
 
-    return data;
+    const nickname = user.nickname;
+
+    // 응답 데이터 구성
+    return {
+      id: data.id,
+      userId: data.userId,
+      nickName: nickname,
+      postId: data.postId,
+      parentId: data.parentId,
+      content: data.content,
+      createdAt: data.createdAt,
+      updateAt: data.updateAt,
+    };
   }
 
   // 댓글 목록 조회 API

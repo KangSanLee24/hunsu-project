@@ -18,7 +18,6 @@ export class NaverAuthGuard extends AuthGuard('naver') {
     context: ExecutionContext,
     status?: any
   ): TUser {
-    console.log('여기 들어와지니???????????????????????');
     if (err || !user) {
       throw new UnauthorizedException('네이버 계정 정보가 없습니다.');
     }

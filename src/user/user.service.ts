@@ -2,16 +2,16 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  ForbiddenException
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Point } from './entities/point.entity';
+import { Point } from 'src/point/entities/point.entity';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { USER_MESSAGES } from 'src/constants/user-message.constant';
-import { PointLog } from './entities/point-log.entity';
+import { PointLog } from '../point/entities/point-log.entity';
 import { SoftdeleteUserDto } from './dtos/softdelete-user.dto';
 
 @Injectable()
@@ -28,7 +28,7 @@ export class UserService {
 
     @InjectRepository(PointLog)
     private pointLogRepository: Repository<PointLog>
-  ) { }
+  ) {}
 
   /** 내 정보 조회(R) API **/
   async myProfile(user: User) {
@@ -175,7 +175,9 @@ export class UserService {
 
   /** 회원탈퇴 API*/
   async softdeleteUser(user: User, softdeleteUserDto: SoftdeleteUserDto) {
-    const foundUser = await this.userRepository.findOne({ where: { id: user.id } });
+    const foundUser = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
 
     // 유저가 존재하는지 확인
     if (!foundUser) {
@@ -183,7 +185,7 @@ export class UserService {
     }
 
     // 유저 정보를 업데이트
-    user.nickname = `탈퇴한 회원입니다 : ${user.nickname}`
+    user.nickname = `탈퇴한 회원입니다 : ${user.nickname}`;
     user.deletedAt = new Date();
 
     return this.userRepository.save(user);
