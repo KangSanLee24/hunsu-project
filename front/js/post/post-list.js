@@ -30,13 +30,13 @@ async function fetchBoardData(category, sort, page) {
     if (sort) {
       queryParams.append('sort', sort);
     }
-
+    // if (keyword) {
+    //   queryParams.append('keyword', keyword);
+    // }
     const response = await fetch(
       `${API_BASE_URL}/posts?${queryParams.toString()}`
     );
-    // const response = await fetch(
-    //   `${API_BASE_URL}/posts?category=${category}&sort=${sort}&page=${page}&limit=${postsPerPage}&keyword=${encodeURIComponent(keyword)}`
-    // );
+
     const result = await response.json();
 
     if (result.statusCode === 200) {

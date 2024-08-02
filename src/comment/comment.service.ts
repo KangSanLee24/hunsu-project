@@ -65,13 +65,19 @@ export class CommentService {
       ...createCommentDto,
     });
 
-    await this.alarmService.createAlarm(
-      post.userId, // 게시글 글쓴이에게
-      AlarmFromType.POST, // 유형은 POST
-      post.id // postId 게시글에 새로운 댓글이 달렸다고 전달
-    );
+    const nickname = user.nickname;
 
-    return data;
+    // 응답 데이터 구성
+    return {
+      id: data.id,
+      userId: data.userId,
+      nickName: nickname,
+      postId: data.postId,
+      parentId: data.parentId,
+      content: data.content,
+      createdAt: data.createdAt,
+      updateAt: data.updateAt,
+    };
   }
 
   // 댓글 목록 조회 API

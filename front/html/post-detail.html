@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/styles/style.css" />
     <link rel="stylesheet" href="/styles/post-detail.css" />
     <script type="module" src="/js/post/post-detail.js"></script>
+    <script type="module" src="/js/post/comments.js"></script>
   </head>
 
   <body>
@@ -40,6 +41,14 @@
         </div>
         <div class="comments">
           <h3>댓글</h3>
+          <div class="comment-input">
+            <textarea
+              id="comment-content"
+              placeholder="댓글을 입력하세요..."
+              rows="4"
+            ></textarea>
+            <button id="submit-comment">댓글 작성</button>
+          </div>
           <ul id="comment-list"></ul>
         </div>
       </div>
