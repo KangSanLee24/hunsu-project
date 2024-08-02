@@ -17,6 +17,8 @@ import { Role } from 'src/user/types/user-role.type';
 import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
 import { AlarmService } from 'src/alarm/alarm.service';
 import { AlarmFromType } from 'src/alarm/types/alarm-from.type';
+import { PointService } from 'src/point/point.service';
+import { PointType } from 'src/point/types/point.type';
 
 @Injectable()
 export class CommentService {
@@ -32,7 +34,8 @@ export class CommentService {
     @InjectRepository(CommentLike)
     private commentLikeRepository: Repository<CommentLike>,
     @InjectRepository(CommentDislike)
-    private commentDislikeRepository: Repository<CommentDislike>
+    private commentDislikeRepository: Repository<CommentDislike>,
+    private readonly pointService: PointService
   ) {}
 
   // 댓글 생성
@@ -64,6 +67,14 @@ export class CommentService {
       postId,
       ...createCommentDto,
     });
+
+    // 댓글 생성 포인트 지급
+    const isValidPoint = await this.pointService.validatePointLog(
+      userId,
+      PointType.COMMENT
+    );
+    if (isValidPoint)
+      this.pointService.savePointLog(userId, PointType.COMMENT, true);
 
     const nickname = user.nickname;
 
@@ -199,6 +210,9 @@ export class CommentService {
         COMMENT_MESSAGE.COMMENT.DELETE.FAILURE.FORBIDDEN
       );
     }
+
+    // 댓글 삭제로 포인트 차감
+    this.pointService.savePointLog(userId, PointType.POST, false);
 
     await this.commentRepository.save({
       id: commentId,
