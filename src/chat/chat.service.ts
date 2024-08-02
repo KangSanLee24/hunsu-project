@@ -46,14 +46,14 @@ export class ChatService {
   async createChatRoom(user: User, createChatDto: CreateChatDto) {
     
     const newChatRoom = await this.chatRoomRepository.save({
-      userId: 1, //user.id,임시
+      userId: user.id,
       title: createChatDto.title
     });
 
     //멤버에 방장 추가
     await this.chatMemberRepository.save({
       roomId: newChatRoom.id,
-      userId: 1//user.id
+      userId: user.id
     });
 
     return newChatRoom;
@@ -65,6 +65,7 @@ export class ChatService {
     
     const chatRooms = await this.chatRoomRepository.find({
       relations: ['user'],
+      where: {isDeleted: false},
       select: {
         id: true,
         user: {
@@ -96,8 +97,11 @@ export class ChatService {
       )
     };
 
-    //채팅방멤버 삭제
-    //채팅방 삭제
+    //채팅방 삭제 예정 컬럼 업데이트
+    await this.chatRoomRepository.update(
+      {id: chatRoomId}, {isDeleted: true}
+    );
+    
   }
 
   //채팅방 입장
@@ -236,7 +240,7 @@ export class ChatService {
     await this.chatLogRepository.save({
       roomId: chatRoomId,
       content: message,
-      memberId: 1   //임시
+      memberId: findUser.id
     });
   }
 
@@ -261,7 +265,7 @@ export class ChatService {
     //디비 저장
     await this.chatImageRepository.save({
       roomId: chatRoomId,
-      userId: 1, //임시
+      userId: findUser.id,
       imgUrl: fileUrl
     });
 
@@ -282,6 +286,7 @@ export class ChatService {
         createdAt: true,
       },
       where: {
+        isDeleted: false,
         title: Like(`%${title}%`)
       },
       order: {createdAt: 'DESC'}
