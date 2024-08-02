@@ -40,4 +40,10 @@ export class ChatRoom {
 
   @OneToMany(() => ChatMember, (chatMember) => chatMember.chatRooms, { cascade: true })
   chatMembers: ChatMember[];
+
+  @OneToMany(() => ChatImage, (chatImage) => chatImage.chatRooms, { cascade: true })
+  chatImages: ChatImage[];
+
+  @OneToMany(() => ChatLog, (chatLog) => chatLog.chatRooms, { cascade: true })
+  chatLogs: ChatLog[];
 }
