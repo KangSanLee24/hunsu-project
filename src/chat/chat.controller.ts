@@ -88,8 +88,9 @@ export class ChatController {
    * @returns
    */
   @Delete(':chatRoomId/out')
-  async outChatRoom(@Param('chatRoomId') chatRoomId: string, @LogIn() user: User) {
-    return await this.chatService.outChatRoom(+chatRoomId, user);
+  async outChatRoom(@Param('chatRoomId') chatRoomId: string, @Body() body) {
+    const { authorId } = body;
+    return await this.chatService.outChatRoom(+chatRoomId, authorId);
   }
 
   /**
@@ -97,7 +98,8 @@ export class ChatController {
    * @returns
    */
   @Delete(':chatRoomId')
-  async removeChatRoom(@Param('chatRoomId') chatRoomId: string, @LogIn() user: User) {
-    return await this.chatService.removeChatRoom(+chatRoomId, user);
+  async removeChatRoom(@Param('chatRoomId') chatRoomId: string,  @Body() body) {
+    const { authorId } = body;
+    return await this.chatService.removeChatRoom(+chatRoomId, authorId);
   }
 }
