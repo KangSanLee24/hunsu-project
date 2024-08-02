@@ -267,7 +267,7 @@ export class ChatService {
   }
 
   //채팅방 검색
-  async chatRoomSearch(title: string) {
+  async chatRoomSearch(title?: string, sort?: Order) {
 
     const findChatRoom = await this.chatRoomRepository.find({
       relations: ['user'],
@@ -281,9 +281,9 @@ export class ChatService {
       },
       where: {
         isDeleted: false,
-        title: Like(`%${title}%`)
+        title: title ? Like(`%${title}%`) : Like('%%'),
       },
-      order: {createdAt: 'DESC'}
+      order: {createdAt: sort ? sort : 'DESC'}
     });
 
     const chatRoomsFormatted = findChatRoom.map((room) => ({
