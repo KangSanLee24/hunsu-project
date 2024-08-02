@@ -45,6 +45,7 @@ export class UserService {
       point: point.accPoint,
       role: profile.role,
       joinDate: profile.createdAt,
+      id: profile.id,
     };
 
     // 4. 반환

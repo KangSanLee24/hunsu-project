@@ -48,6 +48,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Failed to get author:', error);
     }
 
+    console.log(currentUser, currentUserId);
+
     // 채팅 목록을 자동으로 스크롤 하단으로 이동
     function scrollToBottom() {
         chatScroll.scrollTop = chatScroll.scrollHeight;
