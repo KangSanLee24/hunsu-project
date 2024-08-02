@@ -5,6 +5,7 @@ import { ChatLog } from 'src/chat/entities/chat-log.entity';
 import { Like, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Hashtag } from './entities/hashtag.entity';
+import { HashtagFromType } from './types/hashtag-from.type';
 
 @Injectable()
 export class HashtagService {
@@ -29,12 +30,12 @@ export class HashtagService {
 
     const hashtagPattern = /#\S+/g;
 
-    // findChatLogs.forEach((content) => {
-
-    //   this.hashTagRepository.save({
-    //     hashtagItem: content.content.match(hashtagPattern)
-    //   })
-      
-    // });
+    for ( const chat of findChatLogs ) {
+      const newHashtag = await this.hashTagRepository.save({
+        hashtagItem: String(chat.content.match(hashtagPattern)),
+        userId: chat.memberId,
+        hashtagType: HashtagFromType.CHAT
+      })
+    };
   }
 }

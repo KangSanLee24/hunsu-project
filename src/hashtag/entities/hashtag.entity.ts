@@ -20,9 +20,6 @@ export class Hashtag {
   @Column({ type: 'varchar', name: 'hashtag_item' })
   hashtagItem: string;
 
-  @Column({ type: 'int', name: 'count'})
-  count: number;
-
   @Column({ name: 'hashtag_type' })
   hashtagType: HashtagFromType;
 
