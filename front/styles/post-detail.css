@@ -106,7 +106,7 @@
 /*게시판 좋아요 싫어요 버튼 */
 .like-dislike {
   display: flex; /* 버튼들을 수평으로 배치 */
-  justify-content: flex-end; /* 버튼들을 오른쪽으로 정렬 */
+  justify-content: center; /* 버튼들을 중앙으로 정렬 */
   margin-top: 10px; /* 버튼 위쪽에 여백 추가 */
 }
 
