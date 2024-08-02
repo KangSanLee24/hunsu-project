@@ -3,13 +3,31 @@ import { API_BASE_URL } from "../../config/config.js";
 //채팅 목록 가져오기
 export async function fetchChatRooms() {
     try {
-      const response = await fetch(`${API_BASE_URL}/chatrooms`);
+      const accessToken = localStorage.getItem('accessToken');
+
+      const response = await fetch(`${API_BASE_URL}/chatrooms`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`, // 토큰을 헤더에 추가
+          'Content-Type': 'application/json' // 필요에 따라 Content-Type 추가
+        }
+      });
       const rooms = await response.json();
       
       const roomsWithDetails = await Promise.all(rooms.map(async (room) => {
         const [memberCountResponse, lastChatTimeResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/chatrooms/${room.id}/member-count`),
-          fetch(`${API_BASE_URL}/chatrooms/${room.id}/chat-time`)
+          fetch(`${API_BASE_URL}/chatrooms/${room.id}/member-count`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          }),
+          fetch(`${API_BASE_URL}/chatrooms/${room.id}/chat-time`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          })
         ]);
         
         const memberCount = await memberCountResponse.json();

@@ -7,8 +7,9 @@ import { User } from 'src/user/entities/user.entity';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Order } from 'src/post/types/post-order.type';
+import { AuthGuard } from '@nestjs/passport';
 
-//@UseGuards(JwtStrategy)
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('채팅 API')
 @Controller('chatrooms')
 export class ChatController {

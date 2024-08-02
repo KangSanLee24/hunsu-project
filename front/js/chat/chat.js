@@ -1,6 +1,28 @@
 import { API_BASE_URL } from "../../config/config.js";
 
-document.addEventListener('DOMContentLoaded', () => {
+async function getAuthor() {
+    try{
+        const accessToken = localStorage.getItem('accessToken');
+
+        const response = await fetch(`${API_BASE_URL}/users/me`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            }
+          });
+    
+          const result = await response.json();
+          const author = result.data.nickname;
+
+          return author;
+    }catch {
+        console.error('Error:', error);
+        throw error;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
 
     const socket = io('http://localhost:3000');
 
@@ -16,12 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const imagePreview = document.getElementById('imagePreview');
     let file = null; // 파일 변수 초기화
 
-    let currentUser = generateUserName(); 
-
-    // 사용자 이름 생성 함수
-    function generateUserName() {
-        const count = Math.floor(Math.random() * 1000) + 1;
-        return `가나다${count}`;
+    let currentUser;
+    try{
+        currentUser = await getAuthor();
+    } catch(error){
+        console.error('Failed to get author:', error);
     }
 
     // 채팅 목록을 자동으로 스크롤 하단으로 이동
