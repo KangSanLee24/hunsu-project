@@ -15,8 +15,8 @@ import { CommentLike } from 'src/like/entities/comment-like.entity';
 import { CommentDislike } from 'src/dislike/entities/comment-dislike.entity';
 import { PostLike } from 'src/like/entities/post-like.entity';
 import { PostDislike } from 'src/dislike/entities/post-dislike.entity';
-import { Point } from './point.entity';
-import { PointLog } from './point-log.entity';
+import { Point } from 'src/point/entities/point.entity';
+import { PointLog } from '../../point/entities/point-log.entity';
 import { ChatRoom } from 'src/chat/entities/chat-room.entity';
 import { SocialType } from '../types/social-type.type';
 

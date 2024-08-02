@@ -14,7 +14,7 @@ import _ from 'lodash';
 
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
-import { Point } from 'src/user/entities/point.entity';
+import { Point } from 'src/point/entities/point.entity';
 
 import { SignUpDto } from './dtos/sign-up.dto';
 import { LogInDto } from './dtos/log-in.dto';
