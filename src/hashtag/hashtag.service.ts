@@ -1,12 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateHashtagDto } from './dto/create-hashtag.dto';
-import { UpdateHashtagDto } from './dto/update-hashtag.dto';
 import { ChatLog } from 'src/chat/entities/chat-log.entity';
 import { Like, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Hashtag } from './entities/hashtag.entity';
 import { HashtagFromType } from './types/hashtag-from.type';
-import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class HashtagService {
@@ -17,6 +14,19 @@ export class HashtagService {
     private readonly chatLogRepository: Repository<ChatLog>,
   ) {}
 
+  //해시태그 카운트 계산
+  async hashtagCount() {
+
+    const hashtagCount = await this.hashTagRepository.query(
+      `select hashtag_item , count(*) as count
+      from hashtags
+      group by hashtag_item;`
+    );
+
+    return hashtagCount;
+  }
+
+  //해시태그 생성
   async createHashtags() {
     
     const nowDate = new Date();
@@ -39,10 +49,5 @@ export class HashtagService {
       })
     };
   }
-
-  //1분에 한번씩 채팅 내역 -> 해시태그로 이동
-  @Cron(CronExpression.EVERY_MINUTE)
-  handleCron() {
-    this.createHashtags() ;
-  }
+  
 }

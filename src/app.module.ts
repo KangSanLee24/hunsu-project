@@ -22,6 +22,7 @@ import { AlarmModule } from './alarm/alarm.module';
 import { PointModule } from './point/point.module';
 import { HashtagModule } from './hashtag/hashtag.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ScheduleModule } from './schedule/schedule.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     AlarmModule,
     PointModule,
     HashtagModule,
+    ScheduleModule,
   ],
   controllers: [AppController],
   providers: [AwsService],
