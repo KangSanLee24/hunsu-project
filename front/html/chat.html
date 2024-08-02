@@ -9,8 +9,18 @@
     </head>
 
     <body>
+        <header>
+            <div class="logo">5ZIRAP</div>
+            <nav>
+              <ul>
+                <li><a href="./log-in.html">로그인</a></li>
+                <li><a href="./sign-up.html">회원가입</a></li>
+              </ul>
+            </nav>
+          </header>
 
         <main>
+          <div class="container">
             <div class="chat">
                 <div class="chat-header">
                     <span id="roomName" class="chatting room name"></span>
@@ -28,7 +38,24 @@
                     <button id="sendButton" class="send-button">전송</button>
                 </div>
             </div>
+          </div>
         </main>
+
+        <footer>
+            <div class="footer-menu">
+              <button onclick="window.location.href='./chat-list.html'">
+                Live Chat
+              </button>
+              <button onclick="window.location.href='./post-list.html'">
+                게시판
+              </button>
+              <button onclick="window.location.href='./main.html'">홈으로</button>
+              <button>좋아요</button>
+              <button onclick="window.location.href='./my-page.html'">
+                마이페이지
+              </button>
+            </div>
+          </footer>
 
         <script type= 'module' src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
         <script type= 'module' src="/js/chat/chat.js"></script>
