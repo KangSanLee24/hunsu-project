@@ -22,14 +22,14 @@ import { User } from 'src/user/entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 
 @UseGuards(AuthGuard('jwt'))
-@ApiTags('대댓글 API')
+@ApiTags('5. RECOMMENT API')
 @ApiBearerAuth()
 @Controller('comments')
 export class RecommentController {
   constructor(private readonly recommentService: RecommentService) {}
 
   /** 대댓글 생성 **/
-  @ApiOperation({ summary: '대댓글 생성 API' })
+  @ApiOperation({ summary: '1. 대댓글 생성 API' })
   @ApiResponse({ status: HttpStatus.CREATED })
   @Post(':commentId/recomments')
   async createRecomment(
@@ -45,7 +45,7 @@ export class RecommentController {
   }
 
   /** 대댓글 수정 **/
-  @ApiOperation({ summary: '대댓글 수정 API' })
+  @ApiOperation({ summary: '2. 대댓글 수정 API' })
   @Patch(':commentId/recomments/:recommentId')
   async updateRecomment(
     @Param('commentId') commentId: number,
@@ -67,7 +67,7 @@ export class RecommentController {
   }
 
   /** 대댓글 삭제 **/
-  @ApiOperation({ summary: '대댓글 삭제 API' })
+  @ApiOperation({ summary: '3. 대댓글 삭제 API' })
   @Delete(':commentsId/recomments/:recommentId')
   async removeRecomment(
     @Param('commentId') commentId: number,

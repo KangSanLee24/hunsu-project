@@ -31,13 +31,10 @@ export class PostService {
     private readonly userRepository: Repository<User>,
 
     private readonly awsService: AwsService
-  ) { }
+  ) {}
 
   /* 게시글 생성 API*/
-  async create(
-    createPostDto: CreatePostDto,
-    userId: number
-  ) {
+  async create(createPostDto: CreatePostDto, userId: number) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       withDeleted: true,
@@ -149,10 +146,7 @@ export class PostService {
   // }
 
   /*게시글 수정 API*/
-  async update(
-    id: number,
-    updatePostDto: UpdatePostDto,
-    userId: number) {
+  async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
     const post = await this.postRepository.findOne({
       where: { id },
       withDeleted: true,
@@ -164,7 +158,7 @@ export class PostService {
     }
 
     // 작성자 본인인지 확인
-    else if (post.userId !== userId) {
+    if (post.userId !== userId) {
       throw new ForbiddenException(POST_MESSAGE.POST.UPDATE.FAILURE.FORBIDDEN);
     }
 
@@ -179,6 +173,7 @@ export class PostService {
   ) {
     const post = await this.postRepository.findOne({
       where: { id },
+      relations: ['postImages'],
       withDeleted: true,
     });
 
@@ -188,22 +183,28 @@ export class PostService {
     }
 
     // 작성자 본인인지 확인
-    else if (post.userId !== userId) {
+    if (post.userId !== userId) {
       throw new ForbiddenException(POST_MESSAGE.POST.DELETE.FAILURE.FORBIDDEN);
     }
+    // AWS S3에서 이미지 삭제
+    // for문으로 s3 서비스의 삭제 메소드 이용해서 게시글에 속한 이미지 하나씩 삭제
+    for (const image of post.postImages) {
+      this.awsService.deleteFileFromS3(image.imgUrl);
+    }
 
-    return this.postRepository.remove(post);
+    // DB에서 게시글 삭제
+    this.postRepository.remove(post);
   }
 
   /*게시글 강제 삭제 API*/
   async forceRemove(id: number, userId: number) {
-    // 
+    //
     const post = await this.postRepository.findOne({
       where: { id },
       withDeleted: true,
     });
     const user = await this.userRepository.findOne({
-      where: { id: userId }
+      where: { id: userId },
     });
 
     // 게시글이 존재하는지 확인
@@ -213,37 +214,47 @@ export class PostService {
 
     // user의 역할이 admin인지 확인
     if (user.role !== Role.ADMIN) {
-      throw new ForbiddenException(POST_MESSAGE.POST.FORCE_DELETE.FAILURE.FORBIDDEN);
+      throw new ForbiddenException(
+        POST_MESSAGE.POST.FORCE_DELETE.FAILURE.FORBIDDEN
+      );
     }
 
     return this.postRepository.remove(post);
   }
 
   /** 이미지 업로드 API **/
-  async uploadPostImage(id: number, file: Express.Multer.File) {
+  async uploadPostImages(id: number, files: Express.Multer.File[]) {
     const post = await this.postRepository.findOne({ where: { id } });
 
     if (!post) {
       throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
     }
-    const [fileName, fileExt] = file.originalname.split('.');
+    // 업로드된 이미지 URL을 저장할 배열을 초기화한다
+    const uploadedImageUrls: string[] = [];
 
-    // 업로드
-    const fileUrl = await this.awsService.imageUploadToS3(
-      `${Date.now()}_${fileName}`, // 이미지 이름과 URL이 같고 이미지는 다르게 되는 경우를 방지하고자 날짜를 넣음
-      'posts',
-      file,
-      fileExt
-    );
+    // 파일 배열을 순회하여 각 파일을 처리한다
+    for (const file of files) {
+      const [fileName, fileExt] = file.originalname.split('.');
+      // 파일을 S3에 업로드하고 URL을 반환받는다
+      const fileUrl = await this.awsService.imageUploadToS3(
+        // 업로드
+        `${Date.now()}_${fileName}`, // 이미지 이름과 URL이 같고 이미지는 다르게 되는 경우를 방지하고자 날짜를 넣음
+        'posts',
+        file,
+        fileExt
+      );
+      // 업로드된 이미지의 URL을 db에 저장
+      const postImage = this.postImageRepository.create({
+        imgUrl: fileUrl,
+        postId: post.id,
+      });
+      await this.postImageRepository.save(postImage);
 
-    // url db에 저장하는 코드 추가
-    const postImage = this.postImageRepository.create({
-      imgUrl: fileUrl,
-      postId: post.id,
-    });
+      // 업로드된 이미지 URL을 배열에 추가
+      uploadedImageUrls.push(fileUrl);
+    }
 
-    await this.postImageRepository.save(postImage);
-
-    return fileUrl; // S3 URL 반환
+    // 업로드된 이미지 URL 배열 반환
+    return uploadedImageUrls;
   }
 }

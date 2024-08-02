@@ -15,6 +15,8 @@ import { CommentLike } from 'src/like/entities/comment-like.entity';
 import { CommentDislike } from 'src/dislike/entities/comment-dislike.entity';
 import { Role } from 'src/user/types/user-role.type';
 import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
+import { AlarmService } from 'src/alarm/alarm.service';
+import { AlarmFromType } from 'src/alarm/types/alarm-from.type';
 
 @Injectable()
 export class CommentService {
@@ -23,6 +25,8 @@ export class CommentService {
     private readonly commentRepository: Repository<Comment>,
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
+
+    private readonly alarmService: AlarmService,
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @InjectRepository(CommentLike)

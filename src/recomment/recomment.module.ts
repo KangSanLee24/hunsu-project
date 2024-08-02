@@ -9,6 +9,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Point } from 'src/user/entities/point.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { UserModule } from 'src/user/user.module';
+import { AlarmModule } from 'src/alarm/alarm.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UserModule } from 'src/user/user.module';
     UserModule,
     CommentModule,
     AuthModule,
+    AlarmModule,
   ],
   controllers: [RecommentController],
   providers: [RecommentService],
