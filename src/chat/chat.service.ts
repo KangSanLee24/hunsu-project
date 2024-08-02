@@ -32,10 +32,10 @@ export class ChatService {
   
   //채팅방 생성자 (채팅방 오너) 체크
 
-  async checkChatOwner(id: number) {
+  async checkChatOwner(chatRoomId: number, authorId: number) : Promise<boolean>{
 
     const chatOwner = await this.chatRoomRepository.findOne({
-      where: {userId: id}
+      where: { id: chatRoomId, userId: authorId}
     });
 
     return chatOwner ? true : false
@@ -89,7 +89,7 @@ export class ChatService {
 
   async removeChatRoom(chatRoomId: number, authorId: number) {
 
-    const checkChatOwner = await this.checkChatOwner(authorId);
+    const checkChatOwner = await this.checkChatOwner(chatRoomId, authorId);
 
     if(checkChatOwner == false) {
       throw new ForbiddenException(
@@ -102,6 +102,7 @@ export class ChatService {
       {id: chatRoomId}, {isDeleted: true}
     );
     
+    return { message: '삭제예정 컬럼 업데이트 완료'};
   }
 
   //채팅방 입장
@@ -136,9 +137,10 @@ export class ChatService {
     //채팅방 방장이면 나가기 -> 채팅방 삭제 로직으로 이동
     //즉 방장이 나가면 채팅방 폭파
 
-    const checkChatOwner = await this.checkChatOwner(authorId);
+    const checkChatOwner = await this.checkChatOwner(chatRoomId, authorId);
+
     if(checkChatOwner == true) {
-      const removeChat = this.removeChatRoom(chatRoomId, authorId);
+      const removeChat = await this.removeChatRoom(chatRoomId, authorId);
       return removeChat;
     };
 

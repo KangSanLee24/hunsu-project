@@ -118,6 +118,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('전송할 메시지:', inputValue);
             socket.emit('chat', { roomId, author: currentUser, body: inputValue });
             messageInput.value = ''; // 입력 필드 비우기
+            messageInput.style.fontWeight = 'normal'; // 기본 스타일로 되돌리기
+            messageInput.style.color = 'black'; // 기본 색상
         }
 
         if(imageExists) {
