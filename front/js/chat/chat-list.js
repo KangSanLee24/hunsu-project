@@ -57,7 +57,7 @@ chatRooms.forEach((room, index) => {
     <ul>
         <li key=${index}>
         <a href="/html/chat.html?roomId=${room.id}&roomName=${encodeURIComponent(room.title)}" class="chat-list-link">
-            <div className="chat-room-info">
+            <div className="chat-room-info" style="display: flex; justify-content: space-between; align-items: center;">
                 <span className="chat-room-name">${room.title}</span>
                 <span className="chat-room-user">${room.user.nickname}</span>
                 <span className="chat-room-count">${room.memberCount} / 100</span>
