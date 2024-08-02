@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
-import { JwtStrategy } from 'src/auth/guards/jwt.strategy';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/user/entities/user.entity';
 import { LogIn } from 'src/decorators/log-in.decorator';
@@ -72,8 +71,8 @@ export class ChatController {
    * @returns
    */
   @Get('search')
-  async chatRoomSearch(@Query('title') title: string) {
-    return await this.chatService.chatRoomSearch(title);
+  async chatRoomSearch(@Query('title') title: string, @Query('sort') sort: Order) {
+    return await this.chatService.chatRoomSearch(title, sort);
   }
 
   /**
