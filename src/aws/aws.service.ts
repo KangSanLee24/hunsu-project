@@ -6,6 +6,8 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
+import path from 'path';
+import { promises as fs } from 'fs';
 
 @Injectable()
 export class AwsService {
@@ -55,6 +57,36 @@ export class AwsService {
       Bucket: this.configService.get('AWS_S3_BUCKET_NAME'), // S3 버킷 이름
       Key: fileName, // 삭제될 파일의 이름
     });
-    await this.s3Client.send(command);
+
+    try {
+      await this.s3Client.send(command);
+    } catch (error) {
+      const logFilePath = path.join(__dirname, 'post_s3_error.log'); // 로그 파일 경로 설정
+      const logMessage = `${new Date().toISOString()} - ${error.message}\n`; // 로그 메시지 생성
+
+      await fs.appendFile(logFilePath, logMessage); // 로그 파일에 메시지 추가
+    }
+  }
+
+  //이미지 삭제
+  async deleteImageFromS3(fileUrl: string) {
+
+    const fileName = fileUrl.split('/').slice(-2).join('/');
+    const key = `chats/${fileName}`;
+
+    const command = new DeleteObjectCommand({
+      Bucket: this.configService.get('AWS_S3_BUCKET_NAME'), // S3 버킷 이름
+      Key: key, // 삭제할 파일의 이름
+    });
+  
+    try {
+      await this.s3Client.send(command);
+      console.log(`Successfully deleted: ${key}`);
+    } catch (error) {
+      const logFilePath = path.join(__dirname, 'chat_s3_error.log'); // 로그 파일 경로 설정
+      const logMessage = `${new Date().toISOString()} - ${error.message}\n`; // 로그 메시지 생성
+
+      await fs.appendFile(logFilePath, logMessage); // 로그 파일에 메시지 추가
+    }
   }
 }
