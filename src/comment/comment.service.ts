@@ -61,7 +61,19 @@ export class CommentService {
       ...createCommentDto,
     });
 
-    return data;
+    const nickname = user.nickname;
+
+    // 응답 데이터 구성
+    return {
+      id: data.id,
+      userId: data.userId,
+      nickName: nickname,
+      postId: data.postId,
+      parentId: data.parentId,
+      content: data.content,
+      createdAt: data.createdAt,
+      updateAt: data.updateAt,
+    };
   }
 
   // 댓글 목록 조회 API
