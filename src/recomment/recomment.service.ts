@@ -11,6 +11,8 @@ import { Comment } from 'src/comment/entities/comment.entity';
 import { User } from 'src/user/entities/user.entity';
 import { AlarmService } from 'src/alarm/alarm.service';
 import { AlarmFromType } from 'src/alarm/types/alarm-from.type';
+import { PointService } from 'src/point/point.service';
+import { PointType } from 'src/point/types/point.type';
 
 @Injectable()
 export class RecommentService {
@@ -18,7 +20,8 @@ export class RecommentService {
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
 
-    private readonly alarmService: AlarmService
+    private readonly alarmService: AlarmService,
+    private readonly pointService: PointService
   ) {}
 
   //대댓글 찾기
@@ -56,6 +59,14 @@ export class RecommentService {
       content: createRecommentDto.content,
     });
 
+    // 댓글 생성 포인트 지급
+    const isValidPoint = await this.pointService.validatePointLog(
+      user.id,
+      PointType.COMMENT
+    );
+    if (isValidPoint)
+      this.pointService.savePointLog(user.id, PointType.COMMENT, true);
+
     await this.alarmService.createAlarm(
       findPost.userId, // 댓글 글쓴이에게
       AlarmFromType.COMMENT, // 유형은 COMMENT
@@ -80,11 +91,13 @@ export class RecommentService {
   }
 
   //대댓글 삭제
-
-  async removeRecomment(commentId: number, recommentId: number) {
+  async removeRecomment(userId, commentId: number, recommentId: number) {
     const removeRecomment = await this.commentRepository.delete({
       id: recommentId,
     });
+
+    // 댓글 삭제로 포인트 차감
+    this.pointService.savePointLog(userId, PointType.POST, false);
 
     return removeRecomment;
   }

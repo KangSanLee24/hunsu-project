@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { PointLog } from './entities/point-log.entity';
 import { User } from 'src/user/entities/user.entity';
-import { PointScore, PointType } from './types/point.type';
+import { MaxPointScore, PointScore, PointType } from './types/point.type';
 
 @Injectable()
 export class PointService {
@@ -34,7 +34,7 @@ export class PointService {
       userId,
       PointType.ATTENTION
     );
-    const maxPoint = PointScore[PointType.ATTENTION];
+    const maxPoint = MaxPointScore[PointType.ATTENTION];
 
     if (todayPoint >= maxPoint) {
       throw new ForbiddenException('오늘 이미 출석을 하였습니다.');
@@ -110,7 +110,7 @@ export class PointService {
     // findTodayPointById로 나온 숫자가 기준을 넘으면 false
     // 기준을 안 넘으면 true
     const todayPoint = await this.findTodayPointById(userId, pointType);
-    const maxPoint = PointScore[pointType];
+    const maxPoint = MaxPointScore[pointType];
 
     return todayPoint < maxPoint;
   }
