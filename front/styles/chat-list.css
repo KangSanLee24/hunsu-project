@@ -38,7 +38,6 @@
   display: flex; /* Flexbox를 사용 */
   justify-content: space-between; /* 요소 사이에 균등한 간격을 둡니다 */
   align-items: center; /* 요소들을 수직 중앙 정렬 */
-  width: 100%; /* 전체 폭 사용 */
 }
 
 .chat-room-name {
@@ -98,4 +97,47 @@
   border: none;
   background: none;
   color: #333;
+}
+
+.searchContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 가운데 정렬 */
+  margin-bottom: 20px;
+}
+
+#searchInput {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-right: 10px;
+  width: 350px; /* 너비를 300px로 설정 */
+}
+
+#sortSelect {
+  padding: 8px;
+  margin-right: 10px;
+}
+
+#searchRoomButton {
+  border: 1px solid #ccc;
+  padding: 10px 20px;
+  color: black;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+#createChatButton {
+  border: 1px solid #ccc;
+  padding: 10px 20px;
+  color: black;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: auto; /* 오른쪽 끝으로 이동 */
+}
+
+
+#searchRoomButton:hover, #createChatButton:hover {
+  background-color: #e9f0f7
 }

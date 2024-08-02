@@ -46,13 +46,14 @@ export class ChatService {
   async createChatRoom(user: User, createChatDto: CreateChatDto) {
     
     const newChatRoom = await this.chatRoomRepository.save({
-      userId: 1, //user.id,임시
+      userId: user.id,
       title: createChatDto.title
     });
 
+    //멤버에 방장 추가
     await this.chatMemberRepository.save({
       roomId: newChatRoom.id,
-      userId: 1//user.id
+      userId: user.id
     });
 
     return newChatRoom;
@@ -64,6 +65,7 @@ export class ChatService {
     
     const chatRooms = await this.chatRoomRepository.find({
       relations: ['user'],
+      where: {isDeleted: false},
       select: {
         id: true,
         user: {
@@ -95,13 +97,16 @@ export class ChatService {
       )
     };
 
-    //채팅방멤버 삭제
-    //채팅방 삭제
+    //채팅방 삭제 예정 컬럼 업데이트
+    await this.chatRoomRepository.update(
+      {id: chatRoomId}, {isDeleted: true}
+    );
+    
   }
 
   //채팅방 입장
 
-  async joinChatRoom(chatRoomId: number, user: User) {
+  async joinChatRoom(chatRoomId: number, authorId: number) {
 
     //100명 제한
     const checkJoin = await this.memberCount(chatRoomId);
@@ -118,23 +123,24 @@ export class ChatService {
 
     const newChatMember = await this.chatMemberRepository.save({
       roomId: chatRoom.id,
-      userId: user.id,
+      userId: authorId,
     });
 
-    const resChat = {
-      chatName: chatRoom.title,
-      roomId: newChatMember.roomId,
-      memberNickname: newChatMember.user.nickname
-    };
-
-    return resChat;
+    return chatRoom;
   }
 
   //채팅방 나가기
 
   async outChatRoom(chatRoomId: number, user: User) {
 
-    //채팅방 생성자는 어떻게 할지?
+    //채팅방 방장이면 나가기 -> 채팅방 삭제 로직으로 이동
+    //즉 방장이 나가면 채팅방 폭파
+
+    const checkChatOwner = this.checkChatOwner(user.id);
+    if(checkChatOwner) {
+      const removeChat = this.removeChatRoom(chatRoomId, user);
+      return removeChat;
+    };
 
     const chatRoom = await this.chatRoomRepository.findOne({
       where: {id: chatRoomId}
@@ -228,7 +234,7 @@ export class ChatService {
     await this.chatLogRepository.save({
       roomId: chatRoomId,
       content: message,
-      memberId: 1   //임시
+      memberId: findUser.id
     });
   }
 
@@ -253,7 +259,7 @@ export class ChatService {
     //디비 저장
     await this.chatImageRepository.save({
       roomId: chatRoomId,
-      userId: 1, //임시
+      userId: findUser.id,
       imgUrl: fileUrl
     });
 
@@ -274,6 +280,7 @@ export class ChatService {
         createdAt: true,
       },
       where: {
+        isDeleted: false,
         title: Like(`%${title}%`)
       },
       order: {createdAt: 'DESC'}

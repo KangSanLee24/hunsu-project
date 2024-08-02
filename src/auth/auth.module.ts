@@ -9,7 +9,6 @@ import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { User } from 'src/user/entities/user.entity';
-import { Point } from 'src/user/entities/point.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VerifyPassword } from './entities/verify-password.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
@@ -19,6 +18,7 @@ import { VerifyEmail } from 'src/mail/entities/verify-email.entity';
 import { MailModule } from 'src/mail/mail.module';
 // import { KakaoStrategy } from './guards/kakao.strategy';
 import { NaverStrategy } from './guards/naver.strategy';
+import { Point } from 'src/point/entities/point.entity';
 
 @Module({
   imports: [
@@ -48,4 +48,4 @@ import { NaverStrategy } from './guards/naver.strategy';
   providers: [AuthService, JwtStrategy, NaverStrategy],
   exports: [AuthService, JwtStrategy, NaverStrategy],
 })
-export class AuthModule { }
+export class AuthModule {}

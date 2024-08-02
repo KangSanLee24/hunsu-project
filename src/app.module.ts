@@ -19,6 +19,7 @@ import { EventsModule } from './events/events.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AlarmModule } from './alarm/alarm.module';
+import { PointModule } from './point/point.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { AlarmModule } from './alarm/alarm.module';
     ChatModule,
     EventsModule,
     AlarmModule,
+    PointModule,
   ],
   controllers: [AppController],
   providers: [AwsService],
