@@ -7,8 +7,9 @@ import { User } from 'src/user/entities/user.entity';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Order } from 'src/post/types/post-order.type';
+import { AuthGuard } from '@nestjs/passport';
 
-//@UseGuards(JwtStrategy)
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('채팅 API')
 @Controller('chatrooms')
 export class ChatController {
@@ -65,8 +66,9 @@ export class ChatController {
    * @returns
    */
   @Post(':chatRoomId/join')
-  async joinChatRoom(@Param('chatRoomId') chatRoomId: string, @LogIn() user: User) {
-    return await this.chatService.joinChatRoom(+chatRoomId, user);
+  async joinChatRoom(@Param('chatRoomId') chatRoomId: string, @Body() body) {
+    const { authorId } = body;
+    return await this.chatService.joinChatRoom(+chatRoomId, authorId);
   }
 
   /**

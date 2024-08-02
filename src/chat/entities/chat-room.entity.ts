@@ -38,6 +38,15 @@ export class ChatRoom {
   @CreateDateColumn()
   createdAt: Date;
 
+  @Column({ type: 'boolean', name: 'is_deleted', default: false})
+  isDeleted: boolean;
+
   @OneToMany(() => ChatMember, (chatMember) => chatMember.chatRooms, { cascade: true })
   chatMembers: ChatMember[];
+
+  @OneToMany(() => ChatImage, (chatImage) => chatImage.chatRooms, { cascade: true })
+  chatImages: ChatImage[];
+
+  @OneToMany(() => ChatLog, (chatLog) => chatLog.chatRooms, { cascade: true })
+  chatLogs: ChatLog[];
 }

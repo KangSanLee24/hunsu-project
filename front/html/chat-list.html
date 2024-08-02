@@ -22,10 +22,8 @@
     <main>
       <div class="chat-list">
         <h1>채팅</h1>
-        <ul id="chatList">
-          <!-- 채팅방 목록이 동적으로 삽입됩니다. -->
-        </ul>
-        <div class="controls">
+
+        <div class="searchContainer">
           <input type="text" id="searchInput" placeholder="채팅방 검색..." />
           <select id="sortSelect">
             <option value="latest">최신순</option>
@@ -34,6 +32,9 @@
           <button id="searchRoomButton">검색</button>
           <button id="createChatButton">채팅방 만들기</button>
         </div>
+        <ul id="chatList">
+          <!-- 채팅방 목록이 동적으로 삽입됩니다. -->
+        </ul>
       </div>
 
       <!-- 모달 창 HTML -->
