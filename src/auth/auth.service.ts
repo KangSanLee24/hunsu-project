@@ -410,21 +410,21 @@ export class AuthService {
             '[네이버 로그인] 가입에서 오류가 발생하였습니다.'
           );
         }
+
+        // 4. 회원가입 point 50 추가
+        await this.pointService.savePointLog(
+          newMember.id,
+          PointType.SIGN_UP,
+          true
+        );
       }
 
-      // 4. 로그인
+      // 5. 로그인
       const logInDto = {
         email: user.email,
         password: naverUser.id,
       };
       const data = await this.logIn(logInDto);
-
-      // 5. 회원가입 point 50 추가
-      await this.pointService.savePointLog(
-        newMember.id,
-        PointType.SIGN_UP,
-        true
-      );
 
       // 6. 반환
       return data;

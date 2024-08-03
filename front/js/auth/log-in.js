@@ -1,14 +1,24 @@
 import { API_BASE_URL } from '../../config/config.js';
 
+/** 로그인 페이지에 필요한 변수 선언 **/
+const naverLogInBtn = document.getElementById('naver_login');
+
+/** 로그인 **/
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
+  // 로그인 폼이 존재하는 경우
   if (loginForm) {
+    /** 일반 로그인 **/
+    // 1. [로그인하기] 버튼을 누르면 [일반 로그인] 수행
     loginForm.addEventListener('submit', async (event) => {
+      // 1-0. 기존 동작 방지(submit의 경우 입력된 데이터 쿼리화 방지)
       event.preventDefault();
 
+      // 1-1. input에 입력된 email과 password 가져오기
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
 
+      // 1-2. 로그인API request 요청 => response로 받아오기
       const response = await fetch(`${API_BASE_URL}/auth/log-in`, {
         method: 'POST',
         headers: {
@@ -17,31 +27,74 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ email, password }),
       });
 
+      // 1-3. response를 json화
       const result = await response.json();
 
+      // 1-4. 로그인 관련 데이터 처리
       if (response.ok && result.status === 200) {
-        // 토큰 저장
+        // 1-4-A. 로그인 성공시 + 이메일 인증O
+        // 1-4-A-1. 토큰들 로컬스토리지에 저장
         localStorage.setItem('accessToken', result.data.accessToken);
         localStorage.setItem('refreshToken', result.data.refreshToken);
 
-        // 알림 표시
+        // 1-4-A-2. '로그인에 성공했습니다.' alert
         alert(result.message);
 
-        // 메인 페이지로 이동
+        // 1-4-A-3. 메인 페이지로 이동
         window.location.href = './main.html';
       } else if (
+        // 1-4-B. 로그인 성공시 + 이메일 인증X
         result.message ===
         '아직 이메일 인증을 하지 않으셨습니다. 이메일 인증을 진행해 주세요.'
       ) {
-        // 이메일 인증이 필요한 경우
+        // 1-4-B-1. 위 메시지 alert
         alert(result.message);
+        // 1-4-B-2. 이메일 인증 페이지로 이동
         window.location.href = './email-confirmation.html';
       } else {
-        // 에러 처리
+        // 1-4-C. 기타 로그인 에러 처리
+        alert(result.message || '로그인에 실패했습니다.');
+      }
+    });
+
+    /** 네이버 로그인 **/
+    // 1. [N] 버튼을 누르면 [네이버 로그인] 수행
+    naverLogInBtn.addEventListener('click', async (event) => {
+      // 1-0. 기존 동작 방지
+      event.preventDefault();
+
+      // 1-1. Naver로그인API request 요청 => response로 받아오기
+      const response = await fetch(`${API_BASE_URL}/auth/log-in/naver`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // 1-3. response를 json화
+      const result = await response.json();
+
+      console.log(result);
+
+      // 1-4. 로그인 관련 데이터 처리
+      if (response.ok && result.status === 200) {
+        // 1-4-A. 로그인 성공시 + 이메일 인증O
+        // 1-4-A-1. 토큰들 로컬스토리지에 저장
+        localStorage.setItem('accessToken', result.data.accessToken);
+        localStorage.setItem('refreshToken', result.data.refreshToken);
+
+        // 1-4-A-2. '로그인에 성공했습니다.' alert
+        alert(result.message);
+
+        // 1-4-A-3. 메인 페이지로 이동
+        window.location.href = './main.html';
+      } else {
+        // 1-4-C. 기타 로그인 에러 처리
         alert(result.message || '로그인에 실패했습니다.');
       }
     });
   } else {
+    // 로그인 폼이 존재하지 않는 경우
     console.error('로그인 폼을 찾을 수 없습니다.');
   }
 });

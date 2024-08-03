@@ -3,13 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>홈페이지</title>
+    <title>5ZIRAP</title>
+    <!-- CSS -->
     <link rel="stylesheet" href="/styles/style.css" />
     <link rel="stylesheet" href="/styles/main.css" />
-    <script type="module" src="/js/main/header.js"></script>
-    <script type="module" src="/js/main/main.js"></script>
   </head>
+
   <body>
+    <!-- HEADER -->
     <header>
       <div class="logo">5ZIRAP</div>
       <nav>
@@ -21,18 +22,22 @@
       </nav>
     </header>
 
+    <!-- MAIN BODY -->
     <main>
+      <!-- HOT LIVECHATS -->
       <section class="live-chat">
-        <h2>실시간 HOT LIVE CHAT</h2>
+        <h2>HOT LiveChat</h2>
         <ul id="liveChatList"></ul>
       </section>
 
-      <section class="weekly-posts">
+      <!-- HOP POSTS & RANKS -->
+      <section class="weekly-contents">
         <h2>주간 HOT 게시글</h2>
         <ul id="weeklyPostsList"></ul>
       </section>
     </main>
 
+    <!-- FOOTER -->
     <footer>
       <div class="footer-menu">
         <button onclick="window.location.href='./chat-list.html'">
@@ -53,5 +58,9 @@
         </button>
       </div>
     </footer>
+
+    <!-- JS  -->
+    <script type="module" src="/js/main/header.js"></script>
+    <script type="module" src="/js/main/main.js"></script>
   </body>
 </html>
