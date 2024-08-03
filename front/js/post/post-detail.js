@@ -4,6 +4,9 @@ import { API_BASE_URL } from '../../config/config.js';
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get('id');
 
+const submitLikeButton = document.getElementById('like-btn');
+const submitDislikeButton = document.getElementById('dislike-btn');
+
 // 게시글 상세 조회 API 호출
 async function fetchPost(postId) {
   try {
@@ -37,6 +40,58 @@ async function renderPostDetail(postId) {
       post.data.content || '내용 없음';
   }
 }
+
+// 좋아요 API 호출
+async function updateLikes(postId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/posts/${postId}/likes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+    if (!response.ok) throw new Error('좋아요 업데이트에 실패했습니다.');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// 싫어요 API 호출
+async function updateDislikes(postId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/posts/${postId}/dislikes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+    if (!response.ok) throw new Error('싫어요 업데이트에 실패했습니다.');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// 좋아요 버튼 클릭 핸들러
+async function handleLike() {
+  await updateLikes(postId);
+  await renderPostDetail(postId);
+  submitLikeButton.classList.add('liked');
+}
+
+// 싫어요 버튼 클릭 핸들러
+async function handleDislike() {
+  await updateDislikes(postId);
+  await renderPostDetail(postId);
+  submitDislikeButton.classList.add('disliked');
+}
+
+// 버튼 클릭 이벤트 리스너 추가
+submitLikeButton.addEventListener('click', handleLike);
+submitDislikeButton.addEventListener('click', handleDislike);
 
 // 페이지 로드 시 게시글과 댓글을 렌더링
 if (postId) {

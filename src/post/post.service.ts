@@ -122,7 +122,7 @@ export class PostService {
         'postImages',
         'comments',
         'postLikes',
-        // 'postDislikes',
+        'postDislikes',
       ],
     });
 
@@ -140,7 +140,7 @@ export class PostService {
       content: post.content,
       comments: post.comments, // 댓글
       numLikes: post.postLikes.length, // 좋아요 수
-      // numDislikes: post.postDislikes.length, // 싫어요 수
+      numDislikes: post.postDislikes.length, // 싫어요 수
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
     };
