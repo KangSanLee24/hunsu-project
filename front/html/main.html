@@ -1,50 +1,47 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>홈페이지</title>
-    <link rel="stylesheet" href="/styles/style.css" />
-    <link rel="stylesheet" href="/styles/main.css" />
-    <script type="module" src="/js/main/main.js"></script>
-  </head>
-  <body>
-    <header>
-      <div class="logo">5ZIRAP</div>
-      <nav>
-        <ul>
-          <li><a href="./log-in.html">로그인</a></li>
-          <li><a href="./sign-up.html">회원가입</a></li>
-        </ul>
-      </nav>
-    </header>
 
-    <main>
-      <section class="live-chat">
-        <h2>실시간 HOT LIVE CHAT</h2>
-        <ul id="liveChatList"></ul>
-      </section>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>홈페이지</title>
+  <link rel="stylesheet" href="/styles/style.css" />
+  <link rel="stylesheet" href="/styles/main.css" />
+  <script type="module" src="/js/main/main.js"></script>
+</head>
 
-      <section class="weekly-posts">
-        <h2>주간 HOT 게시글</h2>
-        <ul id="weeklyPostsList"></ul>
-      </section>
-    </main>
+<body>
+  <header>
+    <div class="logo">5ZIRAP</div>
+    <nav>
+      <ul>
+        <li><a href="./log-in.html">로그인</a></li>
+        <li><a href="./sign-up.html">회원가입</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <footer>
-      <div class="footer-menu">
-        <button onclick="window.location.href='./chat-list.html'">
-          Live Chat
-        </button>
-        <button onclick="window.location.href='./post-list.html'">
-          게시판
-        </button>
-        <button onclick="window.location.href='./main.html'">홈으로</button>
-        <button>좋아요</button>
-        <button onclick="window.location.href='./my-page.html'">
-          마이페이지
-        </button>
-      </div>
-    </footer>
-  </body>
+  <main>
+    <section class="live-chat">
+      <h2>실시간 HOT LIVE CHAT</h2>
+      <ul id="liveChatList"></ul>
+    </section>
+
+    <section class="weekly-posts">
+      <h2>주간 HOT 게시글</h2>
+      <ul id="weeklyPostsList"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-menu">
+      <button onclick="window.location.href='./chat-list.html'">Live Chat</button>
+      <button onclick="window.location.href='./post-list.html'">게시판</button>
+      <button onclick="window.location.href='./main.html'">홈으로</button>
+      <button>좋아요</button>
+      <button onclick="window.location.href='./my-page.html'">마이페이지</button>
+    </div>
+  </footer>
+</body>
+
 </html>
