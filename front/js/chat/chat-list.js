@@ -53,22 +53,22 @@ const chatListElement = document.getElementById('chatList');
 chatListElement.innerHTML = ""; // 기존 목록 초기화
 
 chatRooms.forEach((room, index) => {
-    let tempHTML = `
-    <ul>
-        <li key=${index}>
-        <a href="/html/chat.html?roomId=${room.id}&roomName=${encodeURIComponent(room.title)}" class="chat-list-link">
-            <div className="chat-room-info" style="display: flex; justify-content: space-between; align-items: center;">
-                <span className="chat-room-name">${room.title}</span>
-                <span className="chat-room-user">${room.user.nickname}</span>
-                <span className="chat-room-count">${room.memberCount} / 100</span>
-                <span className="chat-room-time">${room.lastChatTime}</span>
-            </div>
-            </Link>
-        </li>
-    </ul>
-    `;
+  let tempHTML = `
+  <ul>
+      <li key=${index}>
+      <a href="/html/chat.html?roomId=${room.id}&roomName=${encodeURIComponent(room.title)}" class="chat-list-link">
+          <div class="chat-room-info" style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="chat-room-name">${room.title}</span>
+              <span class="chat-room-user">${room.user.nickname}</span>
+              <span class="chat-room-count">${room.memberCount} / 100</span>
+              <span class="chat-room-time">${room.lastChatTime}</span>
+          </div>
+          </Link>
+      </li>
+  </ul>
+  `;
 
-    chatListElement.insertAdjacentHTML('beforeend', tempHTML);
+  chatListElement.insertAdjacentHTML('beforeend', tempHTML);
 });
 }
 

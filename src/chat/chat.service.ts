@@ -144,12 +144,8 @@ export class ChatService {
       return removeChat;
     };
 
-    const chatRoom = await this.chatRoomRepository.findOne({
-      where: {id: chatRoomId}
-    });
-
     const outChatMember = await this.chatMemberRepository.delete(
-      {id:chatRoom.id, userId: authorId}
+      {roomId: chatRoomId, userId: authorId}
     );
 
     return outChatMember;
