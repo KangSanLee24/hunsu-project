@@ -37,7 +37,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private configService: ConfigService
-  ) { }
+  ) {}
 
   /** 1. 회원 가입(sign-up) API **/
   @ApiOperation({ summary: '1. 회원 가입(sign-up) API' })
@@ -79,6 +79,7 @@ export class AuthController {
   }
 
   /** 4. 토큰 재발급 API **/
+  @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '4. 토큰 재발급 API' })
   @Post('re-token')
@@ -127,11 +128,11 @@ export class AuthController {
   /** 6-2-1. 소셜로그인 - 구글 **/
   @ApiOperation({ summary: '6-2A. 로그인(log-in) Google API' })
   @Get('log-in/google')
-  async logInGoogle() { }
+  async logInGoogle() {}
   /** 6-2-2. 소셜로그인 - 구글 콜백 **/
   @ApiOperation({ summary: '6-2B. 로그인(log-in) Google 콜백 API' })
   @Get('log-in/google/cb')
-  async logInGoogleCB() { }
+  async logInGoogleCB() {}
 
   /** 6-2. 소셜로그인 - 카카오 **/
   // @UseGuards(AuthGuard('kakao'))
@@ -150,9 +151,7 @@ export class AuthController {
   /** 7. 비밀번호 변경 요청 API **/
   @ApiOperation({ summary: '6. 비밀번호 변경 요청 API' })
   @Post('re-password')
-  async rePassword(
-    @Body() rePasswordDto: RePasswordDto
-  ) {
+  async rePassword(@Body() rePasswordDto: RePasswordDto) {
     const data = await this.authService.rePassword(rePasswordDto);
     return {
       status: HttpStatus.OK,
