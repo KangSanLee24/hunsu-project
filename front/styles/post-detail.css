@@ -125,7 +125,7 @@
 }
 
 .like-dislike button:hover {
-  background-color: #ddd; /* 버튼에 마우스를 올렸을 때 배경 색상 변경 */
+  background-color: #e6e6fa; /* 버튼에 마우스를 올렸을 때 배경 색상 변경 */
 }
 
 .like-dislike button i {
