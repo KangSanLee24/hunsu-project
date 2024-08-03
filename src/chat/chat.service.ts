@@ -322,4 +322,40 @@ export class ChatService {
       }
     };
   }
+
+  //랭킹 숫자 입력 가능
+  async getHotLiveChat(num: number) {
+
+    const getHotLiveChat = await this.entityManager.query(
+      `
+      select a.id, a.owner_id, a.title, a.count, b.img_url
+      from (select a.id, a.user_id as owner_id, a.title, count(b.user_id) as count
+      from (select id, user_id ,title
+      from chat_rooms
+      where is_deleted = FALSE) a join chat_members b
+      on a.id  = b.room_id
+      GROUP by a.id
+      order by count DESC) a left join 
+      (select room_id , user_id, img_url 
+      from chat_Images
+      where (room_id, created_at) IN 
+      (select room_id , max(created_at)
+      from chat_Images
+      group by room_id)) b
+      on a.id = b.room_id
+      where a.owner_id = b.user_id
+      limit ${num};
+      `
+    );
+
+    const data = getHotLiveChat.map((chat) => ({
+      id: chat.id,
+      ownerId: chat.owner_id,
+      title: chat.title,
+      count: chat.count,
+      imgUrl: chat.img_url
+    }));
+
+    return data;
+  }
 }
