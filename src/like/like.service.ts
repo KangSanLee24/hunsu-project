@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommentLike } from './entities/comment-like.entity';
 import { Repository } from 'typeorm';
@@ -7,6 +12,8 @@ import { Post } from 'src/post/entities/post.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
+import { PointService } from 'src/point/point.service';
+import { PointType } from 'src/point/types/point.type';
 
 @Injectable()
 export class LikeService {
@@ -18,8 +25,9 @@ export class LikeService {
     @InjectRepository(PostLike)
     private readonly postLikeRepository: Repository<PostLike>,
     @InjectRepository(CommentLike)
-    private readonly commentLikeRepository: Repository<CommentLike>
-  ) { }
+    private readonly commentLikeRepository: Repository<CommentLike>,
+    private readonly pointService: PointService
+  ) {}
 
   // 댓글 좋아요 조회 API
   async getCommentLikes(commentId: number) {
@@ -54,14 +62,26 @@ export class LikeService {
     }
 
     // 댓글 작성자 ID 비교 후 동일 유저이면 좋아요 금지
-    else if ((existingComment.userId === userId)) {
-      throw new BadRequestException(COMMENT_MESSAGE.LIKE.CREATE.FAILURE.NO_SELF);
+    else if (existingComment.userId === userId) {
+      throw new BadRequestException(
+        COMMENT_MESSAGE.LIKE.CREATE.FAILURE.NO_SELF
+      );
     }
 
     // 댓글 좋아요 눌렀었는지 확인
     if (commentLike) {
-      throw new BadRequestException(COMMENT_MESSAGE.LIKE.CREATE.FAILURE.ALREADY);
+      throw new BadRequestException(
+        COMMENT_MESSAGE.LIKE.CREATE.FAILURE.ALREADY
+      );
     }
+
+    // 댓글 좋아요 생성 포인트 지급
+    const isValidPoint = await this.pointService.validatePointLog(
+      userId,
+      PointType.COMMENT_LIKE
+    );
+    if (isValidPoint)
+      this.pointService.savePointLog(userId, PointType.COMMENT_LIKE, true);
 
     await this.commentLikeRepository.save({
       userId,
@@ -77,7 +97,7 @@ export class LikeService {
     const commentLike = await this.commentLikeRepository.findOneBy({
       userId: userId,
       commentId: commentId,
-    })
+    });
 
     // 댓글 존재 확인
     if (!existingComment) {
@@ -88,6 +108,9 @@ export class LikeService {
     if (!commentLike) {
       throw new NotFoundException(COMMENT_MESSAGE.LIKE.DELETE.FAILURE.NO_LIKE);
     }
+
+    // 댓글 삭제로 포인트 차감
+    this.pointService.savePointLog(userId, PointType.COMMENT_LIKE, false);
 
     await this.commentLikeRepository.delete({
       userId,
@@ -137,6 +160,14 @@ export class LikeService {
       throw new BadRequestException(POST_MESSAGE.LIKE.CREATE.FAILURE.ALREADY);
     }
 
+    // 게시글 좋아요 생성 포인트 지급
+    const isValidPoint = await this.pointService.validatePointLog(
+      userId,
+      PointType.POST_LIKE
+    );
+    if (isValidPoint)
+      this.pointService.savePointLog(userId, PointType.POST_LIKE, true);
+
     await this.postLikeRepository.save({
       userId,
       postId,
@@ -162,6 +193,9 @@ export class LikeService {
     if (!postLike) {
       throw new NotFoundException(POST_MESSAGE.LIKE.DELETE.FAILURE.NO_LIKE);
     }
+
+    // 게시글 삭제로 포인트 차감
+    this.pointService.savePointLog(userId, PointType.POST_LIKE, false);
 
     await this.postLikeRepository.delete({
       userId,

@@ -32,13 +32,13 @@ export class ChatService {
   
   //채팅방 생성자 (채팅방 오너) 체크
 
-  async checkChatOwner(id: number) {
+  async checkChatOwner(chatRoomId: number, authorId: number) : Promise<boolean>{
 
     const chatOwner = await this.chatRoomRepository.findOne({
-      where: {userId: id}
+      where: { id: chatRoomId, userId: authorId}
     });
 
-    return chatOwner
+    return chatOwner ? true : false
   };
 
   //채팅방 생성
@@ -87,11 +87,11 @@ export class ChatService {
 
   //채팅방 삭제
 
-  async removeChatRoom(chatRoomId: number, user: User) {
+  async removeChatRoom(chatRoomId: number, authorId: number) {
 
-    const checkChatOwner = this.checkChatOwner(user.id);
+    const checkChatOwner = await this.checkChatOwner(chatRoomId, authorId);
 
-    if(!checkChatOwner) {
+    if(checkChatOwner == false) {
       throw new ForbiddenException(
         '채팅방 삭제 권한이 없습니다.'
       )
@@ -102,6 +102,7 @@ export class ChatService {
       {id: chatRoomId}, {isDeleted: true}
     );
     
+    return { message: '삭제예정 컬럼 업데이트 완료'};
   }
 
   //채팅방 입장
@@ -131,14 +132,15 @@ export class ChatService {
 
   //채팅방 나가기
 
-  async outChatRoom(chatRoomId: number, user: User) {
+  async outChatRoom(chatRoomId: number, authorId: number) {
 
     //채팅방 방장이면 나가기 -> 채팅방 삭제 로직으로 이동
     //즉 방장이 나가면 채팅방 폭파
 
-    const checkChatOwner = this.checkChatOwner(user.id);
-    if(checkChatOwner) {
-      const removeChat = this.removeChatRoom(chatRoomId, user);
+    const checkChatOwner = await this.checkChatOwner(chatRoomId, authorId);
+
+    if(checkChatOwner == true) {
+      const removeChat = await this.removeChatRoom(chatRoomId, authorId);
       return removeChat;
     };
 
@@ -147,7 +149,7 @@ export class ChatService {
     });
 
     const outChatMember = await this.chatMemberRepository.delete(
-      {id:chatRoom.id, userId: user.id}
+      {id:chatRoom.id, userId: authorId}
     );
 
     return outChatMember;
@@ -267,7 +269,7 @@ export class ChatService {
   }
 
   //채팅방 검색
-  async chatRoomSearch(title: string) {
+  async chatRoomSearch(title?: string, sort?: Order) {
 
     const findChatRoom = await this.chatRoomRepository.find({
       relations: ['user'],
@@ -281,9 +283,9 @@ export class ChatService {
       },
       where: {
         isDeleted: false,
-        title: Like(`%${title}%`)
+        title: title ? Like(`%${title}%`) : Like('%%'),
       },
-      order: {createdAt: 'DESC'}
+      order: {createdAt: sort ? sort : 'DESC'}
     });
 
     const chatRoomsFormatted = findChatRoom.map((room) => ({
@@ -292,5 +294,36 @@ export class ChatService {
     }));
 
     return chatRoomsFormatted;
+  }
+
+  //채팅방 진짜 삭제
+  async deleteChatRoom() {
+
+    //조인
+    const findDeleteChat = await this.chatRoomRepository.find({
+      where: {isDeleted: true},
+      relations: ['chatImages'],
+      select: {
+       id: true,
+       chatImages: {
+        imgUrl: true,
+       },
+      }
+,    });
+
+    //ondelete로 채팅방 -> 내역/이미지/멤버 모두 삭제 됨
+    for (const room of findDeleteChat) {
+      await this.chatLogRepository.delete({roomId: room.id});
+      await this.chatImageRepository.delete({roomId: room.id});
+      await this.chatMemberRepository.delete({roomId: room.id});
+      await this.chatRoomRepository.delete({id: room.id});
+    };
+
+    //s3삭제
+    for (const chat of findDeleteChat) {
+        for(const image of chat.chatImages) {
+        await this.awsService.deleteImageFromS3(image.imgUrl);
+      }
+    };
   }
 }

@@ -10,11 +10,7 @@ import {
 } from '@nestjs/common';
 import { LikeService } from './like.service';
 import { AuthGuard } from '@nestjs/passport';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
@@ -22,9 +18,9 @@ import { POST_MESSAGE } from 'src/constants/post-message.constant';
 
 @Controller('')
 export class LikeController {
-  constructor(private readonly likeService: LikeService) { }
+  constructor(private readonly likeService: LikeService) {}
 
-  @ApiTags('댓글 API')
+  @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '댓글 좋아요 조회 API' })
   @Get('/comments/:commentId/likes')
   async getCommentLikes(@Param('commentId', ParseIntPipe) commentId: number) {
@@ -37,7 +33,7 @@ export class LikeController {
     };
   }
 
-  @ApiTags('댓글 API')
+  @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '댓글 좋아요 생성 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -55,7 +51,7 @@ export class LikeController {
     };
   }
 
-  @ApiTags('댓글 API')
+  @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '댓글 좋아요 삭제 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -73,7 +69,7 @@ export class LikeController {
     };
   }
 
-  @ApiTags('게시글 API')
+  @ApiTags('3. POST API')
   @ApiOperation({ summary: '게시글 좋아요 조회 API' })
   @Get('/posts/:postId/likes')
   async getPostLikes(@Param('postId', ParseIntPipe) postId: number) {
@@ -86,7 +82,7 @@ export class LikeController {
     };
   }
 
-  @ApiTags('게시글 API')
+  @ApiTags('3. POST API')
   @ApiOperation({ summary: '게시글 좋아요 생성 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -104,7 +100,7 @@ export class LikeController {
     };
   }
 
-  @ApiTags('게시글 API')
+  @ApiTags('3. POST API')
   @ApiOperation({ summary: '게시글 좋아요 삭제 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
