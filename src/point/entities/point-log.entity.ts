@@ -6,7 +6,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../../user/entities/user.entity';
+import { PointType } from '../types/point.type';
 
 @Entity({
   name: 'point_logs',
@@ -17,6 +18,9 @@ export class PointLog {
 
   @Column({ unsigned: true })
   userId: number;
+
+  @Column({ type: 'enum', enum: PointType })
+  pointType: PointType;
 
   @Column()
   point: number;

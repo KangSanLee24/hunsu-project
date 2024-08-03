@@ -17,6 +17,8 @@ import { PostImage } from './entities/post-image.entity';
 import { Category } from './types/post-category.type';
 import { Order } from './types/post-order.type';
 import { paginate } from 'nestjs-typeorm-paginate';
+import { PointService } from 'src/point/point.service';
+import { PointType } from 'src/point/types/point.type';
 
 @Injectable()
 export class PostService {
@@ -30,7 +32,8 @@ export class PostService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
 
-    private readonly awsService: AwsService
+    private readonly awsService: AwsService,
+    private readonly pointService: PointService
   ) {}
 
   /* 게시글 생성 API*/
@@ -40,17 +43,27 @@ export class PostService {
       withDeleted: true,
     });
 
-    // 권한 확인
+    // 1. 권한 확인
     if (!user) {
       throw new UnauthorizedException(POST_MESSAGE.POST.UNAUTHORIZED);
     }
 
+    // 2. 게시글 저장
     const createdPost = this.postRepository.create({
       ...createPostDto,
       userId,
     });
 
     const post = await this.postRepository.save(createdPost);
+
+    // 3. 게시글 생성 포인트 지급
+    const isValidPoint = await this.pointService.validatePointLog(
+      userId,
+      PointType.POST
+    );
+    if (isValidPoint)
+      this.pointService.savePointLog(userId, PointType.POST, true);
+
     return {
       id: post.id,
       userId: post.userId,
@@ -191,6 +204,9 @@ export class PostService {
     for (const image of post.postImages) {
       this.awsService.deleteFileFromS3(image.imgUrl);
     }
+
+    // 게시글 삭제로 포인트 차감
+    this.pointService.savePointLog(userId, PointType.POST, false);
 
     // DB에서 게시글 삭제
     this.postRepository.remove(post);

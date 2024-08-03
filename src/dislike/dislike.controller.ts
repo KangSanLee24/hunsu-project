@@ -6,15 +6,11 @@ import {
   Delete,
   ParseIntPipe,
   HttpStatus,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { DislikeService } from './dislike.service';
 import { AuthGuard } from '@nestjs/passport';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { CreateDislikeDto } from './dtos/create-dislike.dto';
@@ -24,12 +20,14 @@ import { POST_MESSAGE } from 'src/constants/post-message.constant';
 
 @Controller('dislike')
 export class DislikeController {
-  constructor(private readonly dislikeService: DislikeService) { }
+  constructor(private readonly dislikeService: DislikeService) {}
 
-  @ApiTags('댓글 API')
+  @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '댓글 싫어요 조회 API' })
   @Get('/comments/:commentId/dislikes')
-  async getCommentDislikes(@Param('commentId', ParseIntPipe) commentId: number) {
+  async getCommentDislikes(
+    @Param('commentId', ParseIntPipe) commentId: number
+  ) {
     const data = await this.dislikeService.getCommentDislikes(commentId);
 
     return {
@@ -39,7 +37,7 @@ export class DislikeController {
     };
   }
 
-  @ApiTags('댓글 API')
+  @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '댓글 싫어요 생성 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -57,7 +55,7 @@ export class DislikeController {
     };
   }
 
-  @ApiTags('댓글 API')
+  @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '댓글 싫어요 삭제 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -75,7 +73,7 @@ export class DislikeController {
     };
   }
 
-  @ApiTags('게시글 API')
+  @ApiTags('3. POST API')
   @ApiOperation({ summary: '게시글 싫어요 조회 API' })
   @Get('/posts/:postId/dislikes')
   async getPostDislikes(@Param('postId', ParseIntPipe) postId: number) {
@@ -88,7 +86,7 @@ export class DislikeController {
     };
   }
 
-  @ApiTags('게시글 API')
+  @ApiTags('3. POST API')
   @ApiOperation({ summary: '게시글 싫어요 생성 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -106,7 +104,7 @@ export class DislikeController {
     };
   }
 
-  @ApiTags('게시글 API')
+  @ApiTags('3. POST API')
   @ApiOperation({ summary: '게시글 싫어요 삭제 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))

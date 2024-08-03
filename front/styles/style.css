@@ -25,6 +25,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 50px;
   background-color: #000000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   letter-spacing: 4px;
@@ -38,14 +39,6 @@ nav ul {
   gap: 15px;
 }
 
-nav li:hover {
-  background-color: #ffffff;
-  color: black;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
 nav a {
   text-decoration: none;
   color: #ffffff;
@@ -53,10 +46,18 @@ nav a {
   font-size: 18px;
 }
 
+nav a:hover {
+  color: red;
+}
+
 header .logo {
   font-size: 24px;
   font-weight: bold;
   color: white;
+}
+
+header .logo:hover {
+  color: red;
 }
 
 main {
@@ -69,6 +70,7 @@ footer {
   bottom: 0;
   left: 0;
   right: 0;
+
   color: white;
   background-color: #000000;
   text-align: center;
@@ -85,10 +87,11 @@ footer button {
   background-color: #000000;
   color: white;
   border: none;
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
   font-size: 18px;
+}
+
+footer button:hover {
+  color: red;
 }
 
 /* 반응형 디자인 */

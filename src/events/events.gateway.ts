@@ -34,12 +34,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   //입장
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(@MessageBody() payload: { roomId: string; author: string; }, @ConnectedSocket() socket: Socket) {
+  async handleJoinRoom(@MessageBody() payload: { roomId: string; author: string; authorId: string }, @ConnectedSocket() socket: Socket) {
     socket.join(payload.roomId);  //유저를 룸에 추가
     this.logger.log(`Socket ${socket.id} joined room: ${payload.roomId}`);
 
-    socket.data.roomId = payload.roomId;
-    socket.data.author = payload.author;
+    socket.data.roomId = payload.roomId; // socket.data에 roomId 설정
+    socket.data.author = payload.author;  
+    socket.data.authorId = payload.authorId; 
+
+    await this.chatService.joinChatRoom(+payload.roomId, +payload.authorId);
 
     //유저가 들어왔음을 알림
     this.server.to(payload.roomId).emit('userJoined', {message: `${payload.author} 님이 입장하셨습니다`});
@@ -70,11 +73,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   //나가기
-  handleDisconnect(socket: Socket) {
+  async handleDisconnect(socket: Socket) {
     this.logger.log(`Socket disconnected: ${socket.id}`);
 
-    const { roomId, author } = socket.data;
+    const { roomId, author, authorId } = socket.data;
+    console.log(socket.data);
+
     socket.leave(roomId);
+
+    await this.chatService.outChatRoom(+roomId, +authorId);
     this.server.to(roomId).emit('userLeft', { message: `${author} 님이 퇴장하셨습니다` });
   }
 }

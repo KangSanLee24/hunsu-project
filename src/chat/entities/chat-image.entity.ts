@@ -2,8 +2,11 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinColumn,
+    ManyToOne,
     PrimaryGeneratedColumn,
   } from 'typeorm';
+import { ChatRoom } from './chat-room.entity';
   
   @Entity({ name: 'chat_Images' })
   export class ChatImage {
@@ -11,7 +14,11 @@ import {
     @PrimaryGeneratedColumn({ unsigned: true })
     id: number;
     
-    // 채팅방 id 
+    //채팅방 id
+    @ManyToOne(() => ChatRoom, (chatRoom) => chatRoom.chatMembers)
+    @JoinColumn({ name: 'room_id', referencedColumnName: 'id' })
+    chatRooms: ChatRoom;
+  
     @Column({ type: 'int', name: 'room_id', unsigned: true })
     roomId: number;
 

@@ -6,6 +6,7 @@
     <title>게시글 상세</title>
     <link rel="stylesheet" href="/styles/style.css" />
     <link rel="stylesheet" href="/styles/post-detail.css" />
+    <script type="module" src="/js/common/header.js"></script>
     <script type="module" src="/js/post/post-detail.js"></script>
     <script type="module" src="/js/post/comments.js"></script>
   </head>
@@ -17,6 +18,7 @@
         <ul>
           <li><a href="./log-in.html">로그인</a></li>
           <li><a href="./sign-up.html">회원가입</a></li>
+          <li><a id="userNickname"></a></li>
         </ul>
       </nav>
     </header>
@@ -57,15 +59,20 @@
     <footer>
       <div class="footer-menu">
         <button onclick="window.location.href='./chat-list.html'">
-          Live Chat
+          💬 Live Chat
         </button>
         <button onclick="window.location.href='./post-list.html'">
-          게시판
+          📝 게시판
         </button>
-        <button onclick="window.location.href='./main.html'">홈으로</button>
-        <button>좋아요</button>
+        <button onclick="window.location.href='./main.html'">🏠 홈으로</button>
+        <button
+          class="footerAlarm"
+          onclick="window.location.href='./alarm.html'"
+        >
+          🔔 알람
+        </button>
         <button onclick="window.location.href='./my-page.html'">
-          마이페이지
+          🏆 마이페이지
         </button>
       </div>
     </footer>

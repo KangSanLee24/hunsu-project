@@ -17,6 +17,8 @@ import { Role } from 'src/user/types/user-role.type';
 import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
 import { AlarmService } from 'src/alarm/alarm.service';
 import { AlarmFromType } from 'src/alarm/types/alarm-from.type';
+import { PointService } from 'src/point/point.service';
+import { PointType } from 'src/point/types/point.type';
 
 @Injectable()
 export class CommentService {
@@ -32,7 +34,8 @@ export class CommentService {
     @InjectRepository(CommentLike)
     private commentLikeRepository: Repository<CommentLike>,
     @InjectRepository(CommentDislike)
-    private commentDislikeRepository: Repository<CommentDislike>
+    private commentDislikeRepository: Repository<CommentDislike>,
+    private readonly pointService: PointService
   ) {}
 
   // 댓글 생성
@@ -65,7 +68,21 @@ export class CommentService {
       ...createCommentDto,
     });
 
+    // 댓글 생성 포인트 지급
+    const isValidPoint = await this.pointService.validatePointLog(
+      userId,
+      PointType.COMMENT
+    );
+    if (isValidPoint)
+      this.pointService.savePointLog(userId, PointType.COMMENT, true);
+
     const nickname = user.nickname;
+
+    await this.alarmService.createAlarm(
+      data.userId, // 게시글 글쓴이(알람을 받을 사용자)에게
+      AlarmFromType.POST, // 유형은 POST
+      data.postId // 어떤 게시글에(postId) 새로운 댓글이 달렸는지
+    );
 
     // 응답 데이터 구성
     return {
@@ -199,6 +216,9 @@ export class CommentService {
         COMMENT_MESSAGE.COMMENT.DELETE.FAILURE.FORBIDDEN
       );
     }
+
+    // 댓글 삭제로 포인트 차감
+    this.pointService.savePointLog(userId, PointType.POST, false);
 
     await this.commentRepository.save({
       id: commentId,

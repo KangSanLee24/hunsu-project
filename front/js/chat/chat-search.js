@@ -4,18 +4,27 @@ import { renderChatRooms } from "./chat-list.js";
 document.addEventListener('DOMContentLoaded', () => {
     const searchButton = document.getElementById('searchRoomButton');
     const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
 
     searchButton.addEventListener('click', async () => {
         const query = searchInput.value.trim();
-        if (query) {
-            const chatRooms = await searchChatRooms(query);
-            renderChatRooms(chatRooms);
-        }
+        const sortOrder = sortSelect.value;
+        
+        console.log(query, sortOrder);
+        const chatRooms = await searchChatRooms(query, sortOrder);
+        renderChatRooms(chatRooms);
     });
 
-    async function searchChatRooms(title) {
+    async function searchChatRooms(title, order) {
         try {
-            const response = await fetch(`${API_BASE_URL}/chatrooms/search?title=${encodeURIComponent(title)}`);
+            const accessToken = localStorage.getItem('accessToken');
+            const response = await fetch(`${API_BASE_URL}/chatrooms/search?title=${encodeURIComponent(title)}&sort=${order}`, {
+                method: 'GET',
+                headers: {
+                  'Authorization': `Bearer ${accessToken}`, 
+                  'Content-Type': 'application/json' 
+                }
+            });
             if (!response.ok) {
                 throw new Error('Network response was not ok.');
             }
@@ -23,8 +32,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const roomsWithDetails = await Promise.all(rooms.map(async (room) => {
                 const [memberCountResponse, lastChatTimeResponse] = await Promise.all([
-                    fetch(`${API_BASE_URL}/chatrooms/${room.id}/member-count`),
-                    fetch(`${API_BASE_URL}/chatrooms/${room.id}/chat-time`)
+                    fetch(`${API_BASE_URL}/chatrooms/${room.id}/member-count`, {
+                        method: 'GET',
+                        headers: {
+                          'Authorization': `Bearer ${accessToken}`
+                        }
+                    }),
+                    fetch(`${API_BASE_URL}/chatrooms/${room.id}/chat-time`, {
+                        method: 'GET',
+                        headers: {
+                          'Authorization': `Bearer ${accessToken}`
+                        }
+                    })
                 ]);
 
                 const memberCount = await memberCountResponse.json();
