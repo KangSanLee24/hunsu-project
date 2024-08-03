@@ -16,7 +16,9 @@ import { Comment } from 'src/comment/entities/comment.entity';
 import { AlarmFromType } from './types/alarm-from.type';
 import { ALARM_MESSAGES } from 'src/constants/alarm-message.constant';
 import { ConfigService } from '@nestjs/config';
-import { Observable, Subject, filter, map } from 'rxjs';
+import { Observable, Subject, filter, from, map } from 'rxjs';
+import { FindAllAlarmsDto } from './dto/find-all-alarms.dto';
+import { paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class AlarmService {
@@ -77,22 +79,37 @@ export class AlarmService {
   }
 
   /** 2. 알람 목록 조회(R-L) **/
-  async findAllAlarm(user: User) {
+  async findAllAlarm(user: User, page: number, limit: number) {
     // 0. 데이터 정리
     const userId = user.id;
 
-    // 1. 알람 목록 조회
-    const alarms: Alarm[] = await this.alarmRepository.find({
-      where: {
-        userId,
+    // 1. 페이지네이션을 적용한 알람 조회
+    const { items, meta } = await paginate<Alarm>(
+      this.alarmRepository,
+      {
+        page,
+        limit,
       },
-      order: {
-        createdAt: 'DESC',
-      },
-    });
+      {
+        where: { userId },
+        order: { createdAt: 'DESC' },
+      }
+    );
 
     // 2. 반환
-    return alarms;
+    return {
+      alarms: items.map((alarm) => ({
+        id: alarm.id,
+        userId: alarm.userId,
+        fromType: alarm.fromType,
+        fromNumber: alarm.fromNumber,
+        notification: alarm.notification,
+        isChecked: alarm.isChecked,
+        createdAt: alarm.createdAt,
+        updatedAt: alarm.updatedAt,
+      })),
+      meta,
+    };
   }
 
   /** 3. 알람 클릭 (Link) **/
@@ -110,8 +127,10 @@ export class AlarmService {
       throw new NotFoundException(ALARM_MESSAGES.CLICK.FAILURE.NO_ALARM);
     }
 
-    // 2. 알람을 [읽음] 처리하고
-    await this.readAlarm(user, alarmId);
+    // 2. 알람을 [읽음] 처리하고 (false인 경우에만 true로 변경)
+    if (alarm.isChecked !== true) {
+      await this.readAlarm(user, alarmId);
+    }
 
     // 3. 유형에 맞게 데이터 제공
     // (프론트에서 링크이동할 것인지, 미리보기로 보여줄 것인지 판단할 것)
@@ -121,8 +140,8 @@ export class AlarmService {
       const post = await this.postRepository.findOneBy({
         id: alarm.fromNumber,
       });
-      // 3-1-2. 게시글 반환
-      return post;
+      // 3-1-2. 게시글id 반환
+      return post.id;
     }
     // 3-2. COMMENT
     if (alarm.fromType == AlarmFromType.COMMENT) {
@@ -134,8 +153,8 @@ export class AlarmService {
       const post = await this.postRepository.findOneBy({
         id: comment.postId,
       });
-      // 3-2-3. 게시글 반환
-      return post;
+      // 3-2-3. 게시글id 반환
+      return post.id;
     }
     // // 3-3. LIVECHAT
     // if (alarm.fromType == AlarmFromType.LIVECHAT) {
@@ -145,12 +164,12 @@ export class AlarmService {
   }
 
   /** 4. 알람 수정(U) **/
-  /** 4-1. 알람 수정(U) - [읽음]처리(개별 선택) **/
+  /** 4-1. 알람 수정(U) - [읽음]처리 반전(개별 선택) **/
   async readAlarm(user: User, alarmId: number) {
     // 0. 데이터 정리
     const userId = user.id;
 
-    // 1. [읽음] 처리할 알람 찾기
+    // 1. [읽음]처리 반전할 알람 찾기
     const alarm = await this.alarmRepository.findOneBy({
       id: alarmId,
       userId,
@@ -160,15 +179,28 @@ export class AlarmService {
       throw new NotFoundException(ALARM_MESSAGES.UPDATE.FAILURE.NO_ALARM);
     }
 
-    // 2. 해당 알람 [읽음]으로 처리
-    await this.alarmRepository.update(
-      {
-        id: alarmId,
-      },
-      {
-        isChecked: true,
-      }
-    );
+    // 2. 해당 알람 [읽음]처리 반전
+    if (alarm.isChecked !== true) {
+      // 2-1. 해당 알람 [읽음]으로 처리 false => true
+      await this.alarmRepository.update(
+        {
+          id: alarmId,
+        },
+        {
+          isChecked: true,
+        }
+      );
+    } else {
+      // 2-2. 해당 알람 [읽음]처리 취소 true => false
+      await this.alarmRepository.update(
+        {
+          id: alarmId,
+        },
+        {
+          isChecked: false,
+        }
+      );
+    }
 
     // 3. 데이터 가공
     const data = {

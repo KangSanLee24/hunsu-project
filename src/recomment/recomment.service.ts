@@ -57,9 +57,9 @@ export class RecommentService {
     });
 
     await this.alarmService.createAlarm(
-      findPost.userId, // 댓글 글쓴이에게
+      findPost.userId, // 댓글 글쓴이(알람을 받을 사용자)에게
       AlarmFromType.COMMENT, // 유형은 COMMENT
-      newRecomment.parentId // commentId 댓글에 새로운 대댓글이 달렸다고 전달
+      newRecomment.parentId // 어떤 댓글에(commentId) 새로운 대댓글이 달렸는지
     );
 
     return newRecomment;

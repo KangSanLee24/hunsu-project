@@ -17,8 +17,14 @@ import { User } from 'src/user/entities/user.entity';
 
 import { ALARM_MESSAGES } from 'src/constants/alarm-message.constant';
 import { AlarmFromType } from './types/alarm-from.type';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { FindAllAlarmsDto } from './dto/find-all-alarms.dto';
 
 @ApiTags('7. ALARM API')
 @Controller('alarms')
@@ -51,9 +57,23 @@ export class AlarmController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '2. 알람 목록 조회' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+  })
   @Get('')
-  async findAllAlarm(@LogIn() user: User) {
-    const data = await this.alarmService.findAllAlarm(user);
+  async findAllAlarm(
+    @LogIn() user: User,
+    @Query() findAllAlarmsDto?: FindAllAlarmsDto
+  ) {
+    const { page, limit } = findAllAlarmsDto || {};
+    const data = await this.alarmService.findAllAlarm(user, page, limit);
     return {
       status: HttpStatus.OK,
       message: ALARM_MESSAGES.READ_LIST.SUCCESS,
@@ -75,10 +95,10 @@ export class AlarmController {
     };
   }
 
-  /** 4-1. 알람 수정(U) - [읽음]처리(개별 선택) **/
+  /** 4-1. 알람 수정(U) - [읽음]처리 반전(개별 선택) **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '4-1. 알람 수정 - [읽음]처리(개별 선택)' })
+  @ApiOperation({ summary: '4-1. 알람 수정 - [읽음]처리 반전(개별 선택)' })
   @Patch(':alarmId')
   async readAlarm(@LogIn() user: User, @Param('alarmId') alarmId: number) {
     const data = await this.alarmService.readAlarm(user, alarmId);

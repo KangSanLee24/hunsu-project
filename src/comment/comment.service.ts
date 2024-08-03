@@ -67,6 +67,12 @@ export class CommentService {
 
     const nickname = user.nickname;
 
+    await this.alarmService.createAlarm(
+      data.userId, // 게시글 글쓴이(알람을 받을 사용자)에게
+      AlarmFromType.POST, // 유형은 POST
+      data.postId // 어떤 게시글에(postId) 새로운 댓글이 달렸는지
+    );
+
     // 응답 데이터 구성
     return {
       id: data.id,
