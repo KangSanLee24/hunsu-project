@@ -19,6 +19,10 @@ import { EventsModule } from './events/events.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AlarmModule } from './alarm/alarm.module';
+import { PointModule } from './point/point.module';
+import { HashtagModule } from './hashtag/hashtag.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ScheduleService } from './schedule/schedule.service'; 
 
 @Module({
   imports: [
@@ -31,6 +35,7 @@ import { AlarmModule } from './alarm/alarm.module';
       validationSchema: configValidationSchema,
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
+    ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
     PostModule,
@@ -43,8 +48,10 @@ import { AlarmModule } from './alarm/alarm.module';
     ChatModule,
     EventsModule,
     AlarmModule,
+    PointModule,
+    HashtagModule,
   ],
   controllers: [AppController],
-  providers: [AwsService],
+  providers: [AwsService, ScheduleService],
 })
 export class AppModule {}

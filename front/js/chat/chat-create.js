@@ -4,22 +4,30 @@ import { fetchChatRooms, renderChatRooms } from "./chat-list.js";
 // 채팅방 생성 API 호출
 async function createChatRoom(roomName) {
     try {
+        const accessToken = localStorage.getItem('accessToken');
+
+        console.log(accessToken);
+
         const response = await fetch(`${API_BASE_URL}/chatrooms`, {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ title: roomName })
         });
 
         const data = await response.json();
+
         if (response.ok) {
             console.log('채팅방 생성 성공:', data);
-            closeModal();
 
-            //새로고침
-            const chatRooms = await fetchChatRooms();
-            renderChatRooms(chatRooms);
+            const roomId = data.id;
+            const title = data.title;
+
+            closeModal();
+            //채팅방으로 이동
+            window.location.href = `/html/chat.html?roomId=${roomId}&roomName=${encodeURIComponent(title)}`;
         } else {
             console.error('채팅방 생성 실패:', data);
         }

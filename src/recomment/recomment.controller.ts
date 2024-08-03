@@ -81,6 +81,7 @@ export class RecommentController {
     }
 
     return await this.recommentService.removeRecomment(
+      user.id,
       +commentId,
       +recommentId
     );
