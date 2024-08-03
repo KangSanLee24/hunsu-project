@@ -1,20 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const accessToken = localStorage.getItem('accessToken');
-  const isLoggedIn = !!accessToken;
-
-  const loginLink = document.querySelector('a[href="./log-in.html"]');
-  const signUpLink = document.querySelector('a[href="./sign-up.html"]');
-
-  if (isLoggedIn) {
-    // 로그인 상태일 때 로그인 및 회원가입 버튼 숨기기
-    if (loginLink) loginLink.style.display = 'none';
-    if (signUpLink) signUpLink.style.display = 'none';
-  } else {
-    // 로그인 상태가 아닐 때 로그인 및 회원가입 버튼 보이기
-    if (loginLink) loginLink.style.display = 'block';
-    if (signUpLink) signUpLink.style.display = 'block';
-  }
-
   const liveChatData = [
     { id: 13021, title: '실시간 채팅 1', users: 30 },
     { id: 12995, title: '실시간 채팅 2', users: 44 },
