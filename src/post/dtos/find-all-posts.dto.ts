@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { Order } from '../types/post-order.type';
 import { Category } from '../types/post-category.type';
 
@@ -23,4 +23,8 @@ export class FindAllPostsDto {
   @IsOptional()
   @IsEnum(Category)
   category: Category;
+
+  @IsOptional()
+  @IsString()
+  keyword: string;
 }

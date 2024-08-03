@@ -73,20 +73,40 @@ export class PostController {
     required: false,
     type: Number,
   })
+  @ApiQuery({
+    name: 'keyword',
+    required: false,
+    type: String,
+  })
   @Get()
   async findAll(@Query() findAllPostsDto?: FindAllPostsDto) {
-    const { page, limit, category, sort } = findAllPostsDto || {};
+    const { page, limit, category, sort, keyword } = findAllPostsDto || {};
     const findAllPost = await this.postService.findAll(
       page,
       limit,
       category,
-      sort
+      sort,
+      keyword
     );
 
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.READ_ALL.SUCCESS,
       data: findAllPost,
+    };
+  }
+
+  /** 화제글 목록 조회 API **/
+  @ApiOperation({ summary: '화제글 목록 조회 API' })
+  @Get('hot')
+  async findHotPost() {
+    console.log('🚀 ~ PostController ~ findHotPost ~ findHotPost:');
+
+    const hotPosts = await this.postService.findHotPost();
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.READ_HOT.SUCCESS,
+      data: hotPosts,
     };
   }
 
@@ -102,18 +122,6 @@ export class PostController {
       data: findOnePost,
     };
   }
-
-  /** 화제글 목록 조회 API **/
-  // @ApiOperation({ summary: '화제글 목록 조회 API' })
-  // @Get('hot')
-  // async findHotPost() {
-  //   const hotPosts = await this.postService.findAll();
-  //   return {
-  //     statusCode: HttpStatus.OK,
-  //     message: POST_MESSAGE.POST.READ_HOT.SUCCESS,
-  //     data: hotPosts,
-  //   };
-  // }
 
   /** 게시글 수정 API **/
   @UseGuards(AuthGuard('jwt'))
