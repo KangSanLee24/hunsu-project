@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../../config/config.js';
+import { elapsedTime } from '../common/elapsed-time.js';
 
 const submitCommentButton = document.getElementById('submit-comment');
 const commentContentInput = document.getElementById('comment-content');
@@ -39,7 +40,7 @@ function addCommentToList(comment) {
   const commentItem = document.createElement('li');
   commentItem.innerHTML = `
                 <p>${comment.nickname} 
-                | 작성일: ${new Date(comment.createdAt).toLocaleString()} 
+                | 작성일: ${elapsedTime(comment.createdAt)} 
                 | 좋아요: ${comment.likes || 0} 
                 | 싫어요: ${comment.dislikes || 0}
                 </p>
@@ -61,7 +62,7 @@ function addCommentToList(comment) {
       const recommentItem = document.createElement('li');
       recommentItem.innerHTML = `
                       <p>${recomment.nickname}
-                      | 작성일: ${new Date(recomment.createdAt).toLocaleString()}
+                      | 작성일: ${elapsedTime(recomment.createdAt)}
                       | 좋아요: ${recomment.likes}
                       | 싫어요: ${recomment.dislikes}</p>
                       <p>${recomment.content}</p>
@@ -158,7 +159,7 @@ commentList.addEventListener('click', async (event) => {
     if (recommentContent) {
       await submitRecomment(commentId, recommentContent);
       recommentInput.style.display = 'none'; // 입력 후 숨김
-      // 댓글 새로 고침 로직을 추가할 수 있습니다.
+      window.location.reload();
     }
   }
 });

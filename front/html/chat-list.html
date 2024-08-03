@@ -22,7 +22,7 @@
 
     <main>
       <div class="chat-list">
-        <h1>채팅</h1>
+        <h1>💬 Live Chat</h1>
 
         <div class="searchContainer">
           <input type="text" id="searchInput" placeholder="채팅방 검색..." />
@@ -33,6 +33,15 @@
           <button id="searchRoomButton">검색</button>
           <button id="createChatButton">채팅방 만들기</button>
         </div>
+
+        <!-- 메뉴바 추가 -->
+        <div class="menu-bar">
+          <div class="menu-item">채팅방</div>
+          <div class="menu-item">방장</div>
+          <div class="menu-item">인원</div>
+          <div class="menu-item">채팅시간</div>
+        </div>
+
         <ul id="chatList">
           <!-- 채팅방 목록이 동적으로 삽입됩니다. -->
         </ul>
@@ -77,7 +86,7 @@
     </footer>
 
     <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
-    <script type="module" src="/js/main/header.js"></script>
+    <script type="module" src="/js/common/header.js"></script>
     <script type="module" src="../js/chat/chat-list.js"></script>
     <script type="module" src="../js/chat/chat-create.js"></script>
     <script type="module" src="../js/chat/chat-search.js"></script>
