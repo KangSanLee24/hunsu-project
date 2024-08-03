@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../../config/config.js';
+import { elapsedTime } from '../common/elapsed-time.js';
 
 const boardListElement = document.getElementById('board-list');
 const categorySelect = document.getElementById('category-select');
@@ -69,7 +70,7 @@ function renderBoardList(data) {
             <td>${item.category}</td>
             <td><a href="post-detail.html?id=${item.id}">${item.title}</a></td>
             <td>${item.nickname}</td>
-            <td>${new Date(item.createdAt).toLocaleString()}</td>
+            <td>${elapsedTime(item.createdAt)}</td>
             <td>${item.numComments}</td>
         `;
     boardListElement.appendChild(row);
@@ -106,7 +107,7 @@ filterButton.addEventListener('click', () => {
   fetchBoardData(categorySelect.value, sortSelect.value, currentPage);
 });
 
-// 페이지 이동 버튼 클릭 이벤트
+/** 페이지 이동 버튼 클릭 이벤트 */
 prevButton.addEventListener('click', () => {
   if (currentPage > 1) {
     currentPage--;
@@ -114,6 +115,7 @@ prevButton.addEventListener('click', () => {
   }
 });
 
+/** 페이지 이동 버튼 클릭 이벤트 */
 nextButton.addEventListener('click', () => {
   if (currentPage < totalPages) {
     currentPage++;
