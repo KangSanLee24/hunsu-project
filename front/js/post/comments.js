@@ -158,7 +158,7 @@ commentList.addEventListener('click', async (event) => {
     if (recommentContent) {
       await submitRecomment(commentId, recommentContent);
       recommentInput.style.display = 'none'; // 입력 후 숨김
-      // 댓글 새로 고침 로직을 추가할 수 있습니다.
+      window.location.reload();
     }
   }
 });
