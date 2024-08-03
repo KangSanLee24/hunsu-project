@@ -1,0 +1,80 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.write-button {
+  text-align: center;
+}
+
+.write-button button {
+  background-color: #000000;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.filter-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.filter-container select,
+input,
+button {
+  margin: 3px;
+}
+
+.deleteAlarm {
+  border: 0px;
+}
+
+.deleteAlarm:hover {
+  background-color: black;
+}
+
+.checkAlarm {
+  border: 0px;
+}
+
+.checkAlarm:hover {
+  background-color: black;
+}
+
+.footerAlarm {
+  color: blue;
+  font-weight: bold;
+}
+
+.notLogIn {
+  text-align: center;
+}
+
+.onClickAlarm {
+  color: black;
+}
+
+.onClickAlarm:hover {
+  color: blue;
+  font-weight: bold;
+}
