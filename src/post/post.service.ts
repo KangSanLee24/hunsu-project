@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -6,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
-import { MoreThan, Repository } from 'typeorm';
+import { Like, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
@@ -75,15 +76,18 @@ export class PostService {
       updatedAt: post.updatedAt, // 테스트를 위해 남겨둠 마무리에는 포스트아이디만 리턴할 예정
     };
   }
+
   /*게시글 목록 조회 API*/
   async findAll(
     page: number,
     limit: number,
     category?: Category,
-    sort?: Order
+    sort?: Order,
+    keyword?: string
   ) {
     // 카테고리에 따른 정렬
     const sortCategory = category ? { category } : {};
+    const keywordFilter = keyword ? { title: Like(`%${keyword}%`) } : {};
 
     const { items, meta } = await paginate<Post>(
       this.postRepository,
@@ -92,7 +96,7 @@ export class PostService {
         limit,
       },
       {
-        where: sortCategory,
+        where: { ...sortCategory, ...keywordFilter },
         relations: ['user', 'comments'],
         order: { createdAt: sort ? sort : 'DESC' }, // 정렬조건
       }
@@ -147,16 +151,30 @@ export class PostService {
   }
 
   /*화제글 목록 조회 API*/
-  // async findHotPost() {
-  //   const now = new Date(); // 현재시간
-  //   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 현재시간으로부터 일주일전
+  async findHotPost() {
+    const now = new Date(); // 현재시간
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 현재시간으로부터 일주일전
+    console.log('🚀 ~ PostService ~ findHotPost ~ weekAgo:', weekAgo);
 
-  //   const posts = await this.postRepository.find({
-  //     where: { createdAt: MoreThan(weekAgo) }, // 최근 일주일 이내에 생성된 게시물들 가져오가
-  //     relations: ['user', 'postImages', 'comments', 'postLikes'],
-  //     order: { numLikes: 'DESC' },
-  //   });
-  // }
+    const posts = await this.postRepository.find({
+      where: { createdAt: MoreThan(weekAgo) }, // 최근 일주일 이내에 생성된 게시물들 가져오가
+      relations: ['user', 'postImages', 'comments', 'postLikes'],
+      order: { numLikes: 'DESC' },
+    });
+
+    return posts.map((post) => ({
+      id: post.id,
+      userId: post.userId,
+      nickname: post.user.nickname,
+      title: post.title,
+      content: post.content,
+      numLikes: post.numLikes,
+      numDislikes: post.numDislikes,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      numComments: post.comments.length,
+    }));
+  }
 
   /*게시글 수정 API*/
   async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
