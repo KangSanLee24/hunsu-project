@@ -20,7 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Order } from 'src/post/types/post-order.type';
 import { AuthGuard } from '@nestjs/passport';
 
-//@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('9. CHAT API')
 @Controller('chatrooms')
 export class ChatController {
