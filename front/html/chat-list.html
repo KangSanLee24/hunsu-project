@@ -15,6 +15,7 @@
         <ul>
           <li><a href="./log-in.html">로그인</a></li>
           <li><a href="./sign-up.html">회원가입</a></li>
+          <li><a id="userNickname"></a></li>
         </ul>
       </nav>
     </header>
@@ -43,7 +44,12 @@
         <button id="closeButton" class="close-btn">&times;</button>
         <h2 class="modal-title">채팅방 생성</h2>
         <div class="input-container">
-          <input type="text" id="roomName" name="roomName" placeholder="채팅방 이름을 입력하세요" />
+          <input
+            type="text"
+            id="roomName"
+            name="roomName"
+            placeholder="채팅방 이름을 입력하세요"
+          />
         </div>
         <button id="createButton">채팅방 생성하기</button>
       </div>
@@ -66,6 +72,7 @@
     </footer>
 
     <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+    <script type="module" src="/js/main/header.js"></script>
     <script type="module" src="../js/chat/chat-list.js"></script>
     <script type="module" src="../js/chat/chat-create.js"></script>
     <script type="module" src="../js/chat/chat-search.js"></script>
