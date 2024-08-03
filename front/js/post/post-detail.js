@@ -4,6 +4,10 @@ import { API_BASE_URL } from '../../config/config.js';
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get('id');
 
+const submitLikeButton = document.getElementById('like-btn');
+const submitDislikeButton = document.getElementById('dislike-btn');
+const imageContainer = document.getElementById('image-container'); // 이미지를 표시할 컨테이너
+
 // 게시글 상세 조회 API 호출
 async function fetchPost(postId) {
   try {
@@ -18,7 +22,7 @@ async function fetchPost(postId) {
 // 페이지 렌더링 메소드
 async function renderPostDetail(postId) {
   const post = await fetchPost(postId);
-
+  console.log(post.data.images);
   // 게시글 내용 렌더링
   if (post) {
     document.getElementById('post-category').innerText =
@@ -36,7 +40,69 @@ async function renderPostDetail(postId) {
     document.getElementById('post-content').innerText =
       post.data.content || '내용 없음';
   }
+  // 이미지 렌더링
+  if (post.data.images && post.data.images.length > 0) {
+    post.data.images.forEach((image) => {
+      const imgElement = document.createElement('img');
+      imgElement.src = image; // 이미지 URL
+      imgElement.alt = '게시글 이미지';
+      imgElement.classList.add('post-image'); // 필요에 따라 클래스 추가
+      imageContainer.appendChild(imgElement);
+    });
+  }
 }
+
+// 좋아요 API 호출
+async function updateLikes(postId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/posts/${postId}/likes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+    if (!response.ok) throw new Error('좋아요 업데이트에 실패했습니다.');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// 싫어요 API 호출
+async function updateDislikes(postId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/posts/${postId}/dislikes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+    if (!response.ok) throw new Error('싫어요 업데이트에 실패했습니다.');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// 좋아요 버튼 클릭 핸들러
+async function handleLike() {
+  await updateLikes(postId);
+  await renderPostDetail(postId);
+  submitLikeButton.classList.add('liked');
+}
+
+// 싫어요 버튼 클릭 핸들러
+async function handleDislike() {
+  await updateDislikes(postId);
+  await renderPostDetail(postId);
+  submitDislikeButton.classList.add('disliked');
+}
+
+// 버튼 클릭 이벤트 리스너 추가
+submitLikeButton.addEventListener('click', handleLike);
+submitDislikeButton.addEventListener('click', handleDislike);
 
 // 페이지 로드 시 게시글과 댓글을 렌더링
 if (postId) {
