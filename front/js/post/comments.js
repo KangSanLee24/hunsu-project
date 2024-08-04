@@ -35,6 +35,46 @@ async function createComment(content) {
   }
 }
 
+// 댓글 좋아요 API 호출 함수
+async function likeComment(commentId) {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/comments/${commentId}/likes`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      }
+    );
+    if (!response.ok) throw new Error('댓글 좋아요에 실패했습니다.');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    alert('댓글 좋아요에 오류가 발생했습니다.');
+  }
+}
+
+// 댓글 싫어요 API 호출 함수
+async function dislikeComment(commentId) {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/comments/${commentId}/dislikes`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      }
+    );
+    if (!response.ok) throw new Error('댓글 싫어요에 실패했습니다.');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    alert('댓글 싫어요에 오류가 발생했습니다.');
+  }
+}
+
 // 댓글 리스트에 추가하는 함수
 function addCommentToList(comment) {
   const commentItem = document.createElement('li');
@@ -50,6 +90,8 @@ function addCommentToList(comment) {
                   <textarea placeholder="대댓글을 입력하세요..." rows="2"></textarea>
                   <button class="submit-recomment">작성</button>
                 </div>
+                <button class="comment-like-btn" data-comment-id="${comment.id}">좋아요</button>
+                <button class="comment-dislike-btn" data-comment-id="${comment.id}">싫어요</button>
             `;
 
   // 대댓글이 있는 경우 렌더링
@@ -94,6 +136,29 @@ async function fetchComments() {
     alert('댓글을 불러오는 중 오류가 발생했습니다.');
   }
 }
+
+// 댓글 좋아요 버튼 클릭 이벤트 핸들러
+async function handleLikeButtonClick(event) {
+  const commentId = event.target.dataset.commentId;
+  await likeComment(commentId);
+  window.location.reload(); // 댓글 목록 새로고침
+}
+
+// 댓글 싫어요 버튼 클릭 이벤트 핸들러
+async function handleDislikeButtonClick(event) {
+  const commentId = event.target.dataset.commentId;
+  await dislikeComment(commentId);
+  window.location.reload(); // 댓글 목록 새로고침
+}
+
+// 댓글 리스트에 좋아요 및 싫어요 버튼 클릭 이벤트 리스너
+commentList.addEventListener('click', async (event) => {
+  if (event.target.classList.contains('comment-like-btn')) {
+    await handleLikeButtonClick(event);
+  } else if (event.target.classList.contains('comment-dislike-btn')) {
+    await handleDislikeButtonClick(event);
+  }
+});
 
 // 댓글 렌더링 함수
 function renderComments(comments) {
