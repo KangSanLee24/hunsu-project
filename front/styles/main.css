@@ -6,6 +6,12 @@
   font-style: normal;
 }
 
+body {
+  font-family: 'Jua', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
 /* 0. 각 섹션 CONTAINER 속성 */
 .hot-live-chats,
 .hot-ozirap {
@@ -20,6 +26,9 @@
 h2 {
   margin: 0 0 10px;
   color: rgb(36, 36, 36);
+}
+h2:hover {
+  color: rgb(201, 51, 51);
 }
 
 /* 1. HOT - LIVECHAT CONTAINER */
@@ -122,6 +131,9 @@ h2 {
   height: 20px;
   margin-bottom: 3px;
 }
+.chat-title:hover {
+  color: rgb(233, 233, 22);
+}
 .chat-title-var {
   display: block;
   width: 160px;
@@ -137,6 +149,9 @@ h2 {
   width: 160px;
   height: 20px;
 }
+.chat-maker:hover {
+  color: rgb(238, 165, 82);
+}
 .chat-maker-var {
   display: block;
   width: 160px;
@@ -151,6 +166,9 @@ h2 {
   margin: 0px;
   width: 160px;
   height: 20px;
+}
+.chat-headcount:hover {
+  color: rgb(155, 155, 201);
 }
 .chat-headcount-var {
   display: block;
