@@ -98,11 +98,14 @@ export class PostController {
 
   /** 화제글 목록 조회 API **/
   @ApiOperation({ summary: '화제글 목록 조회 API' })
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    enum: Category,
+  })
   @Get('hot')
-  async findHotPost() {
-    console.log('🚀 ~ PostController ~ findHotPost ~ findHotPost:');
-
-    const hotPosts = await this.postService.findHotPost();
+  async findHotPost(@Query('category') category: Category) {
+    const hotPosts = await this.postService.findHotPost(category);
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.READ_HOT.SUCCESS,
