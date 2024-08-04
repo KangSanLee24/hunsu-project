@@ -133,18 +133,10 @@
 }
 
 /* 댓글 좋아요 싫어요 버튼 */
-/* .comment-like-dislike {
-  display: flex; /* 버튼들을 수평으로 배치 */
-/*justify-content: flex-end; /* 버튼을 오른쪽으로 정렬 */
-/*margin-top: 10px; /* 버튼 위쪽에 여백 추가 */
-/*}*/
-
-/* 댓글 좋아요 싫어요 버튼 */
 .comment-like-dislike {
-  position: absolute; /* 절대 위치 설정 */
-  top: 10px; /* 댓글 상단에서의 거리 */
-  right: 10px; /* 댓글 오른쪽에서의 거리 */
   display: flex; /* 버튼들을 수평으로 배치 */
+  justify-content: flex-end; /* 버튼을 오른쪽으로 정렬 */
+  margin-top: 10px; /* 버튼 위쪽에 여백 추가 */
 }
 
 .comment-like-dislike button {
