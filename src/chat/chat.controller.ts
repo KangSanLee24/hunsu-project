@@ -67,6 +67,15 @@ export class ChatController {
   }
 
   /**
+   * hot live chat 조회
+   * @returns
+   */
+  @Get('hotlivechat')
+  async getHotLiveChat(@Query('num') num: number) {
+    return await this.chatService.getHotLiveChat(+num);
+  }
+
+  /**
    * 채팅방 검색
    * @returns
    */

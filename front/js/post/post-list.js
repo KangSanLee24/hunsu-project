@@ -9,15 +9,14 @@ const pageNumbersElement = document.getElementById('page-numbers');
 const prevButton = document.getElementById('prev-button');
 const nextButton = document.getElementById('next-button');
 const currentPageLabel = document.getElementById('current-page-label');
-// const keywordInput = document.getElementById('keyword-input'); // 검색어 입력란
+const keywordInput = document.getElementById('keyword-input');
 
 let currentPage = 1; // 현재 페이지
 let totalPages = 0; // 총 페이지 수
 const postsPerPage = 20; // 페이지 당 게시글 수
 
 // API 호출 함수
-async function fetchBoardData(category, sort, page) {
-  // async function fetchBoardData(category, sort, page, keyword) {
+async function fetchBoardData(category, sort, page, keyword) {
   try {
     // API 호출 시 비어 있는 값을 포함하지 않도록 URL 구성
     const queryParams = new URLSearchParams({
@@ -31,9 +30,9 @@ async function fetchBoardData(category, sort, page) {
     if (sort) {
       queryParams.append('sort', sort);
     }
-    // if (keyword) {
-    //   queryParams.append('keyword', keyword);
-    // }
+    if (keyword) {
+      queryParams.append('keyword', keyword);
+    }
     const response = await fetch(
       `${API_BASE_URL}/posts?${queryParams.toString()}`
     );
@@ -91,7 +90,12 @@ function updatePagination() {
     } else {
       pageButton.addEventListener('click', () => {
         currentPage = i;
-        fetchBoardData(categorySelect.value, sortSelect.value, currentPage);
+        fetchBoardData(
+          categorySelect.value,
+          sortSelect.value,
+          currentPage,
+          keywordInput.value
+        );
       });
     }
 
@@ -104,14 +108,24 @@ function updatePagination() {
 // 필터 버튼 클릭 시 API 호출
 filterButton.addEventListener('click', () => {
   currentPage = 1; // 검색 시 첫 페이지로 초기화
-  fetchBoardData(categorySelect.value, sortSelect.value, currentPage);
+  fetchBoardData(
+    categorySelect.value,
+    sortSelect.value,
+    currentPage,
+    keywordInput.value
+  );
 });
 
 /** 페이지 이동 버튼 클릭 이벤트 */
 prevButton.addEventListener('click', () => {
   if (currentPage > 1) {
     currentPage--;
-    fetchBoardData(categorySelect.value, sortSelect.value, currentPage);
+    fetchBoardData(
+      categorySelect.value,
+      sortSelect.value,
+      currentPage,
+      keywordInput.value
+    );
   }
 });
 
@@ -119,7 +133,12 @@ prevButton.addEventListener('click', () => {
 nextButton.addEventListener('click', () => {
   if (currentPage < totalPages) {
     currentPage++;
-    fetchBoardData(categorySelect.value, sortSelect.value, currentPage);
+    fetchBoardData(
+      categorySelect.value,
+      sortSelect.value,
+      currentPage,
+      keywordInput.value
+    );
   }
 });
 
