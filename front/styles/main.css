@@ -179,14 +179,6 @@ h2:hover {
   overflow: hidden;
   white-space: nowrap;
 }
-/* 1-4. 카드 글씨체 지정 */
-.chat-headcount-var,
-.chat-maker-var,
-.chat-title-var {
-  font-family: 'Jua', sans-serif;
-  font-weight: 100;
-  font-style: normal;
-}
 
 /* 2. HOT - 5ZIRAP CONTAINER */
 .hot-ozirap-container {
@@ -195,37 +187,278 @@ h2:hover {
 }
 /* 2-1. HOT POST RANK */
 .hot-post-rank {
-  width: 35%;
-  min-width: 300px;
-  height: 300px;
+  width: 680px;
+  min-width: 400px;
+  height: 270px;
   border: 1px solid black;
-  border-radius: 5px;
+  border-radius: 10px;
   margin-right: 5px;
+  padding: 10px;
 }
-/* 2-2. TOTAL POINT RANK */
-.total-point-rank {
-  width: 23%;
-  min-width: 190px;
-  height: 300px;
+/* 2-1-1. POST RANK TABS*/
+ul.hot-post-rank-tabs {
+  margin: 0px;
+  padding: 0px;
+  list-style: none;
+}
+/* 2-1-2. POST RANK TAB LISTS */
+ul.hot-post-rank-tabs li {
+  width: 100px;
+  border-radius: 10px 10px 0px 0px;
+  background: rgb(207, 206, 214);
+  color: black;
+  display: inline-block;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+/* 2-1-3. POST RANK TAB LISTS CURRENT */
+ul.hot-post-rank-tabs li.current {
+  border-radius: 10px 10px 0px 0px;
+  background: rgb(36, 36, 36);
+  color: white;
+}
+/* 2-1-4. POST RANK TAB CONTENTS BOX */
+.tab-contents-box {
+  width: auto;
+  min-width: 370px;
+  height: 200px;
+  border-radius: 0px 0px 10px 10px;
+  display: none;
+  padding: 15px;
+}
+/* 2-1-5. POST RANK TAB CONTENTS BOX CURRENT */
+.tab-contents-box.current {
+  width: auto;
+  min-width: 370px;
+  height: 200px;
+  border-radius: 0px 0px 10px 10px;
+  display: inherit;
+  background: #e8eaec;
+}
+/* 2-1-6. POST INFO */
+.post-info {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+/* 2-1-6-1. POST TITLE */
+.post-title {
+  width: 310px;
+  min-width: 215px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-right: 10px;
+
+  /* 내부 (제목 + 댓글수) */
+  display: flex;
+  flex-direction: row;
+}
+/* 2-1-6-1-A. POST TITLE VAR */
+.post-title-var {
+  width: 90%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+/* 2-1-6-1-B. POST COMMENTS VAR */
+.post-title-comment-var {
+  width: 50px;
+  min-width: 50px;
+  color: rgb(61, 61, 253);
+}
+/* 2-1-6-2. POST WRITER */
+.post-writer {
+  width: 140px;
+  min-width: 140px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-right: 10px;
+}
+/* 2-1-6-3. POST DATE */
+.post-date {
+  width: 95px;
+  min-width: 95px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* 2-2. WEEKLY & TOTAL POINT RANK */
+.point-rank {
+  width: 25%;
+  min-width: 195px;
+  height: 270px;
   border: 1px solid black;
-  border-radius: 5px;
+  border-radius: 10px;
   margin-right: 5px;
+  padding: 10px;
 }
-/* 2-3. WEEKLY POINT RANK */
-.weekly-point-rank {
-  width: 23%;
-  min-width: 190px;
-  height: 300px;
-  border: 1px solid black;
-  border-radius: 5px;
-  margin-right: 5px;
+/* 2-2-1. POINTT RANK TABS*/
+ul.point-rank-tabs {
+  margin: 0px;
+  padding: 0px;
+  list-style: none;
 }
-/* 2-4. WEEKLY HASHTAG RANK */
+/* 2-2-2. POINT RANK TAB LISTS */
+ul.point-rank-tabs li {
+  width: 65px;
+  border-radius: 10px 10px 0px 0px;
+  background: rgb(207, 206, 214);
+  color: black;
+  display: inline-block;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+/* 2-2-3. POINT RANK TAB LISTS CURRENT */
+ul.point-rank-tabs li.current {
+  border-radius: 10px 10px 0px 0px;
+  background: rgb(36, 36, 36);
+  color: white;
+}
+/* 2-2-4. POINT RANK TAB RANKING BOX */
+.tab-ranking-box {
+  width: auto;
+  min-width: 165px;
+  height: 200px;
+  border-radius: 0px 0px 10px 10px;
+  display: none;
+  padding: 15px;
+}
+/* 2-2-5. POINT RANK TAB RANKING BOX CURRENT */
+.tab-ranking-box.current {
+  width: auto;
+  min-width: 165px;
+  height: 200px;
+  border-radius: 0px 0px 10px 10px;
+  display: inherit;
+  background: #e8eaec;
+}
+/* 2-2-6. POINT RANK INFO */
+.point-rank-info {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+/* 2-2-6-1. POINT RANK RANKING */
+.point-rank-ranking {
+  width: 20px;
+  min-width: 20px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-right: 10px;
+  text-align: center;
+}
+/* 2-2-6-1. POINT RANK RANKING VAR */
+.point-rank-ranking-var {
+  text-align: center;
+}
+/* 2-2-6-2. POINT RANK NICKNAME */
+.point-rank-nickname {
+  width: 155px;
+  min-width: 60px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-right: 10px;
+}
+/* 2-2-6-3. POINT RANK POINT */
+.point-rank-point {
+  width: 65px;
+  min-width: 60px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* 2-3. WEEKLY HASHTAG RANK */
 .weekly-hashtag-rank {
-  width: 23%;
+  width: 21%;
   min-width: 190px;
-  height: 300px;
+  height: 270px;
   border: 1px solid black;
-  border-radius: 5px;
+  border-radius: 10px;
   margin-right: 0px;
+  padding: 10px;
+}
+/* 2-3-1. HASHTAG RANK TABS*/
+ul.hashtag-rank-tabs {
+  margin: 0px;
+  padding: 0px;
+  list-style: none;
+}
+/* 2-3-2. HASHTAG RANK TAB LISTS */
+ul.hashtag-rank-tabs li {
+  width: 80px;
+  border-radius: 10px 10px 0px 0px;
+  background: rgb(207, 206, 214);
+  color: black;
+  display: inline-block;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+/* 2-3-3. HASHTAG RANK TAB LISTS CURRENT */
+ul.hashtag-rank-tabs li.current {
+  border-radius: 10px 10px 0px 0px;
+  background: rgb(36, 36, 36);
+  color: white;
+}
+/* 2-3-4. HASHTAG RANK TAB RANKING BOX */
+.tab-hashtag-box {
+  width: auto;
+  min-width: 165px;
+  height: 200px;
+  border-radius: 0px 0px 10px 10px;
+  display: none;
+  padding: 15px;
+}
+/* 2-3-5. HASHTAG RANK TAB RANKING BOX CURRENT */
+.tab-hashtag-box.current {
+  width: auto;
+  min-width: 165px;
+  height: 200px;
+  border-radius: 0px 0px 10px 10px;
+  display: inherit;
+  background: #e8eaec;
+}
+/* 2-3-6. HASHTAG RANK INFO */
+.hashtag-rank-info {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+/* 2-3-6-1. HASHTAG RANK RANKING */
+.hashtag-rank-ranking {
+  width: 20px;
+  min-width: 20px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-right: 10px;
+  text-align: center;
+}
+/* 2-3-6-1. HASHTAG RANK RANKING VAR */
+.hashtag-rank-ranking-var {
+  text-align: center;
+}
+/* 2-3-6-2. HASHTAG RANK HASHTAG */
+.hashtag-rank-hashtag {
+  width: 155px;
+  min-width: 80px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-right: 10px;
+}
+/* 2-3-6-3. HASHTAG RANK COUNT */
+.hashtag-rank-count {
+  width: 65px;
+  min-width: 40px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: right;
 }
