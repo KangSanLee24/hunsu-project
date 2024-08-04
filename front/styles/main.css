@@ -1,24 +1,213 @@
-.live-chat,
-.weekly-posts {
-  background-color: #ffffff;
+/* 0. 구글 폰트 */
+@import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Jua&family=Nanum+Pen+Script&display=swap');
+.jua-regular {
+  font-family: 'Jua', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* 0. 각 섹션 CONTAINER 속성 */
+.hot-live-chats,
+.hot-ozirap {
+  background-color: whitesmoke;
   border-radius: 5px;
   margin-bottom: 20px;
+  margin-right: 0px;
+  margin-left: 0px;
   padding: 15px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
-.live-chat li,
-.weekly-posts li {
-  list-style-type: none;
-  padding: 5px;
-  letter-spacing: 1px;
-}
-
 h2 {
   margin: 0 0 10px;
+  color: rgb(36, 36, 36);
 }
 
-ul {
-  list-style: none;
-  padding: 0;
+/* 1. HOT - LIVECHAT CONTAINER */
+.hot-live-chats-container {
+  display: flex;
+  flex-direction: row;
+  overflow: scroll;
+  overflow-y: hidden;
+}
+/* 1-1. HOT - LIVECHAT CONTAINER 스크롤바 속성 */
+/* 1-1-1. 스크롤바 */
+.hot-live-chats-container::-webkit-scrollbar {
+  border-radius: 10px;
+  width: 5px;
+}
+/* 1-1-2. 스크롤바 트랙 */
+.hot-live-chats-container::-webkit-scrollbar-track {
+  background-color: rgb(208, 209, 223);
+  box-shadow: inset 0px 0px 5px white;
+  border-radius: 10px;
+}
+/* 1-1-3. 스크롤바 몸통 */
+.hot-live-chats-container::-webkit-scrollbar-thumb {
+  background-color: rgb(70, 69, 77);
+  box-shadow: inset 0px 0px 5px rgb(175, 175, 175);
+  border-radius: 10px;
+}
+/* 1-1-4. 스크롤바 몸통 호버 */
+.hot-live-chats-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(36, 36, 36);
+  transition: all 0.2s;
+}
+/* 1-1-5. 스크롤바 양끝 좌우버튼 */
+.hot-live-chats-container::-webkit-scrollbar-button {
+  border-radius: 10px;
+  display: none;
+}
+
+/* 1-2. LIVECHAT CARD */
+.hot-live-chat-card {
+  /* 1-2-1. 카드 기본 속성 */
+  width: 190px;
+  min-width: 190px;
+  height: 315px;
+  margin-right: 5px;
+  position: relative;
+}
+/* 1-2-2. 카드 내부 속성 */
+.hot-live-chat-card-inner {
+  background-color: rgb(36, 36, 36);
+  color: white;
+  width: 93%;
+  height: 93%;
+  border: 1px solid black;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1;
+  transition: 0.5s;
+}
+/* 1-2-3. 카드 호버 */
+.hot-live-chat-card-inner:hover {
+  width: 97%;
+  height: 97%;
+  box-shadow: 25px 25px 20px rgba(0, 0, 0, 0.05);
+  z-index: 2;
+}
+/* 1-3. LIVECHAT CARD 내부 */
+/* 1-3-1. CARD IMAGE 썸네일 공간 속성 */
+.card-thumbnail {
+  padding: 10px;
+  height: 210px;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0px;
+}
+/* 1-3-2. CARD IMAGE 자체 속성 */
+.card-thumbnail-image {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 15px;
+}
+/* 1-3-3. CHAT INFO */
+.chat-info {
+  width: 160px;
+  height: 65px;
+  padding-left: 10px;
+  padding-right: 10px;
+  display: flex;
+  flex-direction: column;
+}
+/* 1-3-3-1. CHAT 제목 */
+.chat-title {
+  margin: 0px;
+  width: 160px;
+  height: 20px;
+  margin-bottom: 3px;
+}
+.chat-title-var {
+  display: block;
+  width: 160px;
+  font-size: 16px;
+  text-align: center;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+/* 1-3-3-2. CHAT 방장 */
+.chat-maker {
+  margin: 0px;
+  width: 160px;
+  height: 20px;
+}
+.chat-maker-var {
+  display: block;
+  width: 160px;
+  font-size: 14px;
+  text-align: center;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+/* 1-3-3-3. CHAT 인원수 */
+.chat-headcount {
+  margin: 0px;
+  width: 160px;
+  height: 20px;
+}
+.chat-headcount-var {
+  display: block;
+  width: 160px;
+  font-size: 13px;
+  text-align: center;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+/* 1-4. 카드 글씨체 지정 */
+.chat-headcount-var,
+.chat-maker-var,
+.chat-title-var {
+  font-family: 'Jua', sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+/* 2. HOT - 5ZIRAP CONTAINER */
+.hot-ozirap-container {
+  display: flex;
+  flex-direction: row;
+}
+/* 2-1. HOT POST RANK */
+.hot-post-rank {
+  width: 35%;
+  min-width: 300px;
+  height: 300px;
+  border: 1px solid black;
+  border-radius: 5px;
+  margin-right: 5px;
+}
+/* 2-2. TOTAL POINT RANK */
+.total-point-rank {
+  width: 23%;
+  min-width: 190px;
+  height: 300px;
+  border: 1px solid black;
+  border-radius: 5px;
+  margin-right: 5px;
+}
+/* 2-3. WEEKLY POINT RANK */
+.weekly-point-rank {
+  width: 23%;
+  min-width: 190px;
+  height: 300px;
+  border: 1px solid black;
+  border-radius: 5px;
+  margin-right: 5px;
+}
+/* 2-4. WEEKLY HASHTAG RANK */
+.weekly-hashtag-rank {
+  width: 23%;
+  min-width: 190px;
+  height: 300px;
+  border: 1px solid black;
+  border-radius: 5px;
+  margin-right: 0px;
 }

@@ -12,6 +12,7 @@ body {
 header,
 main,
 footer {
+  min-width: 620px;
   max-width: 1200px; /* 최대 너비 설정 */
   margin: 0 auto; /* 중앙 정렬 */
   padding: 10px 10px; /* 안쪽 여백*/
@@ -95,7 +96,7 @@ footer button:hover {
 }
 
 /* 반응형 디자인 */
-@media (max-width: 600px) {
+@media (max-width: 200px) {
   header {
     flex-direction: column;
     align-items: flex-start;
