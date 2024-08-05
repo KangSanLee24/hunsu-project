@@ -20,6 +20,7 @@ import { Order } from './types/post-order.type';
 import { paginate } from 'nestjs-typeorm-paginate';
 import { PointService } from 'src/point/point.service';
 import { PointType } from 'src/point/types/point.type';
+import { v4 as uuidv4 } from 'uuid'; // ES Modules
 
 @Injectable()
 export class PostService {
@@ -39,6 +40,7 @@ export class PostService {
 
   /* 게시글 생성 API*/
   async create(createPostDto: CreatePostDto, userId: number) {
+    const { title, content, category } = createPostDto;
     const user = await this.userRepository.findOne({
       where: { id: userId },
       withDeleted: true,
@@ -51,7 +53,9 @@ export class PostService {
 
     // 2. 게시글 저장
     const createdPost = this.postRepository.create({
-      ...createPostDto,
+      title,
+      content,
+      category,
       userId,
     });
 
@@ -281,12 +285,8 @@ export class PostService {
   }
 
   /** 이미지 업로드 API **/
-  async uploadPostImages(id: number, files: Express.Multer.File[]) {
-    const post = await this.postRepository.findOne({ where: { id } });
-
-    if (!post) {
-      throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
-    }
+  async uploadPostImages(files: Express.Multer.File[]) {
+    const uuid = uuidv4();
     // 업로드된 이미지 URL을 저장할 배열을 초기화한다
     const uploadedImageUrls: string[] = [];
 
@@ -296,17 +296,11 @@ export class PostService {
       // 파일을 S3에 업로드하고 URL을 반환받는다
       const fileUrl = await this.awsService.imageUploadToS3(
         // 업로드
-        `${Date.now()}_${fileName}`, // 이미지 이름과 URL이 같고 이미지는 다르게 되는 경우를 방지하고자 날짜를 넣음
+        `${Date.now()}_${uuid}`, // 이미지 이름과 URL이 같고 이미지는 다르게 되는 경우를 방지하고자 날짜를 넣음
         'posts',
         file,
         fileExt
       );
-      // 업로드된 이미지의 URL을 db에 저장
-      const postImage = this.postImageRepository.create({
-        imgUrl: fileUrl,
-        postId: post.id,
-      });
-      await this.postImageRepository.save(postImage);
 
       // 업로드된 이미지 URL을 배열에 추가
       uploadedImageUrls.push(fileUrl);
@@ -314,5 +308,40 @@ export class PostService {
 
     // 업로드된 이미지 URL 배열 반환
     return uploadedImageUrls;
+  }
+
+  /** content에서 ![](https://gangsanbucket.s3.ap-northeast-2.amazonaws.com ... ) 의 url만
+   * 뽑아 배열 return하는 메소드**/
+  async filterImage(content: string): Promise<string[]> {
+    // 1. 정규표현식 정의
+    const regex =
+      /!\[.*?\]\(https:\/\/gangsanbucket\.s3\.ap-northeast-2\.amazonaws\.com.*?\)/g;
+
+    // 2. 정규표현식과 일치하는 모든 부분을 찾기
+    const matches = content.match(regex) || [];
+
+    // 3. 각 match에서 URL 부분만 추출하여 배열로 저장
+    const urls = matches.map((match) => {
+      const urlMatch = match.match(
+        /https:\/\/gangsanbucket\.s3\.ap-northeast-2\.amazonaws\.com[^\)]*/
+      );
+      return urlMatch ? urlMatch[0] : '';
+    });
+
+    return urls;
+  }
+
+  /** oldUrls와 newUrls를 받고 oldUrls에만 존재하는 URL만 배열로 뽑아내는 메소드 **/
+  async filterOnlyOrlUrls(
+    oldUrls: string[],
+    newUrls: string[]
+  ): Promise<string[]> {
+    // newUrls 배열을 Set으로 변환하여 빠른 조회 가능하도록 함
+    const newUrlSet = new Set(newUrls);
+
+    // oldUrls 배열을 순회하면서 newUrls에 없는 URL만 필터링하여 반환
+    const uniqueOldUrls = oldUrls.filter((url) => !newUrlSet.has(url));
+
+    return uniqueOldUrls;
   }
 }
