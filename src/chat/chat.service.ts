@@ -134,15 +134,13 @@ export class ChatService {
     const checkChatOwner = await this.checkChatOwner(chatRoomId, authorId);
 
     if(checkChatOwner == true) {
-      const removeChat = await this.removeChatRoom(chatRoomId, authorId);
-      return removeChat;
+      await this.removeChatRoom(chatRoomId, authorId);
+
+    }else {
+      await this.chatMemberRepository.delete(
+        {roomId: chatRoomId, userId: authorId}
+      );
     };
-
-    const outChatMember = await this.chatMemberRepository.delete(
-      {roomId: chatRoomId, userId: authorId}
-    );
-
-    return outChatMember;
   }
 
   //채팅방 인원 계산
