@@ -4,13 +4,14 @@ import { API_BASE_URL } from '../../config/config.js';
 window.imageBlobs = [];
 window.imageUrls = [];
 
-// content에서 `![이미지이름](ㅁㄴㅇㄹ)`
-
 // 게시글 작성 함수
 async function createPost() {
   const title = document.getElementById('post-title').value;
   const category = document.getElementById('post-category').value;
   const content = editor.getMarkdown();
+
+  /** content에서 `![이미지이름](base64인코딩된 부분의 문자열)` 을
+   * `![이미지이름](이미지이름)으로 바꿔서 저장하는 로직*/
 
   const accessToken = localStorage.getItem('accessToken');
 
@@ -43,7 +44,8 @@ async function uploadImages(postId, content) {
   const formData = new FormData();
 
   imageBlobs.forEach((blob) => {
-    formData.append('files', blob); // 배열의 모든 Blob 추가
+    // 배열의 모든 Blob 추가
+    formData.append('files', blob);
   });
 
   try {
@@ -66,15 +68,12 @@ async function uploadImages(postId, content) {
       let finalContent = content;
 
       imageUrls.forEach((url, index) => {
+        // URL에서 파일 이름 추출
+        const fileName = url.split('/').pop();
         // Base64 이미지를 S3 URL로 대체
-        const regex = new RegExp(
-          `!\\[image${index + 1}\\]\\(data:image\\/[^;]+;base64[^)]+\\)`,
-          'g'
-        );
-        finalContent = finalContent.replace(
-          regex,
-          `![image${index + 1}](${url})`
-        );
+        // ![ . ](data:image/ ... ;base64, ...)
+        const regex = /!\[.*?\]\(data:image\/[^;]+;base64,[^)]+\)/g;
+        finalContent = finalContent.replace(regex, `![${fileName}](${url})`);
       });
 
       // 게시글 업데이트
