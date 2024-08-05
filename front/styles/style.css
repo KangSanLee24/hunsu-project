@@ -12,14 +12,19 @@ body {
 header,
 main,
 footer {
-  max-width: 1200px; /* 최대 너비 설정 */
-  margin: 0 auto; /* 중앙 정렬 */
-  padding: 10px 10px; /* 안쪽 여백*/
+  max-width: 1200px;
+  /* 최대 너비 설정 */
+  margin: 0 auto;
+  /* 중앙 정렬 */
+  padding: 10px 10px;
+  /* 안쪽 여백*/
 }
 
 header {
-  position: fixed; /* 고정 위치 */
-  top: 0; /* 상단에 위치 */
+  position: fixed;
+  /* 고정 위치 */
+  top: 0;
+  /* 상단에 위치 */
   left: 0;
   right: 0;
   display: flex;
@@ -30,7 +35,8 @@ header {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   letter-spacing: 4px;
   /* text-align: center; */
-  z-index: 1000; /* 다른 요소 위에 표시 */
+  z-index: 1000;
+  /* 다른 요소 위에 표시 */
 }
 
 nav ul {
@@ -60,9 +66,32 @@ header .logo:hover {
   color: red;
 }
 
+#userNickname,
+#logoutLink {
+  color: white;
+  /* 글자 색상 */
+  font-weight: bold;
+  font-size: 18px;
+  text-decoration: none;
+}
+
+#logoutLink:hover {
+  color: red;
+  /* 마우스 오버 색상 */
+}
+
+.user-info {
+  display: flex;
+  gap: 15px;
+  /* 닉네임과 로그아웃 버튼 사이에 간격 추가 */
+  align-items: center;
+}
+
 main {
-  padding-top: 80px; /* 헤더 높이에 맞춰 여백 추가 */
-  padding-bottom: 80px; /* 푸터 높이에 맞춰 여백 추가 */
+  padding-top: 80px;
+  /* 헤더 높이에 맞춰 여백 추가 */
+  padding-bottom: 80px;
+  /* 푸터 높이에 맞춰 여백 추가 */
 }
 
 footer {

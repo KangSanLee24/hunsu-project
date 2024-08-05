@@ -45,9 +45,13 @@ function setupChatRoomFormToggle() {
     const createButton = document.getElementById('createButton');
     const roomNameInput = document.getElementById('roomName');
 
+    const accessToken = localStorage.getItem('accessToken');
+
     createChatButton.addEventListener('click', () => {
-        modalOverlay.style.display = 'block';
-        chatRoomForm.style.display = 'block';
+        if (accessToken) {
+            modalOverlay.style.display = 'block';
+            chatRoomForm.style.display = 'block';
+        }
     });
 
     closeButton.addEventListener('click', () => {

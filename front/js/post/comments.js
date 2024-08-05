@@ -26,6 +26,8 @@ async function createComment(content) {
     if (response.status === 201) {
       addCommentToList(result.data);
       commentContentInput.value = ''; // 입력란 초기화
+      // 페이지 새로고침
+      window.location.reload();
     } else {
       alert(result.message);
     }
