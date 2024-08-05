@@ -20,7 +20,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Order } from 'src/post/types/post-order.type';
 import { AuthGuard } from '@nestjs/passport';
 
-@UseGuards(AuthGuard('jwt'))
 @ApiTags('9. CHAT API')
 @Controller('chatrooms')
 export class ChatController {
@@ -31,6 +30,7 @@ export class ChatController {
    * @param createChatDto
    * @returns
    */
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async createChatRoom(
     @LogIn() user: User,
@@ -88,6 +88,7 @@ export class ChatController {
    * 채팅방 입장
    * @returns
    */
+  @UseGuards(AuthGuard('jwt'))
   @Post(':chatRoomId/join')
   async joinChatRoom(@Param('chatRoomId') chatRoomId: string, @Body() body) {
     const { authorId } = body;
@@ -98,6 +99,7 @@ export class ChatController {
    * 채팅방 이미지 전송
    * @returns
    */
+  @UseGuards(AuthGuard('jwt'))
   @Post(':chatRoomId/image')
   @UseInterceptors(FileInterceptor('file'))
   async sendImageRoom(
@@ -118,6 +120,7 @@ export class ChatController {
    * 채팅방 나가기
    * @returns
    */
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':chatRoomId/out')
   async outChatRoom(@Param('chatRoomId') chatRoomId: string, @Body() body) {
     const { authorId } = body;
@@ -128,6 +131,7 @@ export class ChatController {
    * 채팅방 삭제
    * @returns
    */
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':chatRoomId')
   async removeChatRoom(@Param('chatRoomId') chatRoomId: string,  @Body() body) {
     const { authorId } = body;
