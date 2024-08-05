@@ -7,10 +7,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const isLoggedIn = !!accessToken;
   const loginLink = document.querySelector('a[href="./log-in.html"]');
   const signUpLink = document.querySelector('a[href="./sign-up.html"]');
-  // 2. 랭킹 관련 변수 선언
+  // 2. 화제글(HOT POST) 관련 변수 선언
   const hotPostListChat = document.getElementById('tab-chat');
   const hotPostListFashion = document.getElementById('tab-fashion');
   const hotPostListCooking = document.getElementById('tab-cooking');
+  // 3. 포인트 랭킹(POINT RANK) 관련 변수 선언
+  const weeklyPointRank = document.getElementById('tab-weekly-rank');
+  const totalPointRank = document.getElementById('tab-total-rank');
+  // 4. 해시태그 랭킹(HASHTAG RANK) 관련 변수 선언
+  const hashtagRank = document.getElementById('tab-hashtag-rank');
 
   /** 2. 로그인 상태에 따른 분기 세팅 **/
   // 1. 만약 로그인이 되어있다면
@@ -71,9 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 4. HOT POST 랜더링 함수 **/
+  /** 4. HOT POST 랜더링 **/
   function renderHotPostList(category, data) {
-    // 1. 불러온 데이터를 하나하나 HTML화
+    // 1. 들어온 데이터를 하나하나 HTML화
     for (let i = 1; i <= data.length; i++) {
       // 1-1. 데이터로 row HTML 생성
       const row = document.createElement('div');
@@ -103,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hotPostListCooking.appendChild(row);
       } else {
         // 1-2-4. 그 외 (현재는 에러처리)
-        console.error('카테고리 분류에서 에러가 발생했습니다.');
+        console.error('화제글 카테고리 분류에서 에러가 발생했습니다.');
       }
     }
   }
@@ -133,6 +138,37 @@ document.addEventListener('DOMContentLoaded', () => {
       $('#' + tabDataId).addClass('current');
     });
   });
+
+  /** 7. POIN RANK 랜더링 **/
+  function renderPointRank(category, data) {
+    // 1. 들어온 데이터를 하나하나 HTML화
+    for (let i = 1; i <= data.length; i++) {
+      // 1-1. 데이터로 row HTML 생성
+      const row = document.createElement('div');
+      row.innerHTML = `
+                <div class="point-rank-info">
+                  <div class="point-rank-ranking">
+                    <span class="point-rank-ranking-var">🥇</span>
+                  </div>                  
+                  <div class="point-rank-nickname">
+                    <span>침착맨</span>
+                  </div>                  
+                  <div class="point-rank-point">
+                    <span>183295</span>
+                  </div>
+                </div>
+      `;
+      // 1-2. 카테고리에 맞게 데이터 넣어주기
+      if (category == 'WEEKLY') {
+        // 1-2-1. WEEKLY
+      } else if (category == 'TOTAL') {
+        // 1-2-2. TOTAL
+      } else {
+        // 1-2-3. 그 외 (현재는 에러처리)
+        console.error('랭킹 카테고리 분류에서 에러가 발생했습니다.');
+      }
+    }
+  }
 
   /** 포인트 랭킹 탭 관련 JS **/
   $(document).ready(function () {
@@ -187,10 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log(time.trim());
     return time;
   };
-
-  /** WEEKLY RANK 등수 분류 **/
-
-  /** TOTAL POINT 레벨 분류 **/
 
   /** 페이지 로딩이 되면 실행할 함수들 **/
   // 1. HOT LIVECHAT LIST

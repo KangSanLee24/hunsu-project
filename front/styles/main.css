@@ -279,6 +279,9 @@ ul.hot-post-rank-tabs li.current {
   white-space: nowrap;
   margin-right: 10px;
 }
+.post-writer-var:hover {
+  color: rgb(238, 165, 82);
+}
 /* 2-1-6-3. POST DATE */
 .post-date {
   width: 95px;
@@ -366,6 +369,9 @@ ul.point-rank-tabs li.current {
   overflow: hidden;
   white-space: nowrap;
   margin-right: 10px;
+}
+.point-rank-nickname:hover {
+  color: rgb(238, 165, 82);
 }
 /* 2-2-6-3. POINT RANK POINT */
 .point-rank-point {
@@ -455,6 +461,9 @@ ul.hashtag-rank-tabs li.current {
   overflow: hidden;
   white-space: nowrap;
   margin-right: 10px;
+}
+.hashtag-rank-hashtag:hover {
+  color: rgb(170, 103, 214);
 }
 /* 2-3-6-3. HASHTAG RANK COUNT */
 .hashtag-rank-count {
