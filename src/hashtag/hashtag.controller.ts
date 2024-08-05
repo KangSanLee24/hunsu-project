@@ -2,8 +2,8 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { HashtagService } from './hashtag.service';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('해시태그 API')
-@Controller('hashtag')
+@ApiTags('10. 해시태그 API')
+@Controller('hashtags')
 export class HashtagController {
   constructor(private readonly hashtagService: HashtagService) {}
 
@@ -11,9 +11,9 @@ export class HashtagController {
  * 해시태그 랭킹 조회
  * @returns
  */
-  @Get('ranks')
-  async hashtagLank(@Query('num') num: number) {
-    return await this.hashtagService.hashtagLank(+num);
+  @Get('ranks-weekly')
+  async hashtagWeeklyLank(@Query('num') num: number) {
+    return await this.hashtagService.hashtagWeeklyLank(+num);
   }
 }
 

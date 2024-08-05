@@ -14,12 +14,13 @@ export class HashtagService {
     private readonly chatLogRepository: Repository<ChatLog>,
   ) {}
 
-  //해시태그 랭킹 조회
-  async hashtagLank(num: number) {
+  //해시태그 주간 랭킹 조회
+  async hashtagWeeklyLank(num: number) {
 
     const hashtagCount = await this.hashTagRepository.query(
       `select hashtag_item , count(*) as count
       from hashtags
+      where created_at >= NOW() - INTERVAL 7 DAY
       group by hashtag_item
       order by count DESC
       limit ${num};`
