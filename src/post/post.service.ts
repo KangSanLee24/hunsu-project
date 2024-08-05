@@ -296,7 +296,7 @@ export class PostService {
       // 파일을 S3에 업로드하고 URL을 반환받는다
       const fileUrl = await this.awsService.imageUploadToS3(
         // 업로드
-        `${Date.now()}_${fileName}`, // 이미지 이름과 URL이 같고 이미지는 다르게 되는 경우를 방지하고자 날짜를 넣음
+        `${Date.now()}_${id}_${fileName}`, // 이미지 이름과 URL이 같고 이미지는 다르게 되는 경우를 방지하고자 날짜를 넣음
         'posts',
         file,
         fileExt
