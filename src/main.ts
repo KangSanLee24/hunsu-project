@@ -3,10 +3,12 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { json } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  // PayloadTooLargeError 오류로 body를 10mb까지 받을 수 있게 수정.
+  app.use(json({ limit: '10mb' }));
   // Configuration 이용해서 .env 활용
   const configService = app.get(ConfigService);
   const port = configService.get<number>('SERVER_PORT');
