@@ -300,26 +300,35 @@ export class ChatService {
        chatImages: {
         imgUrl: true,
        },
-      }
-,    });
+      },
+    });
 
-    //ondelete로 채팅방 -> 내역/이미지/멤버 모두 삭제 됨
-    for (const room of findDeleteChat) {
-      await this.chatLogRepository.delete({roomId: room.id});
-      await this.chatImageRepository.delete({roomId: room.id});
-      await this.chatMemberRepository.delete({roomId: room.id});
-      await this.chatRoomRepository.delete({id: room.id});
-    };
+    //트랜잭션
+    //로그, 이미지, 멤버, 방 삭제
+    await this.entityManager.transaction(async (manager) => {
+      try {
 
-    //s3삭제
-    for (const chat of findDeleteChat) {
-        for(const image of chat.chatImages) {
-        await this.awsService.deleteImageFromS3(image.imgUrl);
+        for (const room of findDeleteChat) {
+          await manager.delete(ChatLog, {roomId: room.id});
+          await manager.delete(ChatImage, {roomId: room.id});
+          await manager.delete(ChatMember, {roomId: room.id});
+          await manager.delete(ChatRoom, {id: room.id});
+        };
+
+        // 트랜잭션이 성공했을 때 S3 삭제
+        await Promise.all(findDeleteChat.map(async (chat) => {
+          for (const image of chat.chatImages) {
+            await this.awsService.deleteImageFromS3(image.imgUrl);
+          }
+        }));
+
+      } catch (error) {
+        console.error('트랜잭션 중 오류 발생:', error);
       }
-    };
+    });
   }
 
-  //랭킹 숫자 입력 가능
+  //랭킹 (숫자 입력 가능)
   async getHotLiveChat(num: number) {
 
     const getHotLiveChat = await this.entityManager.query(
