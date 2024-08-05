@@ -146,7 +146,6 @@ export class PointService {
 
   //누적 포인트 랭킹 조회
   async pointLank(num: number) {
-
     const pointLank = await this.pointRepository.query(
       `
       select a.acc_point , b.nickname
@@ -157,9 +156,9 @@ export class PointService {
       `
     );
 
-    const data = pointLank.map(point => ({
+    const data = pointLank.map((point) => ({
       accPoint: point.acc_point,
-      nickname: point.nickname
+      nickname: point.nickname,
     }));
 
     return data;
@@ -167,7 +166,6 @@ export class PointService {
 
   //주간 포인트 랭킹 조회
   async pointWeeklyLank(num: number) {
-
     const pointLank = await this.pointLogRepository.query(
       `
       select b.nickname, sum(a.point) as point
@@ -180,9 +178,9 @@ export class PointService {
       `
     );
 
-    const data = pointLank.map(point => ({
+    const data = pointLank.map((point) => ({
       point: point.point,
-      nickname: point.nickname
+      nickname: point.nickname,
     }));
 
     return data;

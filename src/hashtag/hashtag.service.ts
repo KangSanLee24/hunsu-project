@@ -26,7 +26,7 @@ export class HashtagService {
     );
 
     const data = hashtagCount.map((hashtag) => ({
-      hashtagItem: hashtag.hashtag_item,
+      hashtag: hashtag.hashtag_item,
       count: hashtag.count,
     }));
 
