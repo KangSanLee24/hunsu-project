@@ -60,11 +60,11 @@
 }
 
 .chat-room-name {
-  text-align: left; /* 방 이름은 왼쪽 정렬 */
+  padding-left: 5px; 
 }
 
 .chat-room-time {
-  text-align: right; /* 인원 수와 시간은 오른쪽 정렬 */
+  padding-right: 5px; 
 }
 
 .chat-list-link {
