@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -6,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
-import { MoreThan, Repository } from 'typeorm';
+import { Like, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
@@ -75,15 +76,18 @@ export class PostService {
       updatedAt: post.updatedAt, // 테스트를 위해 남겨둠 마무리에는 포스트아이디만 리턴할 예정
     };
   }
+
   /*게시글 목록 조회 API*/
   async findAll(
     page: number,
     limit: number,
     category?: Category,
-    sort?: Order
+    sort?: Order,
+    keyword?: string
   ) {
     // 카테고리에 따른 정렬
     const sortCategory = category ? { category } : {};
+    const keywordFilter = keyword ? { title: Like(`%${keyword}%`) } : {};
 
     const { items, meta } = await paginate<Post>(
       this.postRepository,
@@ -92,7 +96,7 @@ export class PostService {
         limit,
       },
       {
-        where: sortCategory,
+        where: { ...sortCategory, ...keywordFilter },
         relations: ['user', 'comments'],
         order: { createdAt: sort ? sort : 'DESC' }, // 정렬조건
       }
@@ -130,6 +134,9 @@ export class PostService {
       throw new NotFoundException('게시글을 찾을 수 없습니다.');
     }
 
+    // 가상 컬럼 계산
+    post.getLikesAndDislikes(); // 좋아요 수와 싫어요 수 계산
+
     return {
       id: post.id,
       userId: post.userId,
@@ -138,25 +145,60 @@ export class PostService {
       images: post.postImages.map((image) => image.imgUrl), // 게시글 이미지 : { 이미지 URL}
       category: post.category,
       content: post.content,
-      comments: post.comments, // 댓글
-      numLikes: post.postLikes.length, // 좋아요 수
-      numDislikes: post.postDislikes.length, // 싫어요 수
+      // comments: post.comments, // 댓글
+      numLikes: post.numLikes, // 좋아요 수
+      numDislikes: post.numDislikes, // 싫어요 수
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
     };
   }
 
   /*화제글 목록 조회 API*/
-  // async findHotPost() {
-  //   const now = new Date(); // 현재시간
-  //   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 현재시간으로부터 일주일전
+  async findHotPost(category: Category) {
+    const now = new Date(); // 현재시간
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 현재시간으로부터 일주일전
 
-  //   const posts = await this.postRepository.find({
-  //     where: { createdAt: MoreThan(weekAgo) }, // 최근 일주일 이내에 생성된 게시물들 가져오가
-  //     relations: ['user', 'postImages', 'comments', 'postLikes'],
-  //     order: { numLikes: 'DESC' },
-  //   });
-  // }
+    const posts = await this.postRepository.find({
+      where: { createdAt: MoreThan(weekAgo), category }, // 최근 일주일 이내에 생성된 게시물들 가져오가
+      relations: [
+        'user',
+        'postImages',
+        'comments',
+        'postLikes',
+        'postDislikes',
+      ],
+    });
+
+    // 각 게시글에 대해 좋아요 수와 싫어요 수 계산
+    posts.forEach((post) => {
+      post.getLikesAndDislikes(); // 가상 컬럼 계산
+    });
+
+    // 좋아요 수 기준으로 정렬하고, 좋아요 수가 같을 경우 댓글 수로 정렬
+    const sortedPosts = posts.sort((a, b) => {
+      if (b.numLikes === a.numLikes) {
+        return b.comments.length - a.comments.length; // 댓글 수로 정렬
+      }
+      return b.numLikes - a.numLikes; // 좋아요 수로 정렬
+    });
+
+    // 상위 10개 게시글만 가져오기
+    const topPosts = sortedPosts.slice(0, 10);
+
+    return topPosts.map((post) => ({
+      id: post.id,
+      userId: post.userId,
+      nickname: post.user.nickname,
+      category: post.category,
+      title: post.title,
+      content: post.content,
+      numLikes: post.numLikes, // 가상 컬럼 사용
+      numDislikes: post.numDislikes, // 가상 컬럼 사용
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      numComments: post.comments.length,
+    }));
+  }
 
   /*게시글 수정 API*/
   async update(id: number, updatePostDto: UpdatePostDto, userId: number) {

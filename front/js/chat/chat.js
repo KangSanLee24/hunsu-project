@@ -81,6 +81,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         chatScroll.appendChild(messageElement);
         scrollToBottom();
+
+        // 이미지 로드 후 스크롤 하단으로 이동
+        const img = messageElement.querySelector('img');
+        img.onload = () => {
+            chatScroll.appendChild(messageElement);
+            scrollToBottom(); // 이미지가 로드된 후 스크롤
+        };
     }
 
     // 방 입장 시 서버에 'joinRoom' 이벤트 전송
@@ -109,6 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 메시지 전송 버튼 클릭 이벤트 처리   
     sendButton.addEventListener('click', () => {
+        const accessToken = localStorage.getItem('accessToken');
         const inputValue = messageInput.value.trim();
         const imageExists = file ? true : false;
 
@@ -133,13 +141,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             fetch(`${API_BASE_URL}/chatrooms/${roomId}/image`, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                  }
             })
             .then(response => response.json())
             .then(data => {
                 console.log(data);
                 const { fileUrl } = data;
                 socket.emit('chatImage', { roomId, author: currentUser, fileUrl });
+
+                // 채팅방 상단에 고정할 이미지 표시
+                const fixedImageDiv = document.getElementById('fixedImage');
+                fixedImageDiv.style.display = 'block'; // 이미지 표시
+
+                // 고정핀 텍스트가 이미 존재하는 경우 변경하지 않음
+                if (!fixedImageDiv.querySelector('.fixed-header')) {
+                    const header = document.createElement('div');
+                    header.className = 'fixed-header';
+                    header.textContent = '📌 고정된 이미지';
+                    fixedImageDiv.appendChild(header);
+                }
+
+                // 이미지 업데이트
+                const img = document.getElementById('fixedImageContent');
+                img.src = fileUrl; // 서버에서 받은 새로운 이미지 URL로 업데이트
+
+                // 작성자 정보 업데이트
+                const authorName = document.getElementById('authorName');
+                authorName.textContent = `${currentUser}`; // 작성자 정보 업데이트
             })
             .catch(error => console.error('Error:', error));
 
@@ -148,6 +179,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             imagePreview.style.display = 'none'; // 메시지 전송 후 이미지 미리보기 숨기기
             imagePreview.style.backgroundImage = ''; // 이미지 배경 초기화
             file = null; // 파일 변수 초기화
+        }
+    });
+
+    // 스페이스바 입력 시 스타일 변경
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === '#') {
+            messageInput.style.fontWeight = 'bode'; 
+            messageInput.style.color = 'red';  
+        }
+    });
+    
+    // 스페이스바 입력 시 스타일 변경
+    messageInput.addEventListener('keydown', (e) => {
+        if (e.key === ' ') {
+            messageInput.style.fontWeight = 'normal'; 
+            messageInput.style.color = 'black';  
         }
     });
 

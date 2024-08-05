@@ -20,7 +20,8 @@ export class HashtagService {
     const hashtagCount = await this.hashTagRepository.query(
       `select hashtag_item , count(*) as count
       from hashtags
-      group by hashtag_item;`
+      group by hashtag_item
+      order by count DESC;`
     );
 
     return hashtagCount;
