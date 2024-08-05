@@ -234,5 +234,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         notification.textContent = data.message;
         chatScroll.appendChild(notification);
         chatScroll.scrollTop = chatScroll.scrollHeight; // 최신 메시지로 스크롤
+
+        setTimeout(() => {
+            if(data.message.includes('방장')) {
+                alert('방장이 채팅방을 나갔습니다. 채팅 목록 페이지로 이동하시겠습니까?');
+                window.location.href = '/html/chat-list.html';
+            }
+        }, 1000)
     });
 });
