@@ -182,14 +182,14 @@ export class PostController {
 
   /** 이미지 업로드 API **/
   @ApiOperation({ summary: '6. 게시글 이미지 업로드 API' })
-  @Post(':id/images')
+  @Post(':postId/images')
   @UseInterceptors(FilesInterceptor('files'))
   async uploadFiles(
-    @Param('id') id: number,
+    @Param('postId') postId: number,
     @UploadedFiles() files: Express.Multer.File[]
   ) {
     const uploadedImageUrls = await this.postService.uploadPostImages(
-      id,
+      postId,
       files
     );
     return {
