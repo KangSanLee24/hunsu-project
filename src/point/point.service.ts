@@ -143,4 +143,48 @@ export class PointService {
 
     return pointLogs.reduce((acc, log) => acc + log.point, 0);
   }
+
+  //누적 포인트 랭킹 조회
+  async pointLank(num: number) {
+
+    const pointLank = await this.pointRepository.query(
+      `
+      select a.acc_point , b.nickname
+      from points a join users b
+      on a.user_id = b.id
+      order by acc_point DESC
+      limit ${num};
+      `
+    );
+
+    const data = pointLank.map(point => ({
+      accPoint: point.acc_point,
+      nickname: point.nickname
+    }));
+
+    return data;
+  }
+
+  //주간 포인트 랭킹 조회
+  async pointWeeklyLank(num: number) {
+
+    const pointLank = await this.pointLogRepository.query(
+      `
+      select b.nickname, sum(a.point) as point
+      from point_logs a join users b
+      on a.user_id = b.id
+      where a.created_at >= NOW() - INTERVAL 7 DAY
+      GROUP by b.nickname 
+      order by point DESC
+      limit ${num};
+      `
+    );
+
+    const data = pointLank.map(point => ({
+      point: point.point,
+      nickname: point.nickname
+    }));
+
+    return data;
+  }
 }
