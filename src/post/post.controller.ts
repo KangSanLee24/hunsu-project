@@ -19,6 +19,8 @@ import { AuthGuard, IAuthGuard, Type } from '@nestjs/passport';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiQuery,
   ApiTags,
@@ -113,6 +115,33 @@ export class PostController {
     };
   }
 
+  /** 이미지 업로드 API **/
+  @ApiOperation({ summary: '6. 게시글 이미지 업로드 API' })
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FilesInterceptor('files'))
+  @Post('images')
+  async uploadFiles(@UploadedFiles() files: Express.Multer.File[]) {
+    const uploadedImageUrls = await this.postService.uploadPostImages(files);
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.IMAGE.UPLOAD.SUCCESS,
+      data: uploadedImageUrls,
+    };
+  }
+
   /** 게시글 상세 조회 API **/
   @ApiOperation({ summary: '3. 게시글 상세 조회 API' })
   @Get(':postId')
@@ -177,25 +206,6 @@ export class PostController {
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.FORCE_DELETE.SUCCESS,
-    };
-  }
-
-  /** 이미지 업로드 API **/
-  @ApiOperation({ summary: '6. 게시글 이미지 업로드 API' })
-  @Post(':postId/images')
-  @UseInterceptors(FilesInterceptor('files'))
-  async uploadFiles(
-    @Param('postId') postId: number,
-    @UploadedFiles() files: Express.Multer.File[]
-  ) {
-    const uploadedImageUrls = await this.postService.uploadPostImages(
-      postId,
-      files
-    );
-    return {
-      statusCode: HttpStatus.OK,
-      message: POST_MESSAGE.POST.IMAGE.UPLOAD.SUCCESS,
-      data: uploadedImageUrls,
     };
   }
 }

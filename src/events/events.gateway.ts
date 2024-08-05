@@ -81,7 +81,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     socket.leave(roomId);
 
-    await this.chatService.outChatRoom(+roomId, +authorId);
-    this.server.to(roomId).emit('userLeft', { message: `${author} 님이 퇴장하셨습니다` });
+    const checkChatOwner = await this.chatService.checkChatOwner(+roomId, +authorId);
+
+    if(checkChatOwner == true) {
+      await this.chatService.outChatRoom(+roomId, +authorId);
+      this.server.to(roomId).emit('userLeft', { message: `방장 ${author} 님이 퇴장하셨습니다` });
+    } else {
+      await this.chatService.outChatRoom(+roomId, +authorId);
+      this.server.to(roomId).emit('userLeft', { message: `${author} 님이 퇴장하셨습니다` });
+    }
   }
 }

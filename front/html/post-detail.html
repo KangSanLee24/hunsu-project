@@ -6,6 +6,7 @@
     <title>게시글 상세</title>
     <link rel="stylesheet" href="/styles/style.css" />
     <link rel="stylesheet" href="/styles/post-detail.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script type="module" src="/js/common/header.js"></script>
     <script type="module" src="/js/post/post-detail.js"></script>
     <script type="module" src="/js/post/comments.js"></script>
@@ -43,6 +44,9 @@
           </div>
 
           <p id="post-content">게시글 내용</p>
+          <div id="container">
+            <!--/* 에디터 콘텐츠 렌더링 영역 */-->
+            <div id="editorContent">
           <!-- 좋아요 및 싫어요 버튼 위치 -->
           <div class="like-dislike">
             <button id="like-btn">

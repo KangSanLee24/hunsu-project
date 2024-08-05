@@ -35,12 +35,16 @@ export class HashtagService {
 
   //해시태그 생성 (스케줄러)
   async createHashtags() {
-    const nowDate = new Date();
-    const findChatDate = new Date(nowDate.setMinutes(nowDate.getMinutes() - 1));
+    // DB 시간 가져오기
+    const result = await this.chatLogRepository.query(
+      'SELECT NOW() as currentTime'
+    );
+    const dbTime = new Date(result[0].currentTime);
+    const oneMinutesAgo = new Date(dbTime.getTime() - 1 * 60 * 1000);
 
     const findChatLogs = await this.chatLogRepository.find({
       where: {
-        createdAt: MoreThan(findChatDate),
+        createdAt: MoreThan(oneMinutesAgo),
         content: Like('%#%'),
       },
       select: { content: true, memberId: true, roomId: true },
