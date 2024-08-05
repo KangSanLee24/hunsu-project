@@ -1,3 +1,18 @@
+.menu-bar {
+  display: flex; /* Flexbox 사용 */
+  justify-content: space-between; /* 요소 간 간격 조정 */
+  padding: 10px; /* 내부 여백 */
+  border-bottom: 1px solid #ddd; /* 아래 테두리 추가 */
+  font-weight: bold; /* 글자 굵게 */
+  border-bottom: 1px solid #ddd; /* 아래 테두리 추가 */
+}
+
+.menu-item {
+  flex: 1; /* 각 메뉴 항목을 동일한 비율로 나누기 */
+  text-align: center; /* 중앙 정렬 */
+}
+
+
 .chat-list {
     padding: 20px;
     background-color: #f6f9fc; /* 배경색을 연한 회색으로 설정 */
@@ -20,7 +35,6 @@
 
 .chat-list li {
   display: block;
-  justify-content: space-between;
   align-items: center;
   padding: 12px;
   border-radius: 8px;
@@ -40,15 +54,17 @@
   align-items: center; /* 요소들을 수직 중앙 정렬 */
 }
 
+.chat-room-name, .chat-room-user, .chat-room-count, .chat-room-time {
+  width: 25%; /* 각 요소에 대해 동일한 너비 설정 */
+  text-align: center; /* 중앙 정렬 */
+}
+
 .chat-room-name {
-  font-weight: bold;
-  font-size: 1rem; /* 폰트 크기 설정 */
-  color: #333; /* 채팅방 이름 색상 */
+  text-align: left; /* 방 이름은 왼쪽 정렬 */
 }
 
 .chat-room-time {
-  font-size: 0.875rem; /* 폰트 크기 설정 */
-  color: #888; /* 채팅방 생성 시간 색상 */
+  text-align: right; /* 인원 수와 시간은 오른쪽 정렬 */
 }
 
 .chat-list-link {
@@ -148,22 +164,23 @@ input[type="text"] {
 
 .searchContainer {
   display: flex;
-  align-items: center;
-  justify-content: center; /* 가운데 정렬 */
-  margin-bottom: 20px;
+  align-items: center; /* 수직 가운데 정렬 */
+  gap: 5px; /* 요소 간 간격 */
 }
 
 #searchInput {
-  padding: 10px;
+  flex: 1; /* 입력창이 가능한 공간을 다 차지하게 설정 */
+  padding: 8px;
   border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-right: 10px;
-  width: 350px; /* 너비를 300px로 설정 */
+  border-radius: 4px; /* 모서리 둥글게 */
+  margin-top: 20px;
+  height: 16px;
 }
 
 #sortSelect {
   padding: 8px;
-  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px; /* 모서리 둥글게 */
 }
 
 #searchRoomButton {

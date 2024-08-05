@@ -18,7 +18,7 @@ import { UpdateDislikeDto } from './dtos/update-dislike.dto';
 import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
 
-@Controller('dislike')
+@Controller('')
 export class DislikeController {
   constructor(private readonly dislikeService: DislikeService) {}
 

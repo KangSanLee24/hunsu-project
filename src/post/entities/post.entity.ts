@@ -14,6 +14,7 @@ import { Comment } from 'src/comment/entities/comment.entity';
 import { PostLike } from 'src/like/entities/post-like.entity';
 import { PostDislike } from 'src/dislike/entities/post-dislike.entity';
 import { Category } from '../types/post-category.type';
+import { VirtualColumn } from 'src/decorators/count-like.decorator';
 
 @Entity({ name: 'posts' })
 export class Post {
@@ -38,12 +39,12 @@ export class Post {
   @Column({ type: 'text' })
   content: string;
 
-  // 좋아요수 = numLikes, int
-  @Column({ type: 'int', default: 0 })
+  // 가상 컬럼으로 좋아요 수
+  @VirtualColumn()
   numLikes: number;
 
-  // 싫어요수 = numDislikes, int
-  @Column({ type: 'int', default: 0 })
+  // 가상 컬럼으로 싫어요 수
+  @VirtualColumn()
   numDislikes: number;
 
   // 생성일시 = createdAt, Date
@@ -75,4 +76,10 @@ export class Post {
   // 게시글과 이미지 1대:다 관계
   @OneToMany(() => PostImage, (image) => image.post, { cascade: true })
   postImages: PostImage[];
+
+  // 가상 컬럼을 계산하는 메서드
+  getLikesAndDislikes() {
+    this.numLikes = this.postLikes.length; // postLikes 배열의 길이를 통해 좋아요 수 계산
+    this.numDislikes = this.postDislikes.length; // postDislikes 배열의 길이를 통해 싫어요 수 계산
+  }
 }

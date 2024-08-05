@@ -14,19 +14,27 @@ export class HashtagService {
     private readonly chatLogRepository: Repository<ChatLog>,
   ) {}
 
-  //해시태그 카운트 계산
-  async hashtagCount() {
+  //해시태그 주간 랭킹 조회
+  async hashtagWeeklyLank(num: number) {
 
     const hashtagCount = await this.hashTagRepository.query(
       `select hashtag_item , count(*) as count
       from hashtags
-      group by hashtag_item;`
+      where created_at >= NOW() - INTERVAL 7 DAY
+      group by hashtag_item
+      order by count DESC
+      limit ${num};`
     );
 
-    return hashtagCount;
+    const data = hashtagCount.map(hashtag => ({
+      hashtagItem : hashtag.hashtag_item,
+      count: hashtag.count
+    }));
+    
+    return data;
   }
 
-  //해시태그 생성
+  //해시태그 생성 (스케줄러)
   async createHashtags() {
     
     const nowDate = new Date();
