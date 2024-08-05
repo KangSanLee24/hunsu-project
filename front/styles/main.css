@@ -261,6 +261,9 @@ ul.hot-post-rank-tabs li.current {
   overflow: hidden;
   white-space: nowrap;
 }
+.post-title-var:hover {
+  color: rgb(61, 61, 253);
+}
 /* 2-1-6-1-B. POST COMMENTS VAR */
 .post-title-comment-var {
   width: 50px;

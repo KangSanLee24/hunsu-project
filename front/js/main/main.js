@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (signUpLink) signUpLink.style.display = 'block';
   }
 
-  /** HOT POST - [TYPE(CHAT, FASHION, COOKING)] 랭킹 **/
+  /** 3. HOT POST - [TYPE(CHAT, FASHION, COOKING)] 랭킹 **/
   async function fetchHotPosts(category) {
     try {
       // 1. API 호출 시 비어 있는 값을 포함하지 않도록 URL 구성
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** HOT POST 랜더링 함수 **/
+  /** 4. HOT POST 랜더링 함수 **/
   function renderHotPostList(category, data) {
     // 1. 불러온 데이터를 하나하나 HTML화
     for (let i = 1; i <= data.length; i++) {
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
       row.innerHTML = `
             <div class="post-info">
               <div class="post-title">
-                <span class="post-title-var">${data[i].title}</span>
+                <span class="post-title-var" onClick="clickPost(${data[i].id})">${data[i].title}</span>
                 <span class="post-title-comment-var">(${data[i].numComments})</span>
               </div>
               <div class="post-writer">
@@ -106,6 +106,12 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('카테고리 분류에서 에러가 발생했습니다.');
       }
     }
+  }
+
+  /** 5. HOT POST 클릭 **/
+  // 게시글을 클릭하면 해당 게시글로 이동
+  async function clickPost(postId) {
+    window.location.href = `post-detail.html?id=${postId}`;
   }
 
   /** 게시판 탭 관련 JS **/
@@ -194,4 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchHotPosts('COOKING');
   // 3. POINT RANKING LIST
   // 4. HASHTAG RANKING LIST
+
+  /** 함수 전역 선언 **/
+  window.clickPost = clickPost;
 });
