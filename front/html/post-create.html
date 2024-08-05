@@ -70,14 +70,25 @@
         previewStyle: 'vertical', // 마크다운 프리뷰 스타일 (tab || vertical)
         placeholder: '내용을 입력해 주세요.',
         hooks: {
-          addImageBlobHook(blob, callback) {
-            const reader = new FileReader();
-            reader.onload = () => {
-              const url = reader.result; // Base64 URL 생성
-              callback(url, `${blob.name}`);
-              window.imageBlobs.push(blob);
-            };
-            reader.readAsDataURL(blob); // Blob을 Base64로 변환
+          async addImageBlobHook(blob, callback) {
+            try {
+              const formData = new FormData();
+              formData.append('files', blob);
+              console.log('🚀 ~ addImageBlobHook ~ formData:', formData);
+              const response = await fetch(`/api/posts/images`, {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+                },
+                body: formData,
+              });
+
+              const result = await response.json();
+              console.log('🚀 ~ addImageBlobHook ~ result:', result);
+              callback(result.data, 'image alt attribute');
+            } catch (error) {
+              console.error('업로드 실패 : ', error);
+            }
           },
         },
       });

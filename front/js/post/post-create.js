@@ -1,17 +1,10 @@
 import { API_BASE_URL } from '../../config/config.js';
 
-// 전역 변수로 이미지 저장 배열 정의
-window.imageBlobs = [];
-window.imageUrls = [];
-
 // 게시글 작성 함수
 async function createPost() {
   const title = document.getElementById('post-title').value;
   const category = document.getElementById('post-category').value;
   const content = editor.getMarkdown();
-
-  /** content에서 `![이미지이름](base64인코딩된 부분의 문자열)` 을
-   * `![이미지이름](이미지이름)으로 바꿔서 저장하는 로직*/
 
   const accessToken = localStorage.getItem('accessToken');
 
@@ -32,14 +25,16 @@ async function createPost() {
     const postData = await postResponse.json();
     const postId = postData.data.id; // 생성된 게시글 ID를 저장
 
+    // 해당 게시글 상세 페이지로 이동
+    window.location.href = `./post-detail.html?id=${postId}`;
     // 이미지 업로드를 위한 후처리
-    uploadImages(postId, content);
+    // uploadImages(postId, content);
   } else {
     alert('게시글 생성 실패');
   }
 }
 
-// 이미지 업로드 함수
+// 이미지 업로드 함수 $$$ 삭제예정
 async function uploadImages(postId, content) {
   const formData = new FormData();
 
@@ -77,7 +72,7 @@ async function uploadImages(postId, content) {
       });
 
       // 게시글 업데이트
-      await updatePostContent(postId, finalContent);
+      // await updatePostContent(postId, finalContent);
       alert('게시글과 이미지 업로드 성공');
     } else {
       alert('이미지 업로드 실패');
@@ -88,7 +83,7 @@ async function uploadImages(postId, content) {
   }
 }
 
-// 게시글 업데이트 함수
+// 게시글 업데이트 함수 $$$ 삭제예정
 async function updatePostContent(postId, content) {
   const accessToken = localStorage.getItem('accessToken');
 
