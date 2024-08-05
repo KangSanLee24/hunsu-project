@@ -34,6 +34,8 @@ import { MailService } from 'src/mail/mail.service';
 import { SocialType } from 'src/user/types/social-type.type';
 import { PointService } from 'src/point/point.service';
 import { PointType } from 'src/point/types/point.type';
+import { SocialData } from './entities/social-data.entity';
+import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -52,6 +54,9 @@ export class AuthService {
 
     @InjectRepository(RefreshToken)
     private refreshTokenRepository: Repository<RefreshToken>,
+
+    @InjectRepository(SocialData)
+    private socialDataRepository: Repository<SocialData>,
 
     @InjectRepository(VerifyEmail)
     private verifyEmailRepository: Repository<VerifyEmail>,
@@ -350,7 +355,7 @@ export class AuthService {
     };
   }
 
-  /** 6-1. 소셜로그인 - 네이버 **/
+  /** 6-1-2. 소셜로그인 - 네이버 콜백 **/
   async logInNaver(req: any) {
     try {
       // 0. 필요한 정보 받아오기 + 생성
@@ -426,11 +431,53 @@ export class AuthService {
       };
       const data = await this.logIn(logInDto);
 
-      // 6. 반환
-      return data;
+      // 6. 리다이렉트용 데이터 로직
+      // 6-1. 4자리 난수 형성
+      const certification: number = await this.createCertification();
+      // 6-2. 소셜 로그인 임시 토큰 테이블에 저장
+      const temper = await this.socialDataRepository.save({
+        userId: isExistingUser.id,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        certification: certification,
+      });
+
+      // 7. 데이터
+      const newData = {
+        id: temper.userId,
+        certification: temper.certification,
+      };
+
+      // 8. 반환(유저아이디 + 인증번호만)
+      return newData;
     } catch (err) {
       throw err;
     }
+  }
+
+  /** 6-1-3. 소셜로그인 - 네이버 리콜 (임시 데이터) **/
+  async logInNaverRC(userId, certification) {
+    // 1. 유저id + 인증번호로 토큰 받아오기
+    const data = await this.socialDataRepository.findOne({
+      where: {
+        userId,
+        certification,
+      },
+    });
+    // 2. 필요 없어진 임시 토큰 데이터 삭제
+    await this.socialDataRepository.delete({
+      userId,
+      certification,
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+    });
+    // 3. 토큰 전송
+    const tokens = {
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+    };
+    // 4. 반환
+    return tokens;
   }
 
   /** 6-2. 소셜로그인 - 구글 **/
@@ -588,4 +635,11 @@ export class AuthService {
 
   /** 0. Token 발급기 **/
   async tokenMaker(payload, refresh: boolean) {}
+
+  /** 인증 코드 생성 **/
+  async createCertification() {
+    // 1. 1000 ~ 9999 사이 랜덤수 생성
+    const certification = Math.floor(1000 + Math.random() * 8999);
+    return certification;
+  }
 }

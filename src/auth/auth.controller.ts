@@ -8,8 +8,10 @@ import {
   Post,
   Get,
   Patch,
+  Res,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
@@ -116,11 +118,23 @@ export class AuthController {
   @ApiOperation({ summary: '6-1B. 로그인(log-in) Naver 콜백 API' })
   @UseGuards(AuthGuard('naver'))
   @Get('log-in/naver/cb')
-  async logInNaverCB(@Req() req: any) {
+  async logInNaverCB(@Req() req: any, @Res() res: any) {
     const data = await this.authService.logInNaver(req);
+    const { id, certification } = data;
+    // 유저id와 인증번호4자리를 아래 주소로 전달하며 리다이렉트
+    const url = this.configService.get<string>('NAVER_REDIRECT_URL');
+    res.redirect(`${url}?id=${id}&certification=${certification}`);
+  }
+  /** 6-1-3. 소셜로그인 - 네이버 리콜 **/
+  @Get('log-in/naver/rc')
+  async logInNaverRC(
+    @Query('userId') userId: number,
+    @Query('certification') certification: number
+  ) {
+    const data = await this.authService.logInNaverRC(userId, certification);
     return {
       status: HttpStatus.OK,
-      message: '네이버 로그인에 성공했습니다.',
+      message: '네이버 로그인에 성공하셨습니다.',
       data: data,
     };
   }

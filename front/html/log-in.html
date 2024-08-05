@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>로그인</title>
     <link rel="stylesheet" href="/styles/log-in.css" />
-    <script type="module" src="/js/auth/log-in.js"></script>
   </head>
+
   <body>
     <!-- 로그인 페이지 -->
     <div class="container">
@@ -37,32 +37,39 @@
         <button type="submit">로그인 하기</button>
 
         <!-- [소셜 로그인] 버튼들 -->
-        <img
-          id="naver_login"
-          class="naver_login"
-          src="../images/naver_login.png"
-        />
-        <img
-          id="kakao_login"
-          class="kakao_login"
-          src="../images/kakao_login.png"
-        />
-        <img
-          id="google_login"
-          class="google_login"
-          src="../images/google_login.png"
-        />
-        <img
-          id="instagram_login"
-          class="instagram_login"
-          src="../images/instagram_login.png"
-        />
-        <img
-          id="facebook_login"
-          class="facebook_login"
-          src="../images/facebook_login.png"
-        />
+        <div class="social-buttons">
+          <div id="naver_id_login" class="naver_id_login">
+            <!-- 네이버 버튼이 들어감 -->
+            <img
+              id="naver_login"
+              class="naver_login"
+              src="../images/naver_login.png"
+            />
+          </div>
+          <img
+            id="kakao_login"
+            class="kakao_login"
+            src="../images/kakao_login.png"
+          />
+          <img
+            id="google_login"
+            class="google_login"
+            src="../images/google_login.png"
+          />
+          <img
+            id="instagram_login"
+            class="instagram_login"
+            src="../images/instagram_login.png"
+          />
+          <img
+            id="facebook_login"
+            class="facebook_login"
+            src="../images/facebook_login.png"
+          />
+        </div>
       </form>
     </div>
+
+    <script type="module" src="/js/auth/log-in.js"></script>
   </body>
 </html>

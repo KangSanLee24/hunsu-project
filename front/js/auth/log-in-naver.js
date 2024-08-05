@@ -1,40 +1,59 @@
 import { API_BASE_URL } from '../../config/config.js';
 
-/** 화면이 로딩되면 자동으로 실행 **/
 document.addEventListener('DOMContentLoaded', () => {
-  /** 네이버 콜백 호출 함수 **/
-  const naverLogIn = async () => {
-    try {
-      // 1. 네이버 로그인 콜백 API 호출
-      const response = await fetch(`${API_BASE_URL}/auth/log-in/naver/cb`, {
+  // 1. 쿼리스트링 주소로 받아온 데이터 가져오기
+  const urlParams = new URLSearchParams(location.search);
+  const userId = urlParams.get('id');
+  const certification = urlParams.get('certification');
+
+  // 2. 네이버 로그인
+  const naverLogIn = async (userId, certification) => {
+    // 2-1. 오류검사 (id, certification 있는지)
+    if (!userId) {
+      return console.error('userId가 없습니다.');
+    }
+    if (!certification) {
+      return console.error('certification이 없습니다.');
+    }
+
+    // 2-2. 쿼리파람스 생성
+    const queryParams = new URLSearchParams({
+      userId: userId,
+      certification: certification,
+    });
+
+    // 2-3. id(userId)와 certification으로 ATK, RTK 받아오기
+    const response = await fetch(
+      `${API_BASE_URL}/auth/log-in/naver/rc?${queryParams.toString()}`,
+      {
         method: 'GET',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
-      });
-      // 2. 네이버 로그인 결과 json화
-      const result = await response.json();
-      // 3. 네이버 로그인
-      if (response.ok && result.status === 200) {
-        // 3-1. 성공시 토큰 저장
-        localStorage.setItem('accessToken', result.data.accessToken);
-        localStorage.setItem('refreshToken', result.data.refreshToken);
-      } else {
-        // 3-2. 실패시 '로그인 실패' 엘러트
-        alert(result.message || '로그인에 실패했습니다.');
       }
-      // 4. 결과 엘러트
+    );
+
+    // 3. fetch 받아온 result를 json으로
+    const result = await response.json();
+
+    // 4. 로그인 관련 데이터 처리
+    if (response.ok && result.status === 200) {
+      // 4-A. 로그인 성공시
+      // 4-A-1. 토큰들 로컬스토리지에 저장
+      localStorage.setItem('accessToken', result.data.accessToken);
+      localStorage.setItem('refreshToken', result.data.refreshToken);
+
+      // 4-A-2. '로그인에 성공했습니다.' alert
       alert(result.message);
-      // 5. 메인페이지로 이동
+
+      // 4-A-3. 메인 페이지로 이동
       window.location.href = './main.html';
-    } catch (error) {
-      // 6. 위 모든 상황에서 에러 발생시 메시지
-      console.error('네이버에서 응답이 오지 않습니다.');
+    } else {
+      // 4-B. 기타 로그인 에러 처리
+      alert(result.message || '네이버 로그인에 실패했습니다.');
     }
   };
 
-  /** 리다이렉트 받으면 네이버 콜백 호출 함수 실행 **/
-  naverLogIn();
-  console.log('네이버 로그인 시도');
+  /** 실행 **/
+  naverLogIn(userId, certification);
 });

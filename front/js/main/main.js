@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../../config/config.js';
+import { rankMark, levelMark } from '../common/level-rank.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   /** 1. 페이지에 필요한 변수 세팅 **/
@@ -30,10 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (signUpLink) signUpLink.style.display = 'block';
   }
 
-  /** 3. HOT POST - [TYPE(CHAT, FASHION, COOKING)] 랭킹 **/
+  /** 3. HOT POST - [TYPE(CHAT, FASHION, COOKING)] 랭킹 FETCH **/
   async function fetchHotPosts(category) {
     try {
-      // 1. API 호출 시 비어 있는 값을 포함하지 않도록 URL 구성
+      // 1. 쿼리스트링 구성
       const queryParams = new URLSearchParams({
         category: category,
       });
@@ -79,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /** 4. HOT POST 랜더링 **/
   function renderHotPostList(category, data) {
     // 1. 들어온 데이터를 하나하나 HTML화
-    for (let i = 1; i <= data.length; i++) {
+    for (let i = 0; i < data.length; i++) {
       // 1-1. 데이터로 row HTML 생성
       const row = document.createElement('div');
       row.innerHTML = `
@@ -119,6 +120,213 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = `post-detail.html?id=${postId}`;
   }
 
+  /** 6. WEEKLY POINT RANK FETCH **/
+  async function fetchWeeklyPointRank(num) {
+    try {
+      // 1. 쿼리스트링 구성
+      const queryParams = new URLSearchParams({
+        num: num,
+      });
+
+      // 2. fetch 받아오기 (WEEKLY POINT RANK)
+      const weeklyResponse = await fetch(
+        `${API_BASE_URL}/points/ranks-weekly?${queryParams.toString()}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        }
+      );
+
+      // 3. fetch 받아온 result를 json으로
+      const weeklyResult = await weeklyResponse.json();
+
+      // 4. 데이터 처리
+      if (weeklyResult.status === 200) {
+        // 4-1. data가 배열인지 확인해서 맞으면
+        if (Array.isArray(weeklyResult.data)) {
+          // 4-1-1. 렌더링 함수에 데이터 전달
+          renderWeeklyPointRank(weeklyResult.data);
+        } else {
+          // 4-1-2. data가 배열인지 확인해서 아니면
+          console.error(
+            '포인트 랭킹 데이터 형식이 잘못되었습니다:',
+            weeklyResult.data
+          );
+        }
+      } else {
+        // 4-2. data를 애초에 조회하지 못한 경우 에러메시지
+        console.error('포인트 랭킹 조회 실패:', weeklyResult.message);
+      }
+    } catch (error) {
+      console.error('포인트 랭킹 조회 API 호출 중 오류 발생:', error);
+    }
+  }
+
+  /** 7. TOTAL POINT RANK FETCH **/
+  async function fetchTotalPointRank(num) {
+    try {
+      // 1. 쿼리스트링 구성
+      const queryParams = new URLSearchParams({
+        num: num,
+      });
+
+      // 2. fetch 받아오기 (TOTAL POINT RANK)
+      const totalResponse = await fetch(
+        `${API_BASE_URL}/points/ranks?${queryParams.toString()}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        }
+      );
+
+      // 3. fetch 받아온 result를 json으로
+      const totalResult = await totalResponse.json();
+
+      // 4. 데이터 처리
+      if (totalResult.status === 200) {
+        // 4-1. data가 배열인지 확인해서 맞으면
+        if (Array.isArray(totalResult.data)) {
+          // 4-1-1. 렌더링 함수에 데이터 전달
+          renderTotalPointRank(totalResult.data);
+        } else {
+          // 4-1-2. data가 배열인지 확인해서 아니면
+          console.error(
+            '포인트 랭킹 데이터 형식이 잘못되었습니다:',
+            totalResult.data
+          );
+        }
+      } else {
+        // 4-2. data를 애초에 조회하지 못한 경우 에러메시지
+        console.error('포인트 랭킹 조회 실패:', totalResult.message);
+      }
+    } catch (error) {
+      console.error('포인트 랭킹 조회 API 호출 중 오류 발생:', error);
+    }
+  }
+
+  /** 8. HASHTAG RANK FETCH **/
+  async function fetchHashtagRank(num) {
+    try {
+      // 1. 쿼리스트링 구성
+      const queryParams = new URLSearchParams({
+        num: num,
+      });
+
+      // 2. fetch 받아오기 (HASHTAG RANK)
+      const response = await fetch(
+        `${API_BASE_URL}/hashtags/ranks-weekly?${queryParams.toString()}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        }
+      );
+
+      // 3. fetch 받아온 result를 json으로
+      const result = await response.json();
+
+      // 4. 데이터 처리
+      if (result.status === 200) {
+        // 4-1. data가 배열인지 확인해서 맞으면
+        if (Array.isArray(result.data)) {
+          // 4-1-1. 렌더링 함수에 데이터 전달
+          renderHashtagRank(result.data);
+        } else {
+          // 4-1-2. data가 배열인지 확인해서 아니면
+          console.error(
+            '해시태그 랭킹 데이터 형식이 잘못되었습니다:',
+            result.data
+          );
+        }
+      } else {
+        // 4-2. data를 애초에 조회하지 못한 경우 에러메시지
+        console.error('해시태그 랭킹 조회 실패:', result.message);
+      }
+    } catch (error) {
+      console.error('해시태그 랭킹 조회 API 호출 중 오류 발생:', error);
+    }
+  }
+
+  /** 0. WEEKLY POINT RANK 랜더링 **/
+  function renderWeeklyPointRank(data) {
+    // 1. 들어온 데이터를 하나하나 HTML화
+    for (let i = 1; i <= data.length; i++) {
+      // 1-1. 데이터로 row HTML 생성
+      const row = document.createElement('div');
+      row.innerHTML = `
+                <div class="point-rank-info">
+                  <div class="point-rank-ranking">
+                  <span class="point-rank-ranking-var">${rankMark(i)}</span>
+                  </div>                  
+                  <div class="point-rank-nickname">
+                  <span>${data[i - 1].nickname}</span>
+                  </div>                  
+                  <div class="point-rank-point">
+                  <span>${data[i - 1].point}</span>
+                  </div>
+                  </div>
+                  `;
+      // 1-2. WEEKLY POINT RANK TAB에 데이터 넣어주기
+      weeklyPointRank.appendChild(row);
+    }
+  }
+
+  /** 0. TOTAL POINT RANK 랜더링 **/
+  function renderTotalPointRank(data) {
+    // 1. 들어온 데이터를 하나하나 HTML화
+    for (let i = 1; i <= data.length; i++) {
+      // 1-1. 데이터로 row HTML 생성
+      const row = document.createElement('div');
+      row.innerHTML = `
+      <div class="point-rank-info">
+      <div class="point-rank-ranking">
+      <span class="point-rank-ranking-var">${rankMark(i)}</span>
+      </div>                  
+      <div class="point-rank-nickname">
+      <span>${levelMark(data[i - 1].point)}${data[i - 1].nickname}</span>
+      </div>                  
+      <div class="point-rank-point">
+      <span>${data[i - 1].accPoint}</span>
+      </div>
+      </div>
+      `;
+      // 1-2. TOTAL POINT RANK TAB에 데이터 넣어주기
+      totalPointRank.appendChild(row);
+    }
+  }
+
+  /** 0. HASHTAG RANK 랜더링 **/
+  function renderHashtagRank(data) {
+    // 1. 들어온 데이터를 하나하나 HTML화
+    for (let i = 1; i <= data.length; i++) {
+      // 1-1. 데이터로 row HTML 생성
+      const row = document.createElement('div');
+      row.innerHTML = `        
+                <div class="hashtag-rank-info">                  
+                  <div class="hashtag-rank-ranking">
+                    <span class="hashtag-rank-ranking-var">${rankMark(i)}</span>
+                  </div>                  
+                  <div class="hashtag-rank-hashtag">
+                    <span>${data[i - 1].hashtag}</span>
+                  </div>                  
+                  <div class="hashtag-rank-count">
+                    <span>${data[i - 1].count}</span>
+                  </div>
+                </div>
+      `;
+      // 1-2. HASHTAG RANK TAB에 데이터 넣어주기
+      hashtagRank.appendChild(row);
+    }
+  }
+
   /** 게시판 탭 관련 JS **/
   $(document).ready(function () {
     // 1. 게시판 탭 위에 마우스를 올리면(hover)
@@ -138,37 +346,6 @@ document.addEventListener('DOMContentLoaded', () => {
       $('#' + tabDataId).addClass('current');
     });
   });
-
-  /** 7. POIN RANK 랜더링 **/
-  function renderPointRank(category, data) {
-    // 1. 들어온 데이터를 하나하나 HTML화
-    for (let i = 1; i <= data.length; i++) {
-      // 1-1. 데이터로 row HTML 생성
-      const row = document.createElement('div');
-      row.innerHTML = `
-                <div class="point-rank-info">
-                  <div class="point-rank-ranking">
-                    <span class="point-rank-ranking-var">🥇</span>
-                  </div>                  
-                  <div class="point-rank-nickname">
-                    <span>침착맨</span>
-                  </div>                  
-                  <div class="point-rank-point">
-                    <span>183295</span>
-                  </div>
-                </div>
-      `;
-      // 1-2. 카테고리에 맞게 데이터 넣어주기
-      if (category == 'WEEKLY') {
-        // 1-2-1. WEEKLY
-      } else if (category == 'TOTAL') {
-        // 1-2-2. TOTAL
-      } else {
-        // 1-2-3. 그 외 (현재는 에러처리)
-        console.error('랭킹 카테고리 분류에서 에러가 발생했습니다.');
-      }
-    }
-  }
 
   /** 포인트 랭킹 탭 관련 JS **/
   $(document).ready(function () {
@@ -231,7 +408,10 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchHotPosts('FASHION');
   fetchHotPosts('COOKING');
   // 3. POINT RANKING LIST
+  fetchWeeklyPointRank(10);
+  fetchTotalPointRank(10);
   // 4. HASHTAG RANKING LIST
+  fetchHashtagRank(10);
 
   /** 함수 전역 선언 **/
   window.clickPost = clickPost;

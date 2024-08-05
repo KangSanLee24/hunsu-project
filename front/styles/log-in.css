@@ -67,32 +67,45 @@ button {
   margin-top: 0px;
 }
 
+/* 소셜 로그인 버튼들 모음집 */
+.social-buttons {
+  display: flex;
+  flex-direction: row;
+}
+
+.naver_id_login {
+  width: 55px;
+  height: 55px;
+  border-radius: 5px;
+  margin-right: 5px;
+}
+
 .naver_login {
   width: 55px;
   height: 55px;
   border-radius: 5px;
-  margin-right: 2px;
+  margin-right: 0px;
 }
 
 .kakao_login {
   width: 55px;
   height: 55px;
   border-radius: 5px;
-  margin-right: 2px;
+  margin-right: 5px;
 }
 
 .google_login {
   width: 55px;
   height: 55px;
   border-radius: 5px;
-  margin-right: 1px;
+  margin-right: 5px;
 }
 
 .instagram_login {
   width: 55px;
   height: 55px;
   border-radius: 5px;
-  margin-right: 2px;
+  margin-right: 5px;
 }
 
 .facebook_login {

@@ -189,7 +189,7 @@ h2:hover {
 .hot-post-rank {
   width: 680px;
   min-width: 400px;
-  height: 270px;
+  height: 285px;
   border: 1px solid black;
   border-radius: 10px;
   margin-right: 5px;
@@ -221,7 +221,7 @@ ul.hot-post-rank-tabs li.current {
 .tab-contents-box {
   width: auto;
   min-width: 370px;
-  height: 200px;
+  height: 215px;
   border-radius: 0px 0px 10px 10px;
   display: none;
   padding: 15px;
@@ -230,7 +230,7 @@ ul.hot-post-rank-tabs li.current {
 .tab-contents-box.current {
   width: auto;
   min-width: 370px;
-  height: 200px;
+  height: 215px;
   border-radius: 0px 0px 10px 10px;
   display: inherit;
   background: #e8eaec;
@@ -240,11 +240,13 @@ ul.hot-post-rank-tabs li.current {
   display: flex;
   flex-direction: row;
   overflow: hidden;
+  height: 22px;
 }
 /* 2-1-6-1. POST TITLE */
 .post-title {
   width: 310px;
   min-width: 215px;
+  height: 22px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -274,6 +276,7 @@ ul.hot-post-rank-tabs li.current {
 .post-writer {
   width: 140px;
   min-width: 140px;
+  height: 22px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -286,6 +289,7 @@ ul.hot-post-rank-tabs li.current {
 .post-date {
   width: 95px;
   min-width: 95px;
+  height: 22px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -295,7 +299,7 @@ ul.hot-post-rank-tabs li.current {
 .point-rank {
   width: 25%;
   min-width: 195px;
-  height: 270px;
+  height: 285px;
   border: 1px solid black;
   border-radius: 10px;
   margin-right: 5px;
@@ -327,7 +331,7 @@ ul.point-rank-tabs li.current {
 .tab-ranking-box {
   width: auto;
   min-width: 165px;
-  height: 200px;
+  height: 215px;
   border-radius: 0px 0px 10px 10px;
   display: none;
   padding: 15px;
@@ -336,7 +340,7 @@ ul.point-rank-tabs li.current {
 .tab-ranking-box.current {
   width: auto;
   min-width: 165px;
-  height: 200px;
+  height: 215px;
   border-radius: 0px 0px 10px 10px;
   display: inherit;
   background: #e8eaec;
@@ -346,11 +350,13 @@ ul.point-rank-tabs li.current {
   display: flex;
   flex-direction: row;
   overflow: hidden;
+  height: 22px;
 }
 /* 2-2-6-1. POINT RANK RANKING */
 .point-rank-ranking {
   width: 20px;
   min-width: 20px;
+  height: 22px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -365,6 +371,7 @@ ul.point-rank-tabs li.current {
 .point-rank-nickname {
   width: 155px;
   min-width: 60px;
+  height: 22px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -377,6 +384,7 @@ ul.point-rank-tabs li.current {
 .point-rank-point {
   width: 65px;
   min-width: 60px;
+  height: 22px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -387,7 +395,7 @@ ul.point-rank-tabs li.current {
 .weekly-hashtag-rank {
   width: 21%;
   min-width: 190px;
-  height: 270px;
+  height: 285px;
   border: 1px solid black;
   border-radius: 10px;
   margin-right: 0px;
@@ -419,7 +427,7 @@ ul.hashtag-rank-tabs li.current {
 .tab-hashtag-box {
   width: auto;
   min-width: 165px;
-  height: 200px;
+  height: 215px;
   border-radius: 0px 0px 10px 10px;
   display: none;
   padding: 15px;
@@ -428,7 +436,7 @@ ul.hashtag-rank-tabs li.current {
 .tab-hashtag-box.current {
   width: auto;
   min-width: 165px;
-  height: 200px;
+  height: 215px;
   border-radius: 0px 0px 10px 10px;
   display: inherit;
   background: #e8eaec;
@@ -438,11 +446,13 @@ ul.hashtag-rank-tabs li.current {
   display: flex;
   flex-direction: row;
   overflow: hidden;
+  height: 22px;
 }
 /* 2-3-6-1. HASHTAG RANK RANKING */
 .hashtag-rank-ranking {
   width: 20px;
   min-width: 20px;
+  height: 22px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -457,6 +467,7 @@ ul.hashtag-rank-tabs li.current {
 .hashtag-rank-hashtag {
   width: 155px;
   min-width: 80px;
+  height: 22px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -469,6 +480,7 @@ ul.hashtag-rank-tabs li.current {
 .hashtag-rank-count {
   width: 65px;
   min-width: 40px;
+  height: 22px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;

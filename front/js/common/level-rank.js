@@ -43,8 +43,8 @@ export const levelMark = (point) => {
   }
 };
 
-/** WEEKLY RANK 등수 분류 **/
-export const weeklyRank = (ranking) => {
+/** RANK MARK 분류 **/
+export const rankMark = (ranking) => {
   if (ranking == 1) {
     return '🥇';
   } else if (ranking == 2) {

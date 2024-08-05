@@ -58,43 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /** 네이버 로그인 **/
-    // 1. [N] 버튼을 누르면 [네이버 로그인] 수행
+    // [N] 버튼을 누르면 [네이버 로그인] 수행
     naverLogInBtn.addEventListener('click', async (event) => {
-      // 1-0. 기존 동작 방지
+      // 1. 기존 동작 방지
       event.preventDefault();
-
-      // 1-1. Naver로그인API request 요청 => response로 받아오기
-      const response = await fetch(`${API_BASE_URL}/auth/log-in/naver`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      // 1-3. response를 json화
-      const result = await response.json();
-
-      console.log(result);
-
-      // 1-4. 로그인 관련 데이터 처리
-      if (response.ok && result.status === 200) {
-        // 1-4-A. 로그인 성공시 + 이메일 인증O
-        // 1-4-A-1. 토큰들 로컬스토리지에 저장
-        localStorage.setItem('accessToken', result.data.accessToken);
-        localStorage.setItem('refreshToken', result.data.refreshToken);
-
-        // 1-4-A-2. '로그인에 성공했습니다.' alert
-        alert(result.message);
-
-        // 1-4-A-3. 메인 페이지로 이동
-        window.location.href = './main.html';
-      } else {
-        // 1-4-C. 기타 로그인 에러 처리
-        alert(result.message || '로그인에 실패했습니다.');
-      }
+      // 2. 네이버 로그인 API 실행
+      window.location.href = `${API_BASE_URL}/auth/log-in/naver`;
     });
-  } else {
-    // 로그인 폼이 존재하지 않는 경우
-    console.error('로그인 폼을 찾을 수 없습니다.');
   }
 });
