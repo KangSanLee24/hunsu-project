@@ -65,7 +65,23 @@
             ></textarea>
             <button id="submit-comment">댓글 작성</button>
           </div>
-          <ul id="comment-list"></ul>
+          <ul id="comment-list">
+            <!-- 댓글 좋아요 및 싫어요 버튼 위치 -->
+            <li>
+              <p>댓글 내용</p>
+              <span>작성일: <span class="comment-date"></span></span>
+              <div class="comment-like-dislike">
+                <button class="comment-like-btn">
+                  <i class="fa fa-thumbs-up"></i> &#128518; 좋아요
+                  <span class="comment-likes"></span>
+                </button>
+                <button class="comment-dislike-btn">
+                  <i class="fa fa-thumbs-down"></i> &#128553; 싫어요
+                  <span class="comment-dislikes"></span>
+                </button>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
     </main>
