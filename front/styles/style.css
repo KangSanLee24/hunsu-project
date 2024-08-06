@@ -1,17 +1,22 @@
+/* 0. 구글 폰트 */
+@import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Jua&family=Nanum+Pen+Script&display=swap');
+
+.jua-regular {
+  font-family: 'Jua', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  margin: 0;
-  padding: 0;
-  background-color: #f5f5f5;
+  font-family: 'Jua', sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 header,
 main,
 footer {
+  min-width: 620px;
   max-width: 1200px;
   /* 최대 너비 설정 */
   margin: 0 auto;
@@ -66,27 +71,6 @@ header .logo:hover {
   color: red;
 }
 
-#userNickname,
-#logoutLink {
-  color: white;
-  /* 글자 색상 */
-  font-weight: bold;
-  font-size: 18px;
-  text-decoration: none;
-}
-
-#logoutLink:hover {
-  color: red;
-  /* 마우스 오버 색상 */
-}
-
-.user-info {
-  display: flex;
-  gap: 15px;
-  /* 닉네임과 로그아웃 버튼 사이에 간격 추가 */
-  align-items: center;
-}
-
 main {
   padding-top: 80px;
   /* 헤더 높이에 맞춰 여백 추가 */
@@ -124,7 +108,7 @@ footer button:hover {
 }
 
 /* 반응형 디자인 */
-@media (max-width: 600px) {
+@media (max-width: 200px) {
   header {
     flex-direction: column;
     align-items: flex-start;

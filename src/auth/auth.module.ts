@@ -21,6 +21,7 @@ import { NaverStrategy } from './guards/naver.strategy';
 import { Point } from 'src/point/entities/point.entity';
 import { PointModule } from 'src/point/point.module';
 import { PointLog } from 'src/point/entities/point-log.entity';
+import { SocialData } from './entities/social-data.entity';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { PointLog } from 'src/point/entities/point-log.entity';
       VerifyEmail,
       VerifyPassword,
       PointLog,
+      SocialData,
     ]),
     ConfigModule,
     UserModule,

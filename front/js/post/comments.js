@@ -8,7 +8,6 @@ const commentList = document.getElementById('comment-list');
 // URL에서 게시글 ID를 가져옴
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get('id');
-console.log('🚀 ~ postId:', postId);
 
 // 댓글 작성 함수
 async function createComment(content) {
@@ -222,7 +221,6 @@ commentList.addEventListener('click', async (event) => {
     const recommentContent = recommentInput.querySelector('textarea').value;
     const commentId = event.target.closest('li').querySelector('.recomment-btn')
       .dataset.commentId;
-    console.log('🚀 ~ commentList.addEventListener ~ commentId:', commentId);
 
     if (recommentContent) {
       await submitRecomment(commentId, recommentContent);

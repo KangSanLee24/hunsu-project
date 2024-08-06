@@ -4,37 +4,410 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>홈페이지</title>
+  <title>5ZIRAP</title>
+  <!-- CSS -->
   <link rel="stylesheet" href="/styles/style.css" />
   <link rel="stylesheet" href="/styles/main.css" />
-  <script type="module" src="/js/common/header.js"></script>
-  <script type="module" src="/js/main/main.js"></script>
 </head>
 
 <body>
+  <!-- HEADER -->
   <header>
     <div class="logo">5ZIRAP</div>
     <nav>
       <ul>
-        <li><a href="./log-in.html" style="display:inline-block;">로그인</a></li>
-        <li><a href="./sign-up.html" style="display:inline-block;">회원가입</a></li>
-        <li><a id="userNickname" style="display:none;"></a></li>
+        <li><a href="./log-in.html">로그인</a></li>
+        <li><a href="./sign-up.html">회원가입</a></li>
+        <li><a id="userNickname"></a></li>
       </ul>
     </nav>
   </header>
 
+  <!-- MAIN BODY -->
   <main>
-    <section class="live-chat">
-      <h2>실시간 HOT LIVE CHAT</h2>
-      <ul id="liveChatList"></ul>
-    </section>
+    <!-- 1. HOT LIVECHATS SECTION -->
+    <div class="hot-live-chats">
+      <!-- HOT LIVECHATS SECTION TITLE -->
+      <div class="hot-live-chats-title">
+        <h2>💬 HOT - LiveChat</h2>
+      </div>
 
-    <section class="weekly-posts">
-      <h2>주간 HOT 게시글</h2>
-      <ul id="weeklyPostsList"></ul>
-    </section>
+      <!-- HOT LIVECHATS CONTAINER -->
+      <div class="hot-live-chats-container">
+        <!-- HOT LIVECHATS 목록 (예시 10개) -->
+        <!-- 01 # HOT LIVECHAT CARD 기안84 근본카드 -->
+        <div class="hot-live-chat-card">
+          <!-- CARD INNER (썸네일 + 채팅정보) -->
+          <div class="hot-live-chat-card-inner">
+            <!-- CARD THUMBNAIL IMAGE -->
+            <div class="card-thumbnail">
+              <img class="card-thumbnail-image"
+                src="https://newsimg-hams.hankookilbo.com/2023/02/01/e57b0e0b-32c5-49f8-a526-02ae1d3740ab.jpg" />
+            </div>
+            <!-- CHAT INFO -->
+            <div class="chat-info">
+              <!-- CHAT TITLE -->
+              <div class="chat-title">
+                <span class="chat-title-var">💬패션왕들 모여라!</span>
+              </div>
+              <!-- CHAT MAKER -->
+              <div class="chat-maker">
+                <span class="chat-maker-var">🐣기안84</span>
+              </div>
+              <!-- CHAT HEADCOUNT -->
+              <div class="chat-headcount">
+                <span class="chat-headcount-var">👨‍🏫100/100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 02 # HOT LIVECHAT CARD 수지 -->
+        <div class="hot-live-chat-card">
+          <!-- CARD INNER (썸네일 + 채팅정보) -->
+          <div class="hot-live-chat-card-inner">
+            <!-- CARD THUMBNAIL IMAGE -->
+            <div class="card-thumbnail">
+              <img class="card-thumbnail-image"
+                src="https://pimg.mk.co.kr/news/cms/202309/06/news-p.v1.20230906.162ae1cb99f4452c82c45ee50f62a4f0_P1.jpg" />
+            </div>
+            <!-- CHAT INFO -->
+            <div class="chat-info">
+              <!-- CHAT TITLE -->
+              <div class="chat-title">
+                <span class="chat-title-var">💬수지 맞은 날~</span>
+              </div>
+              <!-- CHAT MAKER -->
+              <div class="chat-maker">
+                <span class="chat-maker-var">💖수지A</span>
+              </div>
+              <!-- CHAT HEADCOUNT -->
+              <div class="chat-headcount">
+                <span class="chat-headcount-var">👨‍🏫99/100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 03 # HOT LIVECHAT CARD 침착맨 -->
+        <div class="hot-live-chat-card">
+          <!-- CARD INNER (썸네일 + 채팅정보) -->
+          <div class="hot-live-chat-card-inner">
+            <!-- CARD THUMBNAIL IMAGE -->
+            <div class="card-thumbnail">
+              <img class="card-thumbnail-image" src="https://cdn.hankyung.com/photo/202308/01.34166839.1.jpg" />
+            </div>
+            <!-- CHAT INFO -->
+            <div class="chat-info">
+              <!-- CHAT TITLE -->
+              <div class="chat-title">
+                <span class="chat-title-var">💬침착맨 패션 토론</span>
+              </div>
+              <!-- CHAT MAKER -->
+              <div class="chat-maker">
+                <span class="chat-maker-var">🐣침착맨</span>
+              </div>
+              <!-- CHAT HEADCOUNT -->
+              <div class="chat-headcount">
+                <span class="chat-headcount-var">👨‍🏫97/100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 03 # HOT LIVECHAT CARD 주우재 -->
+        <div class="hot-live-chat-card">
+          <!-- CARD INNER (썸네일 + 채팅정보) -->
+          <div class="hot-live-chat-card-inner">
+            <!-- CARD THUMBNAIL IMAGE -->
+            <div class="card-thumbnail">
+              <img class="card-thumbnail-image"
+                src="https://cdnimage.ebn.co.kr/news/202002/news_1580991446_1020959_main1.jpg" />
+            </div>
+            <!-- CHAT INFO -->
+            <div class="chat-info">
+              <!-- CHAT TITLE -->
+              <div class="chat-title">
+                <span class="chat-title-var">💬너네가패션을논해?</span>
+              </div>
+              <!-- CHAT MAKER -->
+              <div class="chat-maker">
+                <span class="chat-maker-var">🐥주우재천재</span>
+              </div>
+              <!-- CHAT HEADCOUNT -->
+              <div class="chat-headcount">
+                <span class="chat-headcount-var">👨‍🏫95/100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 05 # HOT LIVECHAT CARD 아이유 -->
+        <div class="hot-live-chat-card">
+          <!-- CARD INNER (썸네일 + 채팅정보) -->
+          <div class="hot-live-chat-card-inner">
+            <!-- CARD THUMBNAIL IMAGE -->
+            <div class="card-thumbnail">
+              <img class="card-thumbnail-image"
+                src="https://talkimg.imbc.com/TVianUpload/tvian/TViews/image/2023/04/27/0e83f60f-51d4-49b2-919c-92ec2ff928c5.jpg" />
+            </div>
+            <!-- CHAT INFO -->
+            <div class="chat-info">
+              <!-- CHAT TITLE -->
+              <div class="chat-title">
+                <span class="chat-title-var">💬내일 공항 가는데요..</span>
+              </div>
+              <!-- CHAT MAKER -->
+              <div class="chat-maker">
+                <span class="chat-maker-var">🎤이지금 [IU Official]</span>
+              </div>
+              <!-- CHAT HEADCOUNT -->
+              <div class="chat-headcount">
+                <span class="chat-headcount-var">👨‍🏫94/100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 06 # HOT LIVECHAT CARD 안유진 -->
+        <div class="hot-live-chat-card">
+          <!-- CARD INNER (썸네일 + 채팅정보) -->
+          <div class="hot-live-chat-card-inner">
+            <!-- CARD THUMBNAIL IMAGE -->
+            <div class="card-thumbnail">
+              <img class="card-thumbnail-image"
+                src="https://cdn.newsculture.press/news/photo/202401/540142_676651_4551.jpg" />
+            </div>
+            <!-- CHAT INFO -->
+            <div class="chat-info">
+              <!-- CHAT TITLE -->
+              <div class="chat-title">
+                <span class="chat-title-var">💬지금 공연 직전!!</span>
+              </div>
+              <!-- CHAT MAKER -->
+              <div class="chat-maker">
+                <span class="chat-maker-var">💖안유진 말고 유진이</span>
+              </div>
+              <!-- CHAT HEADCOUNT -->
+              <div class="chat-headcount">
+                <span class="chat-headcount-var">👨‍🏫93/100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 07 # HOT LIVECHAT CARD 서새봄 -->
+        <div class="hot-live-chat-card">
+          <!-- CARD INNER (썸네일 + 채팅정보) -->
+          <div class="hot-live-chat-card-inner">
+            <!-- CARD THUMBNAIL IMAGE -->
+            <div class="card-thumbnail">
+              <img class="card-thumbnail-image"
+                src="https://cdn.dailysportshankook.co.kr/news/photo/202002/220503_219635_348.jpg" />
+            </div>
+            <!-- CHAT INFO -->
+            <div class="chat-info">
+              <!-- CHAT TITLE -->
+              <div class="chat-title">
+                <span class="chat-title-var">💬꼬막따냥~~</span>
+              </div>
+              <!-- CHAT MAKER -->
+              <div class="chat-maker">
+                <span class="chat-maker-var">🐔서새봄냥</span>
+              </div>
+              <!-- CHAT HEADCOUNT -->
+              <div class="chat-headcount">
+                <span class="chat-headcount-var">👨‍🏫91/100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 08 # HOT LIVECHAT CARD 오정규 -->
+        <div class="hot-live-chat-card">
+          <!-- CARD INNER (썸네일 + 채팅정보) -->
+          <div class="hot-live-chat-card-inner">
+            <!-- CARD THUMBNAIL IMAGE -->
+            <div class="card-thumbnail">
+              <img class="card-thumbnail-image" src="https://cdn.e2news.com/news/photo/202209/245679_99659_10.jpg" />
+            </div>
+            <!-- CHAT INFO -->
+            <div class="chat-info">
+              <!-- CHAT TITLE -->
+              <div class="chat-title">
+                <span class="chat-title-var">💬패션 좀 칩니다</span>
+              </div>
+              <!-- CHAT MAKER -->
+              <div class="chat-maker">
+                <span class="chat-maker-var">🐣유튜버 오정규</span>
+              </div>
+              <!-- CHAT HEADCOUNT -->
+              <div class="chat-headcount">
+                <span class="chat-headcount-var">👨‍🏫90/100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 09 # HOT LIVECHAT CARD 이혜성 아나운서 -->
+        <div class="hot-live-chat-card">
+          <!-- CARD INNER (썸네일 + 채팅정보) -->
+          <div class="hot-live-chat-card-inner">
+            <!-- CARD THUMBNAIL IMAGE -->
+            <div class="card-thumbnail">
+              <img class="card-thumbnail-image"
+                src="https://entertainimg.kbsmedia.co.kr/cms/uploads/PERSON_20220119174441_81ecb12dddbe1d43204a7a3be74a8c0e.jpg" />
+            </div>
+            <!-- CHAT INFO -->
+            <div class="chat-info">
+              <!-- CHAT TITLE -->
+              <div class="chat-title">
+                <span class="chat-title-var">💬아나운서는 뭘 입나?</span>
+              </div>
+              <!-- CHAT MAKER -->
+              <div class="chat-maker">
+                <span class="chat-maker-var">🐣이혜성 아나</span>
+              </div>
+              <!-- CHAT HEADCOUNT -->
+              <div class="chat-headcount">
+                <span class="chat-headcount-var">👨‍🏫89/100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10 # HOT LIVECHAT CARD 신세경 -->
+        <div class="hot-live-chat-card">
+          <!-- CARD INNER (썸네일 + 채팅정보) -->
+          <div class="hot-live-chat-card-inner">
+            <!-- CARD THUMBNAIL IMAGE -->
+            <div class="card-thumbnail">
+              <img class="card-thumbnail-image"
+                src="https://cdn.thetitlenews.net/news/photo/202308/1861_3458_265.jpg" />
+            </div>
+            <!-- CHAT INFO -->
+            <div class="chat-info">
+              <!-- CHAT TITLE -->
+              <div class="chat-title">
+                <span class="chat-title-var">💬옷입고 화장하기</span>
+              </div>
+              <!-- CHAT MAKER -->
+              <div class="chat-maker">
+                <span class="chat-maker-var">🐣신세경입니다</span>
+              </div>
+              <!-- CHAT HEADCOUNT -->
+              <div class="chat-headcount">
+                <span class="chat-headcount-var">👨‍🏫89/100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 11 # HOT LIVECHAT CARD 예시카드 -->
+        <div class="hot-live-chat-card">
+          <!-- CARD INNER (썸네일 + 채팅정보) -->
+          <div class="hot-live-chat-card-inner">
+            <!-- CARD THUMBNAIL IMAGE -->
+            <div class="card-thumbnail">
+              <img class="card-thumbnail-image" src="https://static-cdn.jtvnw.net/ttv-boxart/509658-188x250.jpg" />
+            </div>
+            <!-- CHAT INFO -->
+            <div class="chat-info">
+              <!-- CHAT TITLE -->
+              <div class="chat-title">
+                <span class="chat-title-var">💬채팅방29761</span>
+              </div>
+              <!-- CHAT MAKER -->
+              <div class="chat-maker">
+                <span class="chat-maker-var">🐣익명의방장</span>
+              </div>
+              <!-- CHAT HEADCOUNT -->
+              <div class="chat-headcount">
+                <span class="chat-headcount-var">👨‍🏫77/100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. HOT 5ZIRAP SECTION -->
+    <div class="hot-ozirap">
+      <!-- HOT 5ZIRAP SECTION TITLE -->
+      <div class="hot-ozirap-title">
+        <h2>🌶️ HOT - 5ZIRAP</h2>
+      </div>
+      <!-- HOT 5ZIRAP CONTAINER -->
+      <div class="hot-ozirap-container">
+        <!-- 2-1. HOT POSTS RANK -->
+        <div class="hot-post-rank">
+          <!-- 2-1-1. HOT POST RANK TABLE -->
+          <div class="hot-post-rank-inner">
+            <!-- 2-1-1-L. POSTS RANK TAB LISTS -->
+            <ul class="hot-post-rank-tabs">
+              <li class="tab-link current" data-tab="tab-chat">💬Chat</li>
+              <li class="tab-link" data-tab="tab-fashion">👜Fashion</li>
+              <li class="tab-link" data-tab="tab-cooking">🍝Cooking</li>
+            </ul>
+            <!-- 2-1-1-L-a. POSTS RANK TABS CONTENTS : CHAT -->
+            <div id="tab-chat" class="tab-contents-box current">
+              <!-- 여기에 HOT POST : CHAT 데이터가 들어옴 -->
+            </div>
+            <!-- 2-1-1-L-b. POSTS RANK TABS CONTENTS : FASHION -->
+            <div id="tab-fashion" class="tab-contents-box">
+              <!-- 여기에 HOT POST : FASHION 데이터가 들어옴 -->
+            </div>
+            <!-- 2-1-1-L-c. POSTS RANK TABS CONTENTS : COOKING -->
+            <div id="tab-cooking" class="tab-contents-box">
+              <!-- 여기에 HOT POST : COOKING 데이터가 들어옴 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-2. WEEKLY & TOTAL POINT RANK -->
+        <div class="point-rank">
+          <!-- 2-1-1. HOT POINT RANK TABLE -->
+          <div class="point-rank-inner">
+            <!-- 2-1-1-L. POINT RANK TAB LISTS -->
+            <ul class="point-rank-tabs">
+              <li class="point-tab-link current" data-tab="tab-weekly-rank">
+                🎖️Weekly
+              </li>
+              <li class="point-tab-link" data-tab="tab-total-rank">
+                🏆Total
+              </li>
+            </ul>
+            <!-- 2-1-1-L-a. POINT RANK TABS CONTENTS : WEEKLY -->
+            <div id="tab-weekly-rank" class="tab-ranking-box current">
+              <!-- 여기에 WEEKLY RANK 데이터가 들어옴 -->
+            </div>
+            <!-- 2-1-1-L-b. POINT RANK TABS CONTENTS : TOTAL -->
+            <div id="tab-total-rank" class="tab-ranking-box">
+              <!-- 여기에 TOTAL RANK 데이터가 들어옴 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-3. WEEKLY HASHTAG RANK -->
+        <div class="weekly-hashtag-rank">
+          <!-- 2-3-1. WEEKLY HASHTAG RANK TABLE -->
+          <div class="hashtag-rank-inner">
+            <!-- 2-1-1-L. HASHTAG RANK TAB LISTS -->
+            <ul class="hashtag-rank-tabs">
+              <li class="hashtag-tab-link current" data-tab="tab-hashtag-rank">
+                #Hashtag
+              </li>
+            </ul>
+            <!-- 2-1-1-L-a. HASHTAG RANK TABS CONTENTS : WEEKLY -->
+            <div id="tab-hashtag-rank" class="tab-hashtag-box current">
+              <!-- 여기에 HASHTAG RANK 데이터가 들어옴 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
+  <!-- FOOTER -->
   <footer>
     <div class="footer-menu">
       <button onclick="window.location.href='./chat-list.html'">
@@ -47,7 +420,9 @@
       <button id="alarmButton" class="footerAlarm">
         🔔 알람
       </button>
-      <button id="myPageButton" class="my-page-button">🏆 마이페이지</button>
+      <button id="myPageButton" class="my-page-button">
+        🏆 마이페이지
+      </button>
     </div>
   </footer>
 </body>

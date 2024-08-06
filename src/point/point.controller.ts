@@ -1,4 +1,11 @@
-import { Controller, Get, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PointService } from './point.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -39,20 +46,30 @@ export class PointController {
   }
 
   /** 누적 포인트 랭킹 조회
-   * 
+   *
    * @returns
    */
   @Get('ranks')
   async pointLank(@Query('num') num: number) {
-    return await this.pointService.pointLank(+num);
+    const data = await this.pointService.pointLank(+num);
+    return {
+      status: 200,
+      message: '종합 랭킹 조회에 성공했습니다.',
+      data: data,
+    };
   }
 
   /** 주간 포인트 랭킹 조회
-   * 
+   *
    * @returns
    */
   @Get('ranks-weekly')
   async pointWeeklyLank(@Query('num') num: number) {
-    return await this.pointService.pointWeeklyLank(+num);
+    const data = await this.pointService.pointWeeklyLank(+num);
+    return {
+      status: 200,
+      message: '주간 랭킹 조회에 성공했습니다.',
+      data: data,
+    };
   }
 }

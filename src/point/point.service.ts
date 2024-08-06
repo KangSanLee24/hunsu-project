@@ -196,7 +196,6 @@ export class PointService {
 
   //누적 포인트 랭킹 조회
   async pointLank(num: number) {
-
     const pointLank = await this.pointRepository.query(
       `
       select a.acc_point , b.nickname
@@ -207,32 +206,32 @@ export class PointService {
       `
     );
 
-    const data = pointLank.map(point => ({
+    const data = pointLank.map((point) => ({
       accPoint: point.acc_point,
-      nickname: point.nickname
+      nickname: point.nickname,
     }));
 
     return data;
   }
 
-  //주간 포인트 랭킹 조회
+  //주간 포인트 랭킹 조회 (매주 일요일~토요일))
   async pointWeeklyLank(num: number) {
-
     const pointLank = await this.pointLogRepository.query(
       `
-      select b.nickname, sum(a.point) as point
-      from point_logs a join users b
-      on a.user_id = b.id
-      where a.created_at >= NOW() - INTERVAL 7 DAY
-      GROUP by b.nickname 
-      order by point DESC
+      SELECT b.nickname, SUM(a.point) AS point
+      FROM point_logs a
+      JOIN users b ON a.user_id = b.id
+      WHERE a.created_at >=  DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 8) DAY)  
+        AND a.created_at < DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 1) DAY)
+      GROUP BY b.nickname 
+      ORDER BY point DESC
       limit ${num};
       `
     );
 
-    const data = pointLank.map(point => ({
+    const data = pointLank.map((point) => ({
       point: point.point,
-      nickname: point.nickname
+      nickname: point.nickname,
     }));
 
     return data;

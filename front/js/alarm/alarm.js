@@ -86,7 +86,6 @@ function renderAlarmList(data) {
   // 1. 기본 세팅
   alarmListElement.innerHTML = '';
   // 2. 불러온 데이터를 하나하나 HTML화
-  console.log(data);
   data.forEach((item) => {
     // 2-1. row 생성 준비
     const row = document.createElement('tr');
