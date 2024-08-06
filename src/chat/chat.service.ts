@@ -305,7 +305,10 @@ export class ChatService {
 
     //트랜잭션
     //로그, 이미지, 멤버, 방 삭제
-    await this.entityManager.transaction(async (manager) => {
+    //격리수준 -READ UNCOMMITED -> 트랜잭션 중 다른 데이터 삽입 가능
+    await this.entityManager.transaction(
+      "READ UNCOMMITTED",
+      async (manager) => {
       try {
 
         for (const room of findDeleteChat) {
