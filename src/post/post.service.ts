@@ -261,7 +261,6 @@ export class PostService {
       { id },
       { title, content, category }
     );
-    console.log('🚀 ~ PostService ~ update ~ updatedPost:', updatedPost);
     return await this.postRepository.findOneBy({ id });
   }
 
@@ -364,12 +363,12 @@ export class PostService {
     return uploadedImageUrls;
   }
 
-  /** content에서 ![](https://gangsanbucket.s3.ap-northeast-2.amazonaws.com ... ) 의 url만
+  /** content에서 ![](https://s3.ap-northeast-2.amazonaws.com ... ) 의 url만
    * 뽑아 배열 return하는 메소드**/
   async filterImage(content: string): Promise<string[]> {
     // 1. 정규표현식 정의
     const regex =
-      /!\[.*?\]\(https:\/\/gangsanbucket\.s3\.ap-northeast-2\.amazonaws\.com.*?\)/g;
+      /!\[.*?\]\((https:\/\/s3\.ap-northeast-2\.amazonaws\.com[^\)]+)\)/g;
 
     // 2. 정규표현식과 일치하는 모든 부분을 찾기
     const matches = content.match(regex) || [];
@@ -377,12 +376,13 @@ export class PostService {
     // 3. 각 match에서 URL 부분만 추출하여 배열로 저장
     const urls = matches.map((match) => {
       const urlMatch = match.match(
-        /https:\/\/gangsanbucket\.s3\.ap-northeast-2\.amazonaws\.com[^\)]*/
+        /https:\/\/s3\.ap-northeast-2\.amazonaws\.com[^\)]*/
       );
       return urlMatch ? urlMatch[0] : '';
     });
 
-    return urls;
+    // return urls;
+    return urls.filter((url) => url !== ''); // 빈 문자열 제거
   }
 
   /** oldUrls와 newUrls를 받고 oldUrls에만 존재하는 URL만 배열로 뽑아내는 메소드 **/
@@ -390,10 +390,6 @@ export class PostService {
     oldUrls: string[],
     newUrls: string[]
   ): Promise<string[]> {
-    // 배열이 아닌 경우 빈 배열 반환
-    if (!Array.isArray(oldUrls) || !Array.isArray(newUrls)) {
-      throw new TypeError('oldUrls and newUrls must be arrays');
-    }
     // newUrls 배열을 Set으로 변환하여 빠른 조회 가능하도록 함
     const newUrlSet = new Set(newUrls);
 
