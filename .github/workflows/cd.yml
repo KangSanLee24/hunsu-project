@@ -49,6 +49,10 @@ jobs:
             # Server Port
             echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" > .env
 
+            # FRONT
+            echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" >> .env
+            echo "API_LINK_URL=${{ secrets.API_LINK_URL }}" >> .env
+
             # Database
             echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
             echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
