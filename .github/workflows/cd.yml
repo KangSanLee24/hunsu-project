@@ -14,93 +14,29 @@ jobs:
     # 작업을 실행 할 VM의 OS 지정
     runs-on: ubuntu-22.04
 
-    # runtime 60분으로 확장
-    timeout-minutes: 60
+    # runtime 10분으로 확장
+    timeout-minutes: 10
 
     # 작업 내의 단위 작업(step)을 정의
     steps:
       # SSH 접속 후 명령을 통해서 배포 진행
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/ec2.key
+          chmod 400 ~/.ssh/ec2.key
+          cat >>~/.ssh/config <<END
+          Host ec2
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/ec2.key
+            StrictHostKeyChecking no
+          END
+        env:
+          SSH_USER: ${{ secrets.AWS_EC2_USERNAME }}
+          SSH_KEY: ${{ secrets.AWS_EC2_PEM_KEY }}
+          SSH_HOST: ${{ secrets.AWS_EC2_HOST }}
+
+      # SSH 접속 후 명령을 통해서 배포 진행
       - name: Deploy to EC2
-        uses: appleboy/ssh-action@master # SSH 접속 후 명령 실행을 위해 미리 정의 된 workflow를 불러와서 사용
-        with:
-          host: ${{ secrets.AWS_EC2_HOST }} # EC2 IP주소
-          username: ${{ secrets.AWS_EC2_USERNAME }} # EC2 사용자 (Ubuntu OS 설치 시 기본값은 ubuntu)
-          key: ${{ secrets.AWS_EC2_PEM_KEY }} # EC2 접속을 위한 pem 파일의 raw data
-          port: ${{ secrets.AWS_EC2_PORT }} # EC2 접속을 위한 SSH 포트
-          script: |
-
-            # node, npm, yarn 명령어 사용을 위한 설정 (.bashrc 파일에 추가되어 있는 내용)
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-            # yarn global 설치 한 pm2 명령을 위한 설정 (npm 사용 시 불필요)
-            # export PATH="$(yarn global bin):$PATH"
-
-            # 프로젝트 폴더로 이동
-            cd /home/ubuntu/hunsu-project
-
-            # main 브랜치로 이동
-            git switch main
-
-            # 최신 소스 코드를 가져옴
-            git pull
-
-            # .env 파일 생성
-            # ">" 는 생성 또는 덮어쓰기
-            # ">>" 는 내용 덧붙이기
-            # Server Port
-            echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" > .env
-
-            # FRONT
-            echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" >> .env
-            echo "API_LINK_URL=${{ secrets.API_LINK_URL }}" >> .env
-
-            # Database
-            echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
-            echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
-            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
-            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-            echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
-            echo "DB_SYNC=${{ secrets.DB_SYNC }}" >> .env
-
-            # Security
-            echo "PASSWORD_HASH_ROUNDS=${{ secrets.PASSWORD_HASH_ROUNDS }}" >> .env
-            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-            echo "ACCESS_SECRET_KEY=${{ secrets.ACCESS_SECRET_KEY }}" >> .env
-            echo "ACCESS_EXPIRES_IN=${{ secrets.ACCESS_EXPIRES_IN }}" >> .env
-            echo "REFRESH_SECRET_KEY=${{ secrets.REFRESH_SECRET_KEY }}" >> .env
-            echo "REFRESH_EXPIRES_IN=${{ secrets.REFRESH_EXPIRES_IN }}" >> .env
-
-            # Email Auth
-            echo "NODE_MAILER_ID=${{ secrets.NODE_MAILER_ID }}" >> .env
-            echo "NODE_MAILER_PASSWORD=${{ secrets.NODE_MAILER_PASSWORD }}" >> .env
-
-            # AWS
-            echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
-            echo "AWS_S3_ACCESS_KEY=${{ secrets.AWS_S3_ACCESS_KEY }}" >> .env
-            echo "AWS_S3_SECRET_ACCESS_KEY=${{ secrets.AWS_S3_SECRET_ACCESS_KEY }}" >> .env
-            echo "AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}" >> .env
-
-            # LOG-IN : NAVER
-            echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env 
-            echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env 
-            echo "NAVER_CALLBACK_URL=${{ secrets.NAVER_CALLBACK_URL }}" >> .env 
-            echo "NAVER_REDIRECT_URL=${{ secrets.NAVER_REDIRECT_URL }}" >> .env 
-
-            # 의존성 설치
-            # yarn --frozen-lockfile
-            npm ci
-
-            # 빌드 (ts 아니면 생략 가능)
-            # yarn build
-            npm run build
-
-            # PM2로 실행 중인 서버 중지 및 삭제
-            pm2 delete hunsu-project
-
-            # 서버를 PM2로 실행
-            pm2 --name hunsu-project start dist/main.js
-
-            # PM2 설정 저장 (선택사항, startup 설정을 해놨다면)
-            pm2 save
+        run: ssh ec2 'cd /home/ubuntu/hunsu-project && git switch main && git pull && echo "${{ secrets.ENV }}" > .env && ./scripts/run.sh'
