@@ -56,7 +56,7 @@ export class AwsService {
 
     const command = new DeleteObjectCommand({
       Bucket: this.configService.get('AWS_S3_BUCKET_NAME'), // S3 버킷 이름
-      Key: `chats/${fileName}`, // 삭제될 파일의 이름
+      Key: `posts/${fileName}`, // 삭제될 파일의 이름
     });
 
     try {
