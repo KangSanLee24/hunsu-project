@@ -15,7 +15,7 @@ import { LogIn } from 'src/decorators/log-in.decorator';
 @ApiTags('11. 포인트 API')
 @Controller('points')
 export class PointController {
-  constructor(private readonly pointService: PointService) {}
+  constructor(private readonly pointService: PointService) { }
 
   // 출석 체크
   @UseGuards(AuthGuard('jwt'))

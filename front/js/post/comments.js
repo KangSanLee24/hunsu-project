@@ -8,7 +8,6 @@ const commentList = document.getElementById('comment-list');
 // URL에서 게시글 ID를 가져옴
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get('id');
-console.log('🚀 ~ postId:', postId);
 
 // 댓글 작성 함수
 async function createComment(content) {
@@ -27,6 +26,8 @@ async function createComment(content) {
     if (response.status === 201) {
       addCommentToList(result.data);
       commentContentInput.value = ''; // 입력란 초기화
+      // 페이지 새로고침
+      window.location.reload();
     } else {
       alert(result.message);
     }
@@ -47,6 +48,7 @@ async function likeComment(commentId) {
         },
       }
     );
+
     if (!response.ok) throw new Error('댓글 좋아요에 실패했습니다.');
     return await response.json();
   } catch (error) {
@@ -219,12 +221,13 @@ commentList.addEventListener('click', async (event) => {
     const recommentContent = recommentInput.querySelector('textarea').value;
     const commentId = event.target.closest('li').querySelector('.recomment-btn')
       .dataset.commentId;
-    console.log('🚀 ~ commentList.addEventListener ~ commentId:', commentId);
 
     if (recommentContent) {
       await submitRecomment(commentId, recommentContent);
       recommentInput.style.display = 'none'; // 입력 후 숨김
       window.location.reload();
+    } else {
+      alert('대댓글 내용을 입력하세요.');
     }
   }
 });

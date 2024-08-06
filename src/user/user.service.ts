@@ -9,6 +9,8 @@ import { Repository } from 'typeorm';
 
 import { Point } from 'src/point/entities/point.entity';
 import { User } from './entities/user.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
+import { Post } from 'src/post/entities/post.entity';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { USER_MESSAGES } from 'src/constants/user-message.constant';
 import { PointLog } from '../point/entities/point-log.entity';
@@ -27,8 +29,14 @@ export class UserService {
     private pointRepository: Repository<Point>,
 
     @InjectRepository(PointLog)
-    private pointLogRepository: Repository<PointLog>
-  ) {}
+    private pointLogRepository: Repository<PointLog>,
+
+    @InjectRepository(Post)
+    private postRepository: Repository<Post>,
+
+    @InjectRepository(Comment)
+    private commentRepository: Repository<Comment>,
+  ) { }
 
   /** 내 정보 조회(R) API **/
   async myProfile(user: User) {
@@ -50,6 +58,43 @@ export class UserService {
 
     // 4. 반환
     return data;
+  }
+
+  /** 사용자가 작성한 게시글 조회 메소드 **/
+  async findAllPostByUser(userId: number) {
+    const posts = await this.postRepository.find({
+      where: { userId },
+      relations: ['user', 'comments'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return posts.map(post => ({
+      id: post.id,
+      userId: post.userId,
+      nickname: post.user.nickname,
+      title: post.title,
+      numComments: post.comments.length,
+      category: post.category,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+    }));
+  }
+
+  /** 사용자가 작성한 댓글 조회 메소드 **/
+  async findAllCommentByUser(userId: number) {
+    const comments = await this.commentRepository.find({
+      where: { userId },
+      relations: ['post'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return comments.map(comment => ({
+      id: comment.id,
+      postId: comment.postId,
+      postTitle: comment.post.title, // 게시글 제목 추가
+      content: comment.content,
+      createdAt: comment.createdAt,
+    }));
   }
 
   /** 내 정보 수정(U) API **/

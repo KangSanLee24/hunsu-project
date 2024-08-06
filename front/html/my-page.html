@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>마이 페이지</title>
+    <link rel="stylesheet" href="/styles/style.css" />
+    <link rel="stylesheet" href="/styles/my-page.css" />
+    <script type="module" src="/js/common/header.js"></script>
+    <script type="module" src="/js/my-page/my-page.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">5ZIRAP</div>
+        <nav>
+            <ul>
+                <li><a href="./log-in.html">로그인</a></li>
+                <li><a href="./sign-up.html">회원가입</a></li>
+                <li><a id="userNickname" style="display:none;"></a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="profile">
+            <h2 id="profileNickname">닉네임</h2>
+            <p id="level">LV.1 멤버</p>
+            <div class="points">
+                <span id="totalPoints">포인트: 0</span>
+            </div>
+        </section>
+
+        <!-- 새로운 표 섹션 추가 -->
+        <section class="tasks">
+            <h2>일일퀘스트</h2>
+            <table class="task-table">
+                <thead>
+                    <tr>
+                        <th>출석체크</th>
+                        <th>게시글</th>
+                        <th>게시글 좋아요</th>
+                        <th>댓글</th>
+                        <th>댓글 좋아요</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="task-current" id="attention">0/1</span></td>
+                        <td><span class="task-current" id="post">0/2</span></td>
+                        <td><span class="task-current" id="postLike">0/5</span></td>
+                        <td><span class="task-current" id="comment">0/5</span></td>
+                        <td><span class="task-current" id="commentLike">0/10</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 내가 작성한 게시글 섹션 추가 -->
+        <section class="my-posts">
+            <h2>내가 작성한 게시글</h2>
+            <ul id="myPostsList" class="item-list"></ul>
+        </section>
+
+        <!-- 내가 작성한 댓글 섹션 추가 -->
+        <section class="my-comments">
+            <h2>내가 작성한 댓글</h2>
+            <ul id="myCommentsList" class="item-list"></ul>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-menu">
+            <button onclick="window.location.href='./chat-list.html'">
+                💬 Live Chat
+            </button>
+            <button onclick="window.location.href='./post-list.html'">
+                📝 게시판
+            </button>
+            <button onclick="window.location.href='./main.html'">🏠 홈으로</button>
+            <button id="alarmButton" class="footerAlarm">
+                🔔 알람
+            </button>
+            <button id="myPageButton" class="my-page-button">🏆 마이페이지</button>
+        </div>
+    </footer>
+</body>
+
+</html>
