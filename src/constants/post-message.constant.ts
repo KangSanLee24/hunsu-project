@@ -1,7 +1,6 @@
-import { Delete } from '@nestjs/common';
-
 export const POST_MESSAGE = {
   POST: {
+    UNAUTHORIZED: '권한이 없습니다.',
     NOT_FOUND: '게시글이 존재하지 않습니다.',
     // 게시글 생성
     CREATE: {
@@ -13,25 +12,87 @@ export const POST_MESSAGE = {
 
     // 게시글 목록 조회
     READ_ALL: {
-      SUCCESS: '게시글 목록 조회에 성공하습니다.',
+      SUCCESS: '게시글 목록 조회에 성공하였습니다.',
     },
     // 게시글 상세 조회
     READ_DETAIL: {
       SUCCESS: '게시글 상세 조회에 성공하였습니다.',
     },
+
+    // 화제글 목록 조회
+    READ_HOT: {
+      SUCCESS: '화제글 목록 조회에 성공하였습니다.',
+    },
     // 게시글 수정
     UPDATE: {
       SUCCESS: '게시글 수정에 성공하였습니다.',
+      FAILURE: {
+        FORBIDDEN: '해당 댓글을 수정할 권한이 없습니다.',
+      },
     },
     // 게시글 삭제
     DELETE: {
-      SUCCESS: '댓글 삭제에 성공하였습니다.',
+      SUCCESS: '게시글 삭제에 성공하였습니다.',
+      FAILURE: {
+        FORBIDDEN: '해당 게시글을 삭제할 권한이 없습니다.',
+      },
+    },
+    // 게시글 강제 삭제
+    FORCE_DELETE: {
+      SUCCESS: '게시글 강제 삭제에 성공하였습니다.',
+      FAILURE: {
+        FORBIDDEN: '관리자 계정이 아닙니다.',
+      },
     },
     // 이미지 업로드
     IMAGE: {
       UPLOAD: {
-        SUCCESS: '이미지 업로드에 성공하습니다.',
+        SUCCESS: '이미지 업로드에 성공하였습니다.',
       },
+    },
+  },
+  // 게시글 좋아요
+  LIKE: {
+    // 게시글 좋아요 조회
+    FIND: {
+      SUCCESS: '게시글 좋아요 조회에 성공하였습니다.',
+    },
+    // 게시글 좋아요 생성
+    CREATE: {
+      SUCCESS: '게시글 좋아요 생성에 성공하였습니다.',
+      FAILURE: {
+        NO_SELF: '자신의 게시글에 좋아요를 누를 수 없습니다.',
+        ALREADY: '이미 좋아요를 누른 게시글입니다.',
+      }
+    },
+    // 게시글 좋아요 삭제
+    DELETE: {
+      SUCCESS: '게시글 좋아요 삭제에 성공하였습니다.',
+      FAILURE: {
+        NO_LIKE: '삭제할 좋아요가 존재하지 않습니다.',
+      }
+    },
+  },
+  // 게시글 싫어요
+  DISLIKE: {
+    // 게시글 싫어요 조회
+    FIND: {
+      SUCCESS: '게시글 싫어요 조회에 성공하였습니다.',
+    },
+    // 게시글 싫어요 생성
+    CREATE: {
+      SUCCESS: '게시글 싫어요 생성에 성공하였습니다.',
+      FAILURE: {
+        NO_SELF: '자신의 게시글에 싫어요를 누를 수 없습니다.',
+        ALREADY: '이미 싫어요를 누른 게시글입니다.',
+      }
+    },
+    // 게시글 싫어요 삭제
+    DELETE: {
+      SUCCESS: '게시글 싫어요 삭제에 성공하였습니다.',
+      FAILURE: {
+        NO_DISLIKE: '삭제할 좋아요가 존재하지 않습니다.',
+      }
     },
   },
 };

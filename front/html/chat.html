@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat</title>
+  <link rel="stylesheet" href="/styles/style.css" />
+  <link rel="stylesheet" href="/styles/chat.css" />
+</head>
+
+<body>
+  <header>
+    <div class="logo">5ZIRAP</div>
+    <nav>
+      <ul>
+        <li><a href="./log-in.html">로그인</a></li>
+        <li><a href="./sign-up.html">회원가입</a></li>
+        <li><a id="userNickname"></a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="chat">
+        <div class="chat-header">
+          <span id="roomName" class="chatting room name"></span>
+        </div>
+        <div class="chat-message-list" id="chatscroll" style="overflow: auto">
+          <div id="fixedImage" class="fixed-image" style="display:none;">
+            <div class="fixed-header-container">
+              <div class="fixed-header">📌 고정된 이미지</div>
+              <div class="author-info"><span class="author-bubble" id="authorName"></span></div>
+            </div>
+            <img id="fixedImageContent" style="width: 30%; height: auto; max-height: 200px;" />
+          </div>
+          <!-- 메시지들이 여기에 동적으로 삽입됩니다. -->
+        </div>
+        <div class="chat-composer">
+          <div class="chat-composer-wrapper">
+            <div class="image-preview" id="imagePreview"></div>
+            <input type="file" id="fileInput" class="file-input" />
+            <input type="text" id="messageInput" class="chat-composer-input" placeholder="메시지를 입력하세요" />
+            <label for="fileInput" class="file-upload-icon">📁</label>
+          </div>
+          <button id="sendButton" class="send-button">전송</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-menu">
+      <button onclick="window.location.href='./chat-list.html'">
+        💬 Live Chat
+      </button>
+      <button onclick="window.location.href='./post-list.html'">
+        📝 게시판
+      </button>
+      <button onclick="window.location.href='./main.html'">🏠 홈으로</button>
+      <button class="footerAlarm" onclick="window.location.href='./alarm.html'">
+        🔔 알람
+      </button>
+      <button onclick="window.location.href='./my-page.html'">
+        🏆 마이페이지
+      </button>
+    </div>
+  </footer>
+
+  <script type="module" src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+  <script type="module" src="/js/common/header.js"></script>
+  <script type="module" src="/js/chat/chat.js"></script>
+</body>
+
+</html>

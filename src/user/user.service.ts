@@ -2,20 +2,25 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  ForbiddenException
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Point } from './entities/point.entity';
+import { Point } from 'src/point/entities/point.entity';
 import { User } from './entities/user.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
+import { Post } from 'src/post/entities/post.entity';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { USER_MESSAGES } from 'src/constants/user-message.constant';
-import { PointLog } from './entities/point-log.entity';
+import { PointLog } from '../point/entities/point-log.entity';
 import { SoftdeleteUserDto } from './dtos/softdelete-user.dto';
 
 @Injectable()
 export class UserService {
+  updateUserPassword(user: User) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -24,7 +29,13 @@ export class UserService {
     private pointRepository: Repository<Point>,
 
     @InjectRepository(PointLog)
-    private pointLogRepository: Repository<PointLog>
+    private pointLogRepository: Repository<PointLog>,
+
+    @InjectRepository(Post)
+    private postRepository: Repository<Post>,
+
+    @InjectRepository(Comment)
+    private commentRepository: Repository<Comment>,
   ) { }
 
   /** 내 정보 조회(R) API **/
@@ -42,10 +53,48 @@ export class UserService {
       point: point.accPoint,
       role: profile.role,
       joinDate: profile.createdAt,
+      id: profile.id,
     };
 
     // 4. 반환
     return data;
+  }
+
+  /** 사용자가 작성한 게시글 조회 메소드 **/
+  async findAllPostByUser(userId: number) {
+    const posts = await this.postRepository.find({
+      where: { userId },
+      relations: ['user', 'comments'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return posts.map(post => ({
+      id: post.id,
+      userId: post.userId,
+      nickname: post.user.nickname,
+      title: post.title,
+      numComments: post.comments.length,
+      category: post.category,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+    }));
+  }
+
+  /** 사용자가 작성한 댓글 조회 메소드 **/
+  async findAllCommentByUser(userId: number) {
+    const comments = await this.commentRepository.find({
+      where: { userId },
+      relations: ['post'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return comments.map(comment => ({
+      id: comment.id,
+      postId: comment.postId,
+      postTitle: comment.post.title, // 게시글 제목 추가
+      content: comment.content,
+      createdAt: comment.createdAt,
+    }));
   }
 
   /** 내 정보 수정(U) API **/
@@ -171,7 +220,9 @@ export class UserService {
 
   /** 회원탈퇴 API*/
   async softdeleteUser(user: User, softdeleteUserDto: SoftdeleteUserDto) {
-    const foundUser = await this.userRepository.findOne({ where: { id: user.id } });
+    const foundUser = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
 
     // 유저가 존재하는지 확인
     if (!foundUser) {
@@ -179,7 +230,7 @@ export class UserService {
     }
 
     // 유저 정보를 업데이트
-    user.nickname = `탈퇴한 회원입니다 : ${user.nickname}`
+    user.nickname = `탈퇴한 회원입니다 : ${user.nickname}`;
     user.deletedAt = new Date();
 
     return this.userRepository.save(user);

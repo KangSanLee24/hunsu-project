@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>글쓰기</title>
+    <link
+      rel="stylesheet"
+      href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"
+    />
+    <link rel="stylesheet" href="/styles/style.css" />
+    <link rel="stylesheet" href="/styles/post-create.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo">5ZIRAP</div>
+      <nav>
+        <ul>
+          <li><a href="./log-in.html">로그인</a></li>
+          <li><a href="./sign-up.html">회원가입</a></li>
+          <li><a id="userNickname"></a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <h1>게시글 작성</h1>
+      <input type="text" id="post-title" placeholder="제목을 입력하세요." />
+      <!-- 제목 입력 -->
+      <select id="post-category">
+        <option value="CHAT">잡담</option>
+        <option value="FASHION">패션</option>
+        <option value="COOKING">요리</option>
+      </select>
+      <div class="editor-text-box" id="editor"></div>
+      <!-- 에디터가 렌더링될 DIV -->
+      <button id="post-submit">게시글 작성</button>
+      <!-- 게시글 제출 버튼 -->
+    </main>
+
+    <footer>
+      <div class="footer-menu">
+        <button onclick="window.location.href='./chat-list.html'">
+          💬 Live Chat
+        </button>
+        <button onclick="window.location.href='./post-list.html'">
+          📝 게시판
+        </button>
+        <button onclick="window.location.href='./main.html'">🏠 홈으로</button>
+        <button
+          class="footerAlarm"
+          onclick="window.location.href='./alarm.html'"
+        >
+          🔔 알람
+        </button>
+        <button onclick="window.location.href='./my-page.html'">
+          🏆 마이페이지
+        </button>
+      </div>
+    </footer>
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script type="module" src="/js/common/header.js"></script>
+    <script type="module" src="/js/post/post-create.js"></script>
+    <script>
+      // 전역변수로 이미지 URL 배열 선언
+      window.imageUrls = []; // 전역변수로 설정
+
+      const editor = new toastui.Editor({
+        el: document.querySelector('#editor'), // 에디터를 적용할 요소 (컨테이너)
+        height: 'auto', // 에디터 영역의 높이 값 (OOOpx || auto)
+        initialEditType: 'markdown', // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
+        initialValue: '내용을 입력해 주세요.', // 내용의 초기 값으로, 반드시 마크다운 문자열 형태여야 함
+        previewStyle: 'vertical', // 마크다운 프리뷰 스타일 (tab || vertical)
+        placeholder: '내용을 입력해 주세요.',
+        hooks: {
+          async addImageBlobHook(blob, callback) {
+            try {
+              const formData = new FormData();
+              formData.append('files', blob);
+              const response = await fetch(`/api/posts/images`, {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+                },
+                body: formData,
+              });
+
+              const result = await response.json();
+              // URL을 배열에 추가
+              window.imageUrls.push(result.data[0]); // 업로드된 이미지 URL 저장
+              callback(result.data[0], 'image alt attribute');
+            } catch (error) {
+              console.error('업로드 실패 : ', error);
+            }
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

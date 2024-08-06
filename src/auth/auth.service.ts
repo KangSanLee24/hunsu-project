@@ -14,19 +14,28 @@ import _ from 'lodash';
 
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
-import { Point } from 'src/user/entities/point.entity';
+import { Point } from 'src/point/entities/point.entity';
 
 import { SignUpDto } from './dtos/sign-up.dto';
 import { LogInDto } from './dtos/log-in.dto';
 import { FindIdDto } from './dtos/find-id.dto';
 import { RePasswordDto } from './dtos/re-password.dto';
+import { VerifyPasswordDto } from './dtos/verify-password.dto';
+import { UpdatePasswordDto } from './dtos/update-password.dto';
+import { VerifyEmailDto } from './dtos/verify-email.dto';
+
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshToken } from './entities/refresh-token.entity';
-import { VerifyEmailDto } from './dtos/verify-email.dto';
+import { VerifyPassword } from './entities/verify-password.entity';
 import { VerifyEmail } from 'src/mail/entities/verify-email.entity';
 import { MailService } from 'src/mail/mail.service';
+import { SocialType } from 'src/user/types/social-type.type';
+import { PointService } from 'src/point/point.service';
+import { PointType } from 'src/point/types/point.type';
+import { SocialData } from './entities/social-data.entity';
+import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -38,6 +47,7 @@ export class AuthService {
     private userService: UserService,
     private mailService: MailService,
     private readonly jwtService: JwtService,
+    private pointService: PointService,
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -45,11 +55,17 @@ export class AuthService {
     @InjectRepository(RefreshToken)
     private refreshTokenRepository: Repository<RefreshToken>,
 
-    @InjectRepository(VerifyEmail)
-    private verifyEmailRepository: Repository<VerifyEmail>
-  ) { }
+    @InjectRepository(SocialData)
+    private socialDataRepository: Repository<SocialData>,
 
-  /** 회원 가입(sign-up) API **/
+    @InjectRepository(VerifyEmail)
+    private verifyEmailRepository: Repository<VerifyEmail>,
+
+    @InjectRepository(VerifyPassword)
+    private verifyPasswordRepository: Repository<VerifyPassword>
+  ) {}
+
+  /** 1. 회원 가입(sign-up) API **/
   async signUp(signUpDto: SignUpDto) {
     // 0. dto에서 데이터 꺼내기
     const { email, nickname, password, passwordConfirm } = signUpDto;
@@ -104,14 +120,21 @@ export class AuthService {
       // 4-3-성공시. 트랜잭션 된 상태를 release하면서 트랜잭션 최종완료
       await queryRunner.release();
 
-      // 5. 데이터 가공
+      // 5. 회원가입 point 50 추가
+      await this.pointService.savePointLog(
+        newMember.id,
+        PointType.SIGN_UP,
+        true
+      );
+
+      // 6. 데이터 가공
       const newMemberData = {
         email: newMember.email,
         nickname: newMember.nickname,
         role: newMember.role,
         point: newPoint.accPoint,
       };
-      // 6. 리턴
+      // 7. 리턴
       return newMemberData;
     } catch (err) {
       // 4-2-4. 실패: 도중에 에러 발생시: rollback
@@ -119,17 +142,18 @@ export class AuthService {
       // 4-3-실패시. 롤백된 상태를 release하면서 트랜잭션 최종완료
       await queryRunner.release();
       // 4-4. 이메일 중복 예외 처리
-      if (err instanceof QueryFailedError && err.driverError.code === 'ER_DUP_ENTRY') {
-        throw new ConflictException(
-          AUTH_MESSAGES.SIGN_UP.FAILURE.RESTORE
-        );
+      if (
+        err instanceof QueryFailedError &&
+        err.driverError.code === 'ER_DUP_ENTRY'
+      ) {
+        throw new ConflictException(AUTH_MESSAGES.SIGN_UP.FAILURE.RESTORE);
       }
       // 5. 에러처리
       throw err;
     }
   }
 
-  /** 로그인(log-in) API **/
+  /** 2. 로그인(log-in) API **/
   async logIn(logInDto: LogInDto) {
     // 0. dto에서 데이터 꺼내기
     const { email, password } = logInDto;
@@ -317,47 +341,281 @@ export class AuthService {
     await this.verifyEmailRepository.delete({ email });
 
     // 4. 해당 email에 대한 인증여부를 true로 변경
+    const user: User = await this.userService.findByEmail(email);
     await this.userRepository.update(
       { email },
       {
         verifiedEmail: true,
       }
     );
+
     // 5. 결과 반환
     return {
       verified: email,
     };
   }
 
-  // /** 6. 비밀번호 바꾸기 API **/
-  // async rePassword(rePasswordDto: RePasswordDto) {
-  //   // 0. dto에서 데이터 꺼내기
-  //   const { password, passwordConfirm } = rePasswordDto;
+  /** 6-1-2. 소셜로그인 - 네이버 콜백 **/
+  async logInNaver(req: any) {
+    try {
+      // 0. 필요한 정보 받아오기 + 생성
+      const naverUser = req.user;
+      const hashedPassword = await hash(naverUser.id, 10);
+      const user = {
+        email: `${naverUser.id}@naver.com`,
+        nickname: `NAVER${naverUser.id}`,
+        password: hashedPassword,
+        verifyEmail: true,
+        socialId: naverUser.id,
+        type: SocialType.NAVER,
+      };
 
-  //   // 2. 내 정보 수정
-  //   const user: User = await this.userService.update(
-  //     { password: user.password },
-  //     { nickname: updateUserDto.nickname }
-  //   );
+      // 1. 가입한 회원인지 확인
+      const isExistingUser = await this.userRepository.findOneBy({
+        email: user.email,
+      });
+      // 1-1. 가입한 회원이 아니라면 소셜계정으로 회원가입
 
-  //   // 4. 데이터 가공
-  //   const data = {
-  //     before: {
-  //       nickname: user.nickname,
-  //     },
-  //     after: {
-  //       nickname: updateUserDto.nickname,
-  //     },
-  //   };
+      let newMember: User;
 
-  //   // 5. 반환
-  //   return data;
-  // }
+      if (!isExistingUser) {
+        // 2. 트랜잭션 시작
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        // 3. 트랜잭션 묶기
+        try {
+          // 3-1. 신규 회원 데이터 생성 (회원 가입)
+          newMember = await queryRunner.manager.save(User, {
+            email: user.email,
+            nickname: user.nickname,
+            password: user.password,
+            verifiedEmail: user.verifyEmail,
+            socialId: user.socialId,
+            type: user.type,
+          });
+          // 3-2. 포인트 테이블 생성 (포인트)
+          const newPoint = await queryRunner.manager.save(Point, {
+            userId: newMember.id,
+            accPoint: 0,
+          });
 
+          // 3-3. 성공: 트랜잭션 묶음 종료: commit
+          await queryRunner.commitTransaction();
+          // 3-4-성공시. 트랜잭션 된 상태를 release하면서 트랜잭션 최종완료
+          await queryRunner.release();
+        } catch (err) {
+          // 3-3. 실패: 도중에 에러 발생시: rollback
+          await queryRunner.rollbackTransaction();
+          // 3-4-실패시. 롤백된 상태를 release하면서 트랜잭션 최종완료
+          await queryRunner.release();
 
-  /** 7. 아이디 찾기(find-id) API **/
+          // 3-5. 에러처리
+          throw new UnauthorizedException(
+            '[네이버 로그인] 가입에서 오류가 발생하였습니다.'
+          );
+        }
+
+        // 4. 회원가입 point 50 추가
+        await this.pointService.savePointLog(
+          newMember.id,
+          PointType.SIGN_UP,
+          true
+        );
+      }
+
+      // 5. 로그인
+      const logInDto = {
+        email: user.email,
+        password: naverUser.id,
+      };
+      const data = await this.logIn(logInDto);
+
+      // 6. 리다이렉트용 데이터 로직
+      // 6-1. 4자리 난수 형성
+      const certification: number = await this.createCertification();
+      // 6-2. 소셜 로그인 임시 토큰 테이블에 저장
+      const temper = await this.socialDataRepository.save({
+        userId: isExistingUser.id,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        certification: certification,
+      });
+
+      // 7. 데이터
+      const newData = {
+        id: temper.userId,
+        certification: temper.certification,
+      };
+
+      // 8. 반환(유저아이디 + 인증번호만)
+      return newData;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  /** 6-1-3. 소셜로그인 - 네이버 리콜 (임시 데이터) **/
+  async logInNaverRC(userId, certification) {
+    // 1. 유저id + 인증번호로 토큰 받아오기
+    const data = await this.socialDataRepository.findOne({
+      where: {
+        userId,
+        certification,
+      },
+    });
+    // 2. 필요 없어진 임시 토큰 데이터 삭제
+    await this.socialDataRepository.delete({
+      userId,
+      certification,
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+    });
+    // 3. 토큰 전송
+    const tokens = {
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+    };
+    // 4. 반환
+    return tokens;
+  }
+
+  /** 6-2. 소셜로그인 - 구글 **/
+  async logInGoogle() {}
+
+  /** 7. 비밀번호 변경 요청 API **/
+  async rePassword(rePasswordDto: RePasswordDto) {
+    // 0. dto에서 데이터 꺼내기
+    const { email } = rePasswordDto;
+
+    // 1. 해당 email로 가입된 사용자가 있는지 확인
+    const user: User = await this.userService.findByEmail(email);
+
+    // 2. 해당 user가 없다면 에러메시지(404)
+    if (_.isNil(user)) {
+      throw new NotFoundException(AUTH_MESSAGES.RE_PASSWORD.FAILURE.NO_USER);
+    }
+
+    // 3. 이메일 인증을 아직 하지 않았다면 에러메시지
+    if (user.verifiedEmail !== true) {
+      throw new UnauthorizedException(
+        AUTH_MESSAGES.RE_PASSWORD.FAILURE.NOT_VERIFIED
+      );
+    }
+
+    // 4. 인증 이메일 발송
+    await this.mailService.sendEmail(user.email);
+  }
+
+  /** 8. 비밀번호 변경 인증 API **/
+  async verifyPassword(verifyPasswordDto: VerifyPasswordDto) {
+    // 0. dto에서 데이터 추출
+    const { email, certification } = verifyPasswordDto;
+
+    // 1. 해당 email로 인증번호를 받은 것이 맞는지 확인
+    const isExistingEmail = await this.verifyPasswordRepository.findOneBy({
+      email,
+    });
+    // 1-1. 그렇지 않다면 에러처리
+    if (!isExistingEmail) {
+      throw new BadRequestException(
+        AUTH_MESSAGES.VERIFY_PASSWORD.FAILURE.WRONG_EMAIL
+      );
+    }
+
+    // 2. 인증번호가 일치하는지 검증. 불일치 시 에러처리
+    if (certification !== isExistingEmail.certification) {
+      throw new BadRequestException(
+        AUTH_MESSAGES.VERIFY_PASSWORD.FAILURE.WRONG_CERTIFICATION
+      );
+    }
+
+    // 3. 더이상 사용하지 않는 데이터 삭제
+    await this.verifyEmailRepository.delete({ email });
+
+    // 4. 해당 email에 대한 인증여부를 true로 변경
+    const verifyPassword = await this.verifyPasswordRepository.findOneBy({
+      email,
+    });
+    if (!verifyPassword.isCertified) {
+      await this.verifyPasswordRepository.update(
+        { email },
+        {
+          isCertified: true,
+        }
+      );
+    }
+
+    // 5. 결과 반환
+    return {
+      verified: email,
+    };
+  }
+
+  /** 9. 비밀번호 변경 API **/
+  async updatePassword(updatePasswordDto: UpdatePasswordDto) {
+    // 0. dto에서 데이터 꺼내기
+    const { email, password, passwordConfirm } = updatePasswordDto;
+
+    // 1. 해당 email로 가입된 사용자가 있는지 확인
+    const verifyPassword = await this.verifyPasswordRepository.findOneBy({
+      email,
+    });
+
+    // 1-1. 해당 user가 없다면 에러메시지(404)
+    if (_.isNil(verifyPassword)) {
+      throw new NotFoundException(
+        AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.NO_VERIFYING
+      );
+    }
+
+    // 2. 비밀번호 변경 인증을 완료한지 확인
+    if (!verifyPassword.isCertified) {
+      throw new ConflictException({
+        message: AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.NO_CERTIFIED,
+      });
+    }
+
+    // 3. 비밀번호 일치 여부 확인
+    if (password !== passwordConfirm) {
+      throw new ConflictException({
+        message: AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.PASSWORD_MISMATCH,
+      });
+    }
+
+    // 4. 비밀번호 해시화
+    const hashedPassword = await hash(password, 10);
+
+    // 5. 비밀번호 업데이트
+    await this.userRepository.update(
+      { email },
+      {
+        password: hashedPassword,
+      }
+    );
+
+    // 6. 데이터 가공
+    const data = {
+      before: {
+        password: password,
+      },
+      after: {
+        password: hashedPassword,
+      },
+    };
+
+    // 7. 임시로 생성했던 verify_passwords 테이블의 레코드 삭제
+    await this.verifyPasswordRepository.delete({ email });
+
+    // 8. 결과 반환
+    return {
+      message: '비밀번호가 성공적으로 변경되었습니다.',
+      data,
+    };
+  }
+
+  /** 10. 아이디 찾기(find-id) API **/
   async findId(findIdDto: FindIdDto) {
-
     // 0. dto에서 데이터 꺼내기
     const { nickname } = findIdDto;
 
@@ -373,5 +631,15 @@ export class AuthService {
     return {
       greeting: `당신의 아이디는 ${user.email} 입니다!`,
     };
+  }
+
+  /** 0. Token 발급기 **/
+  async tokenMaker(payload, refresh: boolean) {}
+
+  /** 인증 코드 생성 **/
+  async createCertification() {
+    // 1. 1000 ~ 9999 사이 랜덤수 생성
+    const certification = Math.floor(1000 + Math.random() * 8999);
+    return certification;
   }
 }

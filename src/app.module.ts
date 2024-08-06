@@ -16,14 +16,26 @@ import { AwsModule } from './aws/aws.module';
 import { MailModule } from './mail/mail.module';
 import { ChatModule } from './chat/chat.module';
 import { EventsModule } from './events/events.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { AlarmModule } from './alarm/alarm.module';
+import { PointModule } from './point/point.module';
+import { HashtagModule } from './hashtag/hashtag.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ScheduleService } from './schedule/schedule.service'; 
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'front'), // public 폴더를 정적 파일의 루트로 설정
+      serveRoot: '/', // 기본 URL 경로를 '/'로 설정
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: configValidationSchema,
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
+    ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
     PostModule,
@@ -34,9 +46,12 @@ import { EventsModule } from './events/events.module';
     AwsModule,
     MailModule,
     ChatModule,
-    EventsModule
+    EventsModule,
+    AlarmModule,
+    PointModule,
+    HashtagModule,
   ],
   controllers: [AppController],
-  providers: [AwsService],
+  providers: [AwsService, ScheduleService],
 })
 export class AppModule {}

@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { ChatMember } from './chat-member.entity';
 import { ChatLog } from './chat-log.entity';
+import { ChatImage } from './chat-image.entity';
 
 @Entity('chat_rooms')
 export class ChatRoom {
@@ -37,8 +38,14 @@ export class ChatRoom {
   @CreateDateColumn()
   createdAt: Date;
 
+  @Column({ type: 'boolean', name: 'is_deleted', default: false})
+  isDeleted: boolean;
+
   @OneToMany(() => ChatMember, (chatMember) => chatMember.chatRooms, { cascade: true })
   chatMembers: ChatMember[];
+
+  @OneToMany(() => ChatImage, (chatImage) => chatImage.chatRooms, { cascade: true })
+  chatImages: ChatImage[];
 
   @OneToMany(() => ChatLog, (chatLog) => chatLog.chatRooms, { cascade: true })
   chatLogs: ChatLog[];

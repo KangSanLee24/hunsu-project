@@ -75,6 +75,12 @@ jobs:
             echo "AWS_S3_SECRET_ACCESS_KEY=${{ secrets.AWS_S3_SECRET_ACCESS_KEY }}" >> .env
             echo "AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}" >> .env
 
+            # LOG-IN : NAVER
+            echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env 
+            echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env 
+            echo "NAVER_CALLBACK_URL=${{ secrets.NAVER_CALLBACK_URL }}" >> .env 
+            echo "NAVER_REDIRECT_URL=${{ secrets.NAVER_REDIRECT_URL }}" >> .env 
+
             # 의존성 설치
             # yarn --frozen-lockfile
             npm ci

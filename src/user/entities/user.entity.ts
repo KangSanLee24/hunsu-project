@@ -8,16 +8,17 @@ import {
   DeleteDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Role } from '../types/userRole.type';
+import { Role } from '../types/user-role.type';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { CommentLike } from 'src/like/entities/comment-like.entity';
 import { CommentDislike } from 'src/dislike/entities/comment-dislike.entity';
 import { PostLike } from 'src/like/entities/post-like.entity';
 import { PostDislike } from 'src/dislike/entities/post-dislike.entity';
-import { Point } from './point.entity';
-import { PointLog } from './point-log.entity';
+import { Point } from 'src/point/entities/point.entity';
+import { PointLog } from '../../point/entities/point-log.entity';
 import { ChatRoom } from 'src/chat/entities/chat-room.entity';
+import { SocialType } from '../types/social-type.type';
 
 @Index('email', ['email'], { unique: true })
 @Entity({
@@ -41,6 +42,12 @@ export class User {
 
   @Column({ type: 'boolean', default: false })
   verifiedEmail: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  socialId?: string;
+
+  @Column({ type: 'enum', enum: SocialType, default: SocialType.OZIRAP })
+  socialType: SocialType;
 
   @CreateDateColumn()
   createdAt: Date;

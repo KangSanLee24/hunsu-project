@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Post } from './post.entity';
 
-@Entity({ name: 'postImages' })
+@Entity({ name: 'post_images' })
 export class PostImage {
   // 게시글 이미지 ID, int
   @PrimaryGeneratedColumn({ unsigned: true })
@@ -26,6 +26,6 @@ export class PostImage {
   createdAt: Date;
 
   // 게시글 이미지와 게시글 다:1 관계
-  @ManyToOne(() => Post, (post) => post.postImages)
+  @ManyToOne(() => Post, (post) => post.postImages, { onDelete: 'CASCADE' })
   post: Post;
 }

@@ -1,0 +1,129 @@
+/* 0. 구글 폰트 */
+@import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Jua&family=Nanum+Pen+Script&display=swap');
+
+.jua-regular {
+  font-family: 'Jua', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Jua', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+header,
+main,
+footer {
+  min-width: 620px;
+  max-width: 1200px;
+  /* 최대 너비 설정 */
+  margin: 0 auto;
+  /* 중앙 정렬 */
+  padding: 10px 10px;
+  /* 안쪽 여백*/
+}
+
+header {
+  position: fixed;
+  /* 고정 위치 */
+  top: 0;
+  /* 상단에 위치 */
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+  background-color: #000000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: 4px;
+  /* text-align: center; */
+  z-index: 1000;
+  /* 다른 요소 위에 표시 */
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+}
+
+nav a {
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+nav a:hover {
+  color: red;
+}
+
+header .logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+}
+
+header .logo:hover {
+  color: red;
+}
+
+main {
+  padding-top: 80px;
+  /* 헤더 높이에 맞춰 여백 추가 */
+  padding-bottom: 80px;
+  /* 푸터 높이에 맞춰 여백 추가 */
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  color: white;
+  background-color: #000000;
+  text-align: center;
+}
+
+.footer-menu {
+  display: flex;
+  justify-content: space-around;
+  background-color: #000000;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+footer button {
+  background-color: #000000;
+  color: white;
+  border: none;
+  font-size: 18px;
+}
+
+footer button:hover {
+  color: red;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 200px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav ul {
+    flex-direction: column;
+    padding: 0;
+  }
+
+  nav a {
+    margin-bottom: 10px;
+  }
+
+  .footer-menu {
+    flex-direction: column;
+  }
+}

@@ -9,27 +9,38 @@ import {
   HttpStatus,
   UseGuards,
   UseInterceptors,
-  UploadedFile,
+  Query,
+  UploadedFiles,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { AuthGuard, IAuthGuard, Type } from '@nestjs/passport';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { LogIn } from 'src/decorators/log-in.decorator';
 import { User } from 'src/user/entities/user.entity';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { Category } from './types/post-category.type';
+import { Order } from './types/post-order.type';
+import { FindAllPostsDto } from './dtos/find-all-posts.dto';
 
-@ApiTags('게시글 API')
+@ApiTags('3. POST API')
 @Controller('posts')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService) { }
 
   /** 게시글 생성 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '게시글 생성 API' })
+  @ApiOperation({ summary: '1. 게시글 생성 API' })
   @Post()
   async create(@LogIn() user: User, @Body() createPostDto: CreatePostDto) {
     const userId = user.id;
@@ -43,10 +54,42 @@ export class PostController {
   }
 
   /** 게시글 목록 조회 API **/
-  @ApiOperation({ summary: '게시글 목록 조회 API' })
+  @ApiOperation({ summary: '2. 게시글 목록 조회 API' })
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    enum: Category,
+  })
+  @ApiQuery({
+    name: 'sort',
+    required: false,
+    enum: Order,
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'keyword',
+    required: false,
+    type: String,
+  })
   @Get()
-  async findAll() {
-    const findAllPost = await this.postService.findAll();
+  async findAll(@Query() findAllPostsDto?: FindAllPostsDto) {
+    const { page, limit, category, sort, keyword } = findAllPostsDto || {};
+    const findAllPost = await this.postService.findAll(
+      page,
+      limit,
+      category,
+      sort,
+      keyword
+    );
 
     return {
       statusCode: HttpStatus.OK,
@@ -55,11 +98,56 @@ export class PostController {
     };
   }
 
+  /** 화제글 목록 조회 API **/
+  @ApiOperation({ summary: '화제글 목록 조회 API' })
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    enum: Category,
+  })
+  @Get('hot')
+  async findHotPost(@Query('category') category: Category) {
+    const hotPosts = await this.postService.findHotPost(category);
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.READ_HOT.SUCCESS,
+      data: hotPosts,
+    };
+  }
+
+  /** 이미지 업로드 API **/
+  @ApiOperation({ summary: '6. 게시글 이미지 업로드 API' })
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FilesInterceptor('files'))
+  @Post('images')
+  async uploadFiles(@UploadedFiles() files: Express.Multer.File[]) {
+    const uploadedImageUrls = await this.postService.uploadPostImages(files);
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.IMAGE.UPLOAD.SUCCESS,
+      data: uploadedImageUrls,
+    };
+  }
+
   /** 게시글 상세 조회 API **/
-  @ApiOperation({ summary: '게시글 상세 조회 API' })
-  @Get(':id')
-  async findOne(@Param('id') id: number) {
-    const findOnePost = await this.postService.findOne(id);
+  @ApiOperation({ summary: '3. 게시글 상세 조회 API' })
+  @Get(':postId')
+  async findOne(@Param('postId') postId: number) {
+    const findOnePost = await this.postService.findOne(postId);
+
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.READ_DETAIL.SUCCESS,
@@ -70,19 +158,20 @@ export class PostController {
   /** 게시글 수정 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '게시글 수정 API' })
-  @Patch(':id')
+  @ApiOperation({ summary: '4. 게시글 수정 API' })
+  @Patch(':postId')
   async update(
     @LogIn() user: User,
-    @Param('id') id: number,
+    @Param('postId') postId: number,
     @Body() updatePostDto: UpdatePostDto
   ) {
     const userId = user.id;
     const updatedPost = await this.postService.update(
-      id,
+      postId,
       updatePostDto,
       userId
     );
+
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.UPDATE.SUCCESS,
@@ -93,29 +182,30 @@ export class PostController {
   /** 게시글 삭제 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '게시글 삭제 API' })
-  @Delete(':id')
-  async remove(@LogIn() user: User, @Param('id') id: number) {
+  @ApiOperation({ summary: '5. 게시글 삭제 API' })
+  @Delete(':postId')
+  async remove(@LogIn() user: User, @Param('postId') postId: number) {
     const userId = user.id;
-    await this.postService.remove(id, userId);
+    await this.postService.remove(postId, userId);
+
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.DELETE.SUCCESS,
     };
   }
-  /** 이미지 업로드 API **/
-  @ApiOperation({ summary: '게시글 이미지 업로드 API' })
-  @Post(':id/image')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(
-    @Param('id') id: number,
-    @UploadedFile() file: Express.Multer.File
-  ) {
-    const uploadedImageUrl = await this.postService.uploadPostImage(id, file);
+
+  /** 게시글 강제 삭제 API **/
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '게시글 강제 삭제 API' })
+  @Delete(':postId/admin')
+  async forceRemove(@LogIn() user: User, @Param('id') id: number) {
+    const userId = user.id;
+    await this.postService.forceRemove(id, userId);
+
     return {
       statusCode: HttpStatus.OK,
-      message: POST_MESSAGE.POST.IMAGE.UPLOAD.SUCCESS,
-      data: uploadedImageUrl,
+      message: POST_MESSAGE.POST.FORCE_DELETE.SUCCESS,
     };
   }
 }

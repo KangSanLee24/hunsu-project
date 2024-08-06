@@ -3,10 +3,12 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { json } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  // PayloadTooLargeError 오류로 body를 10mb까지 받을 수 있게 수정.
+  app.use(json({ limit: '10mb' }));
   // Configuration 이용해서 .env 활용
   const configService = app.get(ConfigService);
   const port = configService.get<number>('SERVER_PORT');
@@ -24,8 +26,10 @@ async function bootstrap() {
 
   // CORS 설정
   app.enableCors({
-    origin: 'http://localhost:3000', // 허용할 도메인
-    credentials: true, // 인증 정보 허용
+    origin: ['http://localhost:3000'],
+    methods: ['POST', 'GET', 'OPTIONS'],
+    allowedHeaders: ['POST', 'GET'],
+    credentials: true,
   });
 
   // Swagger 문서 준비
@@ -46,7 +50,6 @@ async function bootstrap() {
     },
   });
 
-  app.enableCors(); // CORS 설정
   // PORT 실행
   await app.listen(port);
 }

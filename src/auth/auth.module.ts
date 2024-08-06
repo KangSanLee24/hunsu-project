@@ -9,13 +9,19 @@ import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { User } from 'src/user/entities/user.entity';
-import { Point } from 'src/user/entities/point.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { VerifyPassword } from './entities/verify-password.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { VerifyEmail } from 'src/mail/entities/verify-email.entity';
 import { MailModule } from 'src/mail/mail.module';
+// import { KakaoStrategy } from './guards/kakao.strategy';
+import { NaverStrategy } from './guards/naver.strategy';
+import { Point } from 'src/point/entities/point.entity';
+import { PointModule } from 'src/point/point.module';
+import { PointLog } from 'src/point/entities/point-log.entity';
+import { SocialData } from './entities/social-data.entity';
 
 @Module({
   imports: [
@@ -35,13 +41,17 @@ import { MailModule } from 'src/mail/mail.module';
       Comment,
       RefreshToken,
       VerifyEmail,
+      VerifyPassword,
+      PointLog,
+      SocialData,
     ]),
     ConfigModule,
     UserModule,
     MailModule,
+    PointModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, NaverStrategy],
+  exports: [AuthService, JwtStrategy, NaverStrategy],
 })
 export class AuthModule {}

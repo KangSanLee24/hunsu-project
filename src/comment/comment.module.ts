@@ -8,13 +8,31 @@ import { Post } from 'src/post/entities/post.entity';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { LikeModule } from 'src/like/like.module';
+import { DislikeModule } from 'src/dislike/dislike.module';
+import { CommentLike } from 'src/like/entities/comment-like.entity';
+import { CommentDislike } from 'src/dislike/entities/comment-dislike.entity';
+import { AlarmModule } from 'src/alarm/alarm.module';
+import { PointModule } from 'src/point/point.module';
+import { Point } from 'src/point/entities/point.entity';
+import { PointLog } from 'src/point/entities/point-log.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Comment, User, Post]),
+    TypeOrmModule.forFeature([
+      Comment,
+      User,
+      Post,
+      CommentLike,
+      CommentDislike,
+      Point,
+      PointLog,
+    ]),
     UserModule,
     AuthModule,
     LikeModule,
+    DislikeModule,
+    AlarmModule,
+    PointModule,
   ],
   controllers: [CommentController],
   providers: [CommentService],

@@ -1,7 +1,13 @@
 // aws.service.ts
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import path from 'path';
+import { promises as fs } from 'fs';
 
 @Injectable()
 export class AwsService {
@@ -25,7 +31,7 @@ export class AwsService {
     file: Express.Multer.File, // 업로드할 파일
     ext: string // 파일 확장자
   ) {
-    const key = `${folder}/${fileName}`;
+    const key = `${folder}/${fileName}.${ext}`;
     // AWS S3에 이미지 업로드 명령을 생성합니다. 파일 이름, 파일 버퍼, 파일 접근 권한, 파일 타입 등을 설정합니다.
     const command = new PutObjectCommand({
       Bucket: this.configService.get('AWS_S3_BUCKET_NAME'), // S3 버킷 이름
@@ -34,14 +40,53 @@ export class AwsService {
       ACL: 'public-read', // 파일 접근 권한
       ContentType: `image/${ext}`, // 파일 타입
     });
-
     // 업로드된 이미지의 URL을 생성합니다.
-    const fileUrl = `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET_NAME}/${folder}/${fileName}`;
+    const fileUrl = `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET_NAME}/${key}`;
 
     // 생성된 명령을 S3 클라이언트에 전달하여 이미지 업로드를 수행합니다.
     await this.s3Client.send(command);
 
     // 업로드된 이미지의 URL을 반환합니다.
     return fileUrl;
+  }
+
+  // 첨부 파일 삭제
+  async deleteFileFromS3(fileUrl: string) {
+    const fileName = fileUrl.split('/').pop();
+
+    const command = new DeleteObjectCommand({
+      Bucket: this.configService.get('AWS_S3_BUCKET_NAME'), // S3 버킷 이름
+      Key: `posts/${fileName}`, // 삭제될 파일의 이름
+    });
+
+    try {
+      await this.s3Client.send(command);
+    } catch (error) {
+      const logFilePath = path.join(__dirname, 'post_s3_error.log'); // 로그 파일 경로 설정
+      const logMessage = `${new Date().toISOString()} - ${error.message}\n`; // 로그 메시지 생성
+
+      await fs.appendFile(logFilePath, logMessage); // 로그 파일에 메시지 추가
+    }
+  }
+
+  //이미지 삭제
+  async deleteImageFromS3(fileUrl: string) {
+    const fileName = fileUrl.split('/').slice(-2).join('/');
+    const key = `chats/${fileName}`;
+
+    const command = new DeleteObjectCommand({
+      Bucket: this.configService.get('AWS_S3_BUCKET_NAME'), // S3 버킷 이름
+      Key: key, // 삭제할 파일의 이름
+    });
+
+    try {
+      await this.s3Client.send(command);
+      console.log(`Successfully deleted: ${key}`);
+    } catch (error) {
+      const logFilePath = path.join(__dirname, 'chat_s3_error.log'); // 로그 파일 경로 설정
+      const logMessage = `${new Date().toISOString()} - ${error.message}\n`; // 로그 메시지 생성
+
+      await fs.appendFile(logFilePath, logMessage); // 로그 파일에 메시지 추가
+    }
   }
 }

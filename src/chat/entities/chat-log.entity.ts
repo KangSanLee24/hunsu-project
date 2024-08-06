@@ -15,7 +15,8 @@ export class ChatLog {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  @ManyToOne(() => ChatRoom, (chatRoom) => chatRoom.chatLogs)
+  //채팅방 id
+  @ManyToOne(() => ChatRoom, (chatRoom) => chatRoom.chatMembers)
   @JoinColumn({ name: 'room_id', referencedColumnName: 'id' })
   chatRooms: ChatRoom;
 
