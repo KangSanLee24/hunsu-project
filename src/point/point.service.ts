@@ -24,8 +24,8 @@ export class PointService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     @InjectRepository(Comment)
-    private readonly commentRepository: Repository<Comment>,
-  ) { }
+    private readonly commentRepository: Repository<Comment>
+  ) {}
 
   // 출석 체크 메소드
   async checkAttendance(userId: number): Promise<void> {
@@ -80,7 +80,10 @@ export class PointService {
 
     // 3-1. 오늘 포인트 타입별 획득 포인트 횟수 조회
     const todayCounts = {
-      attention: await this.findTodayPointCountById(userId, PointType.ATTENTION),
+      attention: await this.findTodayPointCountById(
+        userId,
+        PointType.ATTENTION
+      ),
       weeklyAttention: await this.findTodayPointCountById(
         userId,
         PointType.WEEKLY_ATTENTION
@@ -97,7 +100,8 @@ export class PointService {
     // 4. 최대 횟수 계산
     const maxCounts = {
       attention: MaxPointScore.ATTENTION / PointScore.ATTENTION,
-      weeklyAttention: MaxPointScore.WEEKLY_ATTENTION / PointScore.WEEKLY_ATTENTION,
+      weeklyAttention:
+        MaxPointScore.WEEKLY_ATTENTION / PointScore.WEEKLY_ATTENTION,
       post: MaxPointScore.POST / PointScore.POST,
       comment: MaxPointScore.COMMENT / PointScore.COMMENT,
       postLike: MaxPointScore.POST_LIKE / PointScore.POST_LIKE,
@@ -116,7 +120,12 @@ export class PointService {
   }
 
   // 포인트 추가, 차감 메소드
-  async savePointLog(userId: number, pointType: PointType, sign: boolean, postId?: number) {
+  async savePointLog(
+    userId: number,
+    pointType: PointType,
+    sign: boolean,
+    postId?: number
+  ) {
     let point = await this.pointRepository.findOne({ where: { userId } });
 
     // 댓글 작성 시, 작성자와 포스트 작성자가 동일한지 확인
@@ -125,14 +134,18 @@ export class PointService {
 
       if (post.userId === userId) {
         // 작성자가 포스트 작성자와 동일하면 포인트 추가하지 않음
-        console.log('작성자가 포스트 작성자와 동일하여 포인트 추가하지 않습니다.');
+        console.log(
+          '작성자가 포스트 작성자와 동일하여 포인트 추가하지 않습니다.'
+        );
         return;
       }
     }
 
     const isValidPoint = await this.validatePointLog(userId, pointType);
     if (!isValidPoint) {
-      throw new ForbiddenException('오늘 해당 유형의 포인트를 더 이상 얻을 수 없습니다.');
+      throw new ForbiddenException(
+        '오늘 해당 유형의 포인트를 더 이상 얻을 수 없습니다.'
+      );
     }
 
     const pointScore = PointScore[pointType];
@@ -195,8 +208,8 @@ export class PointService {
   }
 
   //누적 포인트 랭킹 조회
-  async pointLank(num: number) {
-    const pointLank = await this.pointRepository.query(
+  async pointRank(num: number) {
+    const pointRank = await this.pointRepository.query(
       `
       select a.acc_point , b.nickname
       from points a join users b
@@ -206,7 +219,7 @@ export class PointService {
       `
     );
 
-    const data = pointLank.map((point) => ({
+    const data = pointRank.map((point) => ({
       accPoint: point.acc_point,
       nickname: point.nickname,
     }));
@@ -215,8 +228,8 @@ export class PointService {
   }
 
   //주간 포인트 랭킹 조회 (매주 일요일~토요일))
-  async pointWeeklyLank(num: number) {
-    const pointLank = await this.pointLogRepository.query(
+  async pointWeeklyRank(num: number) {
+    const pointRank = await this.pointLogRepository.query(
       `
       SELECT b.nickname, SUM(a.point) AS point
       FROM point_logs a
@@ -229,7 +242,7 @@ export class PointService {
       `
     );
 
-    const data = pointLank.map((point) => ({
+    const data = pointRank.map((point) => ({
       point: point.point,
       nickname: point.nickname,
     }));
