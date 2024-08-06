@@ -36,7 +36,7 @@ export class PostService {
 
     private readonly awsService: AwsService,
     private readonly pointService: PointService
-  ) {}
+  ) { }
 
   /* 게시글 생성 API*/
   async create(createPostDto: CreatePostDto, userId: number) {

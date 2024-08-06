@@ -72,7 +72,12 @@ export class ChatController {
    */
   @Get('hotlivechat')
   async getHotLiveChat(@Query('num') num: number) {
-    return await this.chatService.getHotLiveChat(+num);
+    const data = await this.chatService.getHotLiveChat(+num);
+    return {
+      status: 200,
+      message: '',
+      data: data,
+    };
   }
 
   /**
@@ -80,7 +85,10 @@ export class ChatController {
    * @returns
    */
   @Get('search')
-  async chatRoomSearch(@Query('title') title: string, @Query('sort') sort: Order) {
+  async chatRoomSearch(
+    @Query('title') title: string,
+    @Query('sort') sort: Order
+  ) {
     return await this.chatService.chatRoomSearch(title, sort);
   }
 
@@ -133,7 +141,7 @@ export class ChatController {
    */
   @UseGuards(AuthGuard('jwt'))
   @Delete(':chatRoomId')
-  async removeChatRoom(@Param('chatRoomId') chatRoomId: string,  @Body() body) {
+  async removeChatRoom(@Param('chatRoomId') chatRoomId: string, @Body() body) {
     const { authorId } = body;
     return await this.chatService.removeChatRoom(+chatRoomId, authorId);
   }

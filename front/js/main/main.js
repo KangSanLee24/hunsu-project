@@ -3,19 +3,21 @@ import { rankMark, levelMark } from '../common/level-rank.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   /** 1. 페이지에 필요한 변수 세팅 **/
-  // 1. 로그인 관련 변수 선언
+  // 1-1. 로그인 관련 변수 선언
   const accessToken = localStorage.getItem('accessToken');
   const isLoggedIn = !!accessToken;
   const loginLink = document.querySelector('a[href="./log-in.html"]');
   const signUpLink = document.querySelector('a[href="./sign-up.html"]');
-  // 2. 화제글(HOT POST) 관련 변수 선언
+  // 1-2. 인기채팅(HOT LIVECHAT) 관련 변수 선언
+  const hotLiveChatList = document.getElementById('hot-live-chat-list');
+  // 1-3. 화제글(HOT POST) 관련 변수 선언
   const hotPostListChat = document.getElementById('tab-chat');
   const hotPostListFashion = document.getElementById('tab-fashion');
   const hotPostListCooking = document.getElementById('tab-cooking');
-  // 3. 포인트 랭킹(POINT RANK) 관련 변수 선언
+  // 1-4. 포인트 랭킹(POINT RANK) 관련 변수 선언
   const weeklyPointRank = document.getElementById('tab-weekly-rank');
   const totalPointRank = document.getElementById('tab-total-rank');
-  // 4. 해시태그 랭킹(HASHTAG RANK) 관련 변수 선언
+  // 1-5. 해시태그 랭킹(HASHTAG RANK) 관련 변수 선언
   const hashtagRank = document.getElementById('tab-hashtag-rank');
 
   /** 2. 로그인 상태에 따른 분기 세팅 **/
@@ -31,7 +33,52 @@ document.addEventListener('DOMContentLoaded', () => {
     if (signUpLink) signUpLink.style.display = 'block';
   }
 
-  /** 3. HOT POST - [TYPE(CHAT, FASHION, COOKING)] 랭킹 FETCH **/
+  /** 3. HOT LIVECHAT 랭킹 FETCH **/
+  async function fetchHotLiveChats(num) {
+    try {
+      // 1. 쿼리스트링 구성
+      const queryParams = new URLSearchParams({
+        num: num,
+      });
+
+      // 2. fetch 받아오기 (HOT LIVECHAT)
+      const response = await fetch(
+        `${API_BASE_URL}/chatrooms/hotlivechat?${queryParams.toString()}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        }
+      );
+
+      // 3. fetch 받아온 result를 json으로
+      const result = await response.json();
+
+      // 4. 데이터 처리
+      if (result.status === 200) {
+        // 4-1. data가 배열인지 확인해서 맞으면
+        if (Array.isArray(result.data)) {
+          // 4-1-1. 렌더링 함수에 데이터 전달
+          renderHotLivechatList(result.data);
+        } else {
+          // 4-1-2. data가 배열인지 확인해서 아니면
+          console.error(
+            'HOT LiveChat List 데이터 형식이 잘못되었습니다:',
+            result.data
+          );
+        }
+      } else {
+        // 4-2. data를 애초에 조회하지 못한 경우 에러메시지
+        console.error('HOT LiveChat List 조회 실패:', result.message);
+      }
+    } catch (error) {
+      console.error('HOT LiveChat List 조회 API 호출 중 오류 발생:', error);
+    }
+  }
+
+  /** 4. HOT POST TYPE(CHAT, FASHION, COOKING) 랭킹 FETCH **/
   async function fetchHotPosts(category) {
     try {
       // 1. 쿼리스트링 구성
@@ -77,50 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 4. HOT POST 랜더링 **/
-  function renderHotPostList(category, data) {
-    // 1. 들어온 데이터를 하나하나 HTML화
-    for (let i = 0; i < data.length; i++) {
-      // 1-1. 데이터로 row HTML 생성
-      const row = document.createElement('div');
-      row.innerHTML = `
-            <div class="post-info">
-              <div class="post-title">
-                <span class="post-title-var" onClick="clickPost(${data[i].id})">${data[i].title}</span>
-                <span class="post-title-comment-var">(${data[i].numComments})</span>
-              </div>
-              <div class="post-writer">
-                <span class="post-writer-var">🐣${data[i].nickname}</span>
-              </div>
-              <div class="post-date">
-                <span class="post-date-var">${yyyymmdd(data[i].createdAt)}</span>
-              </div>
-            </div>       
-        `;
-      // 1-2. 카테고리에 맞게 데이터 넣어주기
-      if (category == 'CHAT') {
-        // 1-2-1. CHAT
-        hotPostListChat.appendChild(row);
-      } else if (category == 'FASHION') {
-        // 1-2-2. FASHION
-        hotPostListFashion.appendChild(row);
-      } else if (category == 'COOKING') {
-        // 1-2-3. COOKING
-        hotPostListCooking.appendChild(row);
-      } else {
-        // 1-2-4. 그 외 (현재는 에러처리)
-        console.error('화제글 카테고리 분류에서 에러가 발생했습니다.');
-      }
-    }
-  }
-
-  /** 5. HOT POST 클릭 **/
-  // 게시글을 클릭하면 해당 게시글로 이동
-  async function clickPost(postId) {
-    window.location.href = `post-detail.html?id=${postId}`;
-  }
-
-  /** 6. WEEKLY POINT RANK FETCH **/
+  /** 5. WEEKLY POINT RANK FETCH **/
   async function fetchWeeklyPointRank(num) {
     try {
       // 1. 쿼리스트링 구성
@@ -165,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 7. TOTAL POINT RANK FETCH **/
+  /** 6. TOTAL POINT RANK FETCH **/
   async function fetchTotalPointRank(num) {
     try {
       // 1. 쿼리스트링 구성
@@ -210,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 8. HASHTAG RANK FETCH **/
+  /** 7. HASHTAG RANK FETCH **/
   async function fetchHashtagRank(num) {
     try {
       // 1. 쿼리스트링 구성
@@ -255,20 +259,98 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  /** 0. HOT LIVECHAT 랜더링 **/
+  function renderHotLivechatList(data) {
+    // 1. 들어온 데이터를 하나하나 HTML화
+    for (let i = 0; i < data.length; i++) {
+      // 1-0. 썸네일 있는지 확인 (없으면 기본 이미지를 썸네일로 적용)
+      const thumbnail = data[i].imgUrl
+        ? data[i].imgUrl
+        : 'http://localhost:3000/images/logo_long.png';
+      // 1-1. 데이터로 row HTML 생성
+      const row = document.createElement('div');
+      row.innerHTML = `        
+          <div class="hot-live-chat-card">            
+            <div class="hot-live-chat-card-inner">
+              <div class="card-thumbnail">
+                <img
+                  class="card-thumbnail-image"
+                  src="${thumbnail}"
+                />
+              </div>              
+              <div class="chat-info">                
+                <div class="chat-title">
+                  <span class="chat-title-var">💬${data[i].title}</span>
+                </div>
+                <!-- CHAT MAKER -->
+                <div class="chat-maker">
+                  <span class="chat-maker-var">${levelMark(data[i].point)}${data[i].nickname}</span>
+                </div>
+                <!-- CHAT HEADCOUNT -->
+                <div class="chat-headcount">
+                  <span class="chat-headcount-var">👨‍🏫${data[i].count}/100</span>
+                </div>
+              </div>
+            </div>
+          </div>
+      `;
+      // 1-2. HOT LIVECHAT TAB에 데이터 넣어주기
+      hotLiveChatList.appendChild(row);
+    }
+  }
+
+  /** 0. HOT POST 랜더링 **/
+  function renderHotPostList(category, data) {
+    // 1. 들어온 데이터를 하나하나 HTML화
+    for (let i = 0; i < data.length; i++) {
+      // 1-1. 데이터로 row HTML 생성
+      const row = document.createElement('div');
+      row.innerHTML = `
+            <div class="post-info">
+            <div class="post-title">
+            <span class="post-title-var" onClick="clickPost(${data[i].id})">${data[i].title}</span>
+            <span class="post-title-comment-var">(${data[i].numComments})</span>
+            </div>
+            <div class="post-writer">
+            <span class="post-writer-var">🐣${data[i].nickname}</span>
+              </div>
+              <div class="post-date">
+                <span class="post-date-var">${yyyymmdd(data[i].createdAt)}</span>
+                </div>
+                </div>       
+                `;
+      // 1-2. 카테고리에 맞게 데이터 넣어주기
+      if (category == 'CHAT') {
+        // 1-2-1. CHAT
+        hotPostListChat.appendChild(row);
+      } else if (category == 'FASHION') {
+        // 1-2-2. FASHION
+        hotPostListFashion.appendChild(row);
+      } else if (category == 'COOKING') {
+        // 1-2-3. COOKING
+        hotPostListCooking.appendChild(row);
+      } else {
+        // 1-2-4. 그 외 (현재는 에러처리)
+        console.error('화제글 카테고리 분류에서 에러가 발생했습니다.');
+      }
+    }
+  }
+
   /** 0. WEEKLY POINT RANK 랜더링 **/
   function renderWeeklyPointRank(data) {
     // 1. 들어온 데이터를 하나하나 HTML화
+    console.log(data);
     for (let i = 1; i <= data.length; i++) {
       // 1-1. 데이터로 row HTML 생성
       const row = document.createElement('div');
       row.innerHTML = `
                 <div class="point-rank-info">
-                  <div class="point-rank-ranking">
-                  <span class="point-rank-ranking-var">${rankMark(i)}</span>
-                  </div>                  
-                  <div class="point-rank-nickname">
-                  <span>${data[i - 1].nickname}</span>
-                  </div>                  
+                <div class="point-rank-ranking">
+                <span class="point-rank-ranking-var">${rankMark(i)}</span>
+                </div>                  
+                <div class="point-rank-nickname">
+                <span>${data[i - 1].nickname}</span>
+                </div>                  
                   <div class="point-rank-point">
                   <span>${data[i - 1].point}</span>
                   </div>
@@ -310,24 +392,30 @@ document.addEventListener('DOMContentLoaded', () => {
       // 1-1. 데이터로 row HTML 생성
       const row = document.createElement('div');
       row.innerHTML = `        
-                <div class="hashtag-rank-info">                  
-                  <div class="hashtag-rank-ranking">
-                    <span class="hashtag-rank-ranking-var">${rankMark(i)}</span>
-                  </div>                  
-                  <div class="hashtag-rank-hashtag">
-                    <span>${data[i - 1].hashtag}</span>
-                  </div>                  
-                  <div class="hashtag-rank-count">
-                    <span>${data[i - 1].count}</span>
-                  </div>
-                </div>
+      <div class="hashtag-rank-info">                  
+      <div class="hashtag-rank-ranking">
+      <span class="hashtag-rank-ranking-var">${rankMark(i)}</span>
+      </div>                  
+      <div class="hashtag-rank-hashtag">
+      <span>${data[i - 1].hashtag}</span>
+      </div>                  
+      <div class="hashtag-rank-count">
+      <span>${data[i - 1].count}</span>
+      </div>
+      </div>
       `;
       // 1-2. HASHTAG RANK TAB에 데이터 넣어주기
       hashtagRank.appendChild(row);
     }
   }
 
-  /** 게시판 탭 관련 JS **/
+  /** HOT POST 클릭 **/
+  // 게시글을 클릭하면 해당 게시글로 이동
+  async function clickPost(postId) {
+    window.location.href = `post-detail.html?id=${postId}`;
+  }
+
+  /** HOT POST TAB 관련 JS **/
   $(document).ready(function () {
     // 1. 게시판 탭 위에 마우스를 올리면(hover)
     $('ul.hot-post-rank-tabs li').hover(function () {
@@ -347,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /** 포인트 랭킹 탭 관련 JS **/
+  /** POINT RANK TAB 관련 JS **/
   $(document).ready(function () {
     // 1. 포인트 랭킹 탭 위에 마우스를 올리면(hover)
     $('ul.point-rank-tabs li').hover(function () {
@@ -367,7 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /** 해시태그 랭킹 탭 관련 JS **/
+  /** HASHTAG RANK TAB 관련 JS **/
   $(document).ready(function () {
     // 1. 해시태그 랭킹 탭 위에 마우스를 올리면(hover)
     $('ul.hashtag-rank-tabs li').hover(function () {
@@ -387,7 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /** 시간 표시 함수 **/
+  /** TIME 표기 함수 **/
   const yyyymmdd = (date) => {
     // 1. 한국 시간 보정
     const korDate = Number(new Date(date)) + 1000 * 60 * 60 * 9;
@@ -403,6 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /** 페이지 로딩이 되면 실행할 함수들 **/
   // 1. HOT LIVECHAT LIST
+  fetchHotLiveChats(10);
   // 2. HOT POST RANKING LIST (완료)
   fetchHotPosts('CHAT');
   fetchHotPosts('FASHION');
