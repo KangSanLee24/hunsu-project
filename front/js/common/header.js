@@ -139,7 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       // 로그인 되어 있지 않으면 알림창 표시
       event.preventDefault(); // 기본 동작 막기
-      const confirmLogin = confirm('로그인이 되어있지 않습니다. 로그인을 하시겠습니까?');
+      const confirmLogin = confirm(
+        '로그인이 되어있지 않습니다. 로그인을 하시겠습니까?'
+      );
       if (confirmLogin) {
         // 현재 페이지 URL을 localStorage에 저장
         localStorage.setItem('redirectUrl', redirectUrl);
@@ -165,19 +167,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // 버튼별 리디렉션 URL
   const redirects = {
     // 지정 페이지 (토큰 있어야지만 접속 가능한 페이지)
-    'myPageButton': './my-page.html',
+    myPageButton: './my-page.html',
     'write-post': './post-create.html',
-    'alarmButton': './alarm.html',
+    alarmButton: './alarm.html',
 
     // 이전페이지 (단순히 이전페이지로 돌아갈때)
     'submit-comment': window.location.href,
   };
 
   // 버튼 클릭 이벤트 리스너
-  buttons.forEach(buttonId => {
+  buttons.forEach((buttonId) => {
     const button = document.getElementById(buttonId);
     if (button) {
-      button.addEventListener('click', (event) => handleLoginRequired(event, redirects[buttonId]));
+      button.addEventListener('click', (event) =>
+        handleLoginRequired(event, redirects[buttonId])
+      );
     }
   });
 

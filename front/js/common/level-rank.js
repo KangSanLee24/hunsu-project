@@ -2,41 +2,41 @@
 export const levelMark = (point) => {
   if (point < 0) {
     return '💩';
-  } else if (point < 2000) {
+  } else if (point < 200) {
     return '🥚';
-  } else if (point < 4000) {
+  } else if (point < 400) {
     return '🐣';
-  } else if (point < 6000) {
+  } else if (point < 600) {
     return '🐥';
-  } else if (point < 8000) {
+  } else if (point < 800) {
     return '🐤';
-  } else if (point < 12000) {
+  } else if (point < 1200) {
     return '🐓';
-  } else if (point < 16000) {
+  } else if (point < 1600) {
     return '🦃';
-  } else if (point < 20000) {
+  } else if (point < 2000) {
     return '🦆';
-  } else if (point < 30000) {
+  } else if (point < 3000) {
     return '🦢';
-  } else if (point < 40000) {
+  } else if (point < 4000) {
     return '🦅';
-  } else if (point < 60000) {
+  } else if (point < 6000) {
     return '🤎';
-  } else if (point < 80000) {
+  } else if (point < 8000) {
     return '💜';
-  } else if (point < 100000) {
+  } else if (point < 10000) {
     return '💙';
-  } else if (point < 120000) {
+  } else if (point < 12000) {
     return '💚';
-  } else if (point < 140000) {
+  } else if (point < 14000) {
     return '💛';
-  } else if (point < 160000) {
+  } else if (point < 16000) {
     return '🧡';
-  } else if (point < 180000) {
+  } else if (point < 18000) {
     return '❤️';
-  } else if (point < 200000) {
+  } else if (point < 20000) {
     return '💝';
-  } else if (point < 250000) {
+  } else if (point < 25000) {
     return '💖';
   } else {
     return '⭐';
