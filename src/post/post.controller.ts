@@ -35,7 +35,7 @@ import { FindAllPostsDto } from './dtos/find-all-posts.dto';
 @ApiTags('3. POST API')
 @Controller('posts')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService) { }
 
   /** 게시글 생성 API **/
   @UseGuards(AuthGuard('jwt'))

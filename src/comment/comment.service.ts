@@ -36,7 +36,7 @@ export class CommentService {
     @InjectRepository(CommentDislike)
     private commentDislikeRepository: Repository<CommentDislike>,
     private readonly pointService: PointService
-  ) {}
+  ) { }
 
   // 댓글 생성
   async createComment(
@@ -73,8 +73,10 @@ export class CommentService {
       userId,
       PointType.COMMENT
     );
-    if (isValidPoint)
-      this.pointService.savePointLog(userId, PointType.COMMENT, true);
+    if (isValidPoint) {
+      console.log('postId 전달:', postId); // 디버깅용 로그
+      this.pointService.savePointLog(userId, PointType.COMMENT, true, postId);
+    }
 
     const nickname = user.nickname;
 
@@ -218,7 +220,7 @@ export class CommentService {
     }
 
     // 댓글 삭제로 포인트 차감
-    this.pointService.savePointLog(userId, PointType.POST, false);
+    this.pointService.savePointLog(userId, PointType.COMMENT, false);
 
     await this.commentRepository.save({
       id: commentId,

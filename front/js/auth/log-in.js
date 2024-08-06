@@ -37,11 +37,25 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('accessToken', result.data.accessToken);
         localStorage.setItem('refreshToken', result.data.refreshToken);
 
+        // 출석 체크 API 호출
+        const attendanceResult = await checkAttendance(result.data.accessToken);
+        console.log('출석 체크 호출 결과:', attendanceResult);
+
         // 1-4-A-2. '로그인에 성공했습니다.' alert
         alert(result.message);
 
-        // 1-4-A-3. 메인 페이지로 이동
-        window.location.href = './main.html';
+        // // 메인 페이지로 이동
+        // window.location.href = './main.html';
+
+        // localstorage에서 redirectUrl 가져오기
+        const redirectUrl = localStorage.getItem('redirectUrl') || './main.html';
+
+        // 리다이렉트 URL로 이동
+        window.location.href = redirectUrl;
+        // window.location.href = document.referrer;
+
+        // 리다이렉트 후 localStorage에서 redirectUrl 삭제
+        localStorage.removeItem('redirectUrl');
       } else if (
         // 1-4-B. 로그인 성공시 + 이메일 인증X
         result.message ===
@@ -67,3 +81,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+// 출석 체크 함수
+async function checkAttendance(accessToken) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/points/today`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const result = await response.json();
+    console.log('출석 체크 API 응답:', result);
+
+    if (!response.ok) {
+      throw new Error('출석 체크에 실패했습니다.');
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error during attendance check:', error);
+    return { error: error.message };
+  }
+}

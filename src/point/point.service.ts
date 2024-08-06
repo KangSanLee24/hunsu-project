@@ -8,6 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { PointLog } from './entities/point-log.entity';
 import { User } from 'src/user/entities/user.entity';
+import { Post } from 'src/post/entities/post.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
 import { MaxPointScore, PointScore, PointType } from './types/point.type';
 
 @Injectable()
@@ -18,8 +20,12 @@ export class PointService {
     @InjectRepository(Point)
     private readonly pointRepository: Repository<Point>,
     @InjectRepository(PointLog)
-    private readonly pointLogRepository: Repository<PointLog>
-  ) {}
+    private readonly pointLogRepository: Repository<PointLog>,
+    @InjectRepository(Post)
+    private readonly postRepository: Repository<Post>,
+    @InjectRepository(Comment)
+    private readonly commentRepository: Repository<Comment>,
+  ) { }
 
   // 출석 체크 메소드
   async checkAttendance(userId: number): Promise<void> {
@@ -53,7 +59,7 @@ export class PointService {
     }
 
     // 2. 누적 포인트 조회
-    const point = await this.pointRepository.findOne({ where: { id: userId } });
+    const point = await this.pointRepository.findOne({ where: { userId } });
     const totalPoint = point ? point.accPoint : 0; // 누적 포인트
 
     // 3. 오늘 포인트 타입별 획득 포인트 조회
@@ -72,18 +78,62 @@ export class PointService {
       ),
     };
 
-    // 4. 결과 반환
+    // 3-1. 오늘 포인트 타입별 획득 포인트 횟수 조회
+    const todayCounts = {
+      attention: await this.findTodayPointCountById(userId, PointType.ATTENTION),
+      weeklyAttention: await this.findTodayPointCountById(
+        userId,
+        PointType.WEEKLY_ATTENTION
+      ),
+      post: await this.findTodayPointCountById(userId, PointType.POST),
+      comment: await this.findTodayPointCountById(userId, PointType.COMMENT),
+      postLike: await this.findTodayPointCountById(userId, PointType.POST_LIKE),
+      commentLike: await this.findTodayPointCountById(
+        userId,
+        PointType.COMMENT_LIKE
+      ),
+    };
+
+    // 4. 최대 횟수 계산
+    const maxCounts = {
+      attention: MaxPointScore.ATTENTION / PointScore.ATTENTION,
+      weeklyAttention: MaxPointScore.WEEKLY_ATTENTION / PointScore.WEEKLY_ATTENTION,
+      post: MaxPointScore.POST / PointScore.POST,
+      comment: MaxPointScore.COMMENT / PointScore.COMMENT,
+      postLike: MaxPointScore.POST_LIKE / PointScore.POST_LIKE,
+      commentLike: MaxPointScore.COMMENT_LIKE / PointScore.COMMENT_LIKE,
+    };
+
+    // 5. 결과 반환
     return {
       id: userId,
+      nickname: user.nickname, // 닉네임 추가
       totalPoint,
       today: todayPoints,
+      counts: todayCounts,
+      maxCounts,
     };
   }
 
   // 포인트 추가, 차감 메소드
-  async savePointLog(userId: number, pointType: PointType, sign: boolean) {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    const point = await this.pointRepository.findOne({ where: { id: userId } });
+  async savePointLog(userId: number, pointType: PointType, sign: boolean, postId?: number) {
+    let point = await this.pointRepository.findOne({ where: { userId } });
+
+    // 댓글 작성 시, 작성자와 포스트 작성자가 동일한지 확인
+    if (pointType === PointType.COMMENT) {
+      const post = await this.postRepository.findOne({ where: { id: postId } });
+
+      if (post.userId === userId) {
+        // 작성자가 포스트 작성자와 동일하면 포인트 추가하지 않음
+        console.log('작성자가 포스트 작성자와 동일하여 포인트 추가하지 않습니다.');
+        return;
+      }
+    }
+
+    const isValidPoint = await this.validatePointLog(userId, pointType);
+    if (!isValidPoint) {
+      throw new ForbiddenException('오늘 해당 유형의 포인트를 더 이상 얻을 수 없습니다.');
+    }
 
     const pointScore = PointScore[pointType];
     const newPoint = sign
@@ -185,5 +235,35 @@ export class PointService {
     }));
 
     return data;
+  }
+
+  // 오늘 포인트 타입 횟수 검색하는 메소드
+  async findTodayPointCountById(
+    userId: number,
+    pointType: PointType
+  ): Promise<number> {
+    // 오늘 날짜 기준으로 입력받은 pointType의 횟수를 return
+    const today = new Date();
+    const startOfDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+    const endOfDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() + 1
+    );
+
+    // 조건에 맞는 레코드의 개수를 계산
+    const count = await this.pointLogRepository.count({
+      where: {
+        userId,
+        pointType,
+        createdAt: Between(startOfDay, endOfDay),
+      },
+    });
+
+    return count;
   }
 }

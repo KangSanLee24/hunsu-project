@@ -19,6 +19,8 @@ import { UserService } from './user.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { USER_MESSAGES } from 'src/constants/user-message.constant';
 import { SoftdeleteUserDto } from './dtos/softdelete-user.dto';
+import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
+import { POST_MESSAGE } from 'src/constants/post-message.constant';
 
 @ApiTags('2. USER API')
 @Controller('users')
@@ -36,6 +38,38 @@ export class UserController {
       status: HttpStatus.OK,
       message: USER_MESSAGES.READ_ME.SUCCESS,
       data: data,
+    };
+  }
+
+  /** 사용자가 작성한 게시글 조회 API **/
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '6. 사용자가 작성한 게시글 조회 API' })
+  @Get('/me/posts')
+  async findAllPostByUser(@LogIn() user: User) {
+    const userId = user.id;
+    const userPosts = await this.userService.findAllPostByUser(userId);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: POST_MESSAGE.POST.READ_ALL.SUCCESS,
+      data: userPosts,
+    };
+  }
+
+  /** 사용자가 작성한 댓글 조회 API **/
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '5. 사용자가 작성한 댓글 조회 API' })
+  @Get('/me/comments')
+  async findAllCommentByUser(@LogIn() user: User) {
+    const userId = user.id;
+    const userComments = await this.userService.findAllCommentByUser(userId);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: COMMENT_MESSAGE.COMMENT.READ.SUCCESS,
+      data: userComments,
     };
   }
 
