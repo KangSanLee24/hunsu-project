@@ -46,17 +46,6 @@ async function renderPostDetail(postId) {
     document.getElementById('post-content').innerHTML =
       marked.parse(post.data.content) || '내용 없음';
   }
-  console.log('🚀 ~ renderPostDetail ~ post.data.content:', post.data.content);
-  // // 이미지 렌더링
-  // if (post.data.images && post.data.images.length > 0) {
-  //   post.data.images.forEach((image) => {
-  //     const imgElement = document.createElement('img');
-  //     imgElement.src = image; // 이미지 URL
-  //     imgElement.alt = '게시글 이미지';
-  //     imgElement.classList.add('post-image'); // 필요에 따라 클래스 추가
-  //     imageContainer.appendChild(imgElement);
-  //   });
-  // }
 }
 
 // 좋아요 API 호출
