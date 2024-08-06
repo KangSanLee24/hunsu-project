@@ -142,26 +142,36 @@ document.addEventListener('DOMContentLoaded', () => {
       event.preventDefault(); // 기본 동작 막기
       const confirmLogin = confirm('로그인이 되어있지 않습니다. 로그인을 하시겠습니까?');
       if (confirmLogin) {
+        // 현재 페이지 URL을 localStorage에 저장
+        localStorage.setItem('redirectUrl', redirectUrl);
         // 로그인 페이지로 리다이렉트하면서 리다이렉트 URL을 전달
-        window.location.href = `./log-in.html?redirect=${redirectUrl}`;
+        window.location.href = './log-in.html';
+      } else {
+        // 로그인을 취소했을 때 포커스를 잃게 함
+        event.target.blur();
       }
     }
   }
+
   // 버튼 종류 배열
+  // 해당 버튼 클릭 후 지정한 위치로 가야할 때
+  // localstorage 저장 식
   const buttons = [
     'myPageButton',
-    // 'write-post',
+    'write-post',
+    'alarmButton',
     'submit-comment',
-    // 'createChatButton',
-    'alarmButton'];
+  ];
 
   // 버튼별 리디렉션 URL
   const redirects = {
+    // 지정 페이지 (토큰 있어야지만 접속 가능한 페이지)
     'myPageButton': './my-page.html',
-    'write-post': './post-list.html',
-    'submit-comment': `./post-list.html`,
-    // 'createChatButton': '/chat-list.html',
-    'alarmButton': './alarm.html'
+    'write-post': './post-create.html',
+    'alarmButton': './alarm.html',
+
+    // 이전페이지 (단순히 이전페이지로 돌아갈때)
+    'submit-comment': window.location.href,
   };
 
   // 버튼 클릭 이벤트 리스너
@@ -171,4 +181,46 @@ document.addEventListener('DOMContentLoaded', () => {
       button.addEventListener('click', (event) => handleLoginRequired(event, redirects[buttonId]));
     }
   });
+
+  // 댓글 작성 textarea 클릭 이벤트 리스너 추가
+  const commentContentTextarea = document.getElementById('comment-content');
+  if (commentContentTextarea) {
+    commentContentTextarea.addEventListener('click', (event) => {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        handleLoginRequired(event, window.location.href);
+      }
+    });
+  }
+
+  // 채팅방 만들기 버튼 별도로 처리
+  // 로그인하면 모달창이 켜지면서 자꾸 리디렉션 페이지로 넘어가져서 따로 뺐음.
+  const createChatButton = document.getElementById('createChatButton');
+  if (createChatButton) {
+    createChatButton.addEventListener('click', (event) => {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        handleLoginRequired(event, './chat-list.html');
+      } else {
+        // 로그인 되어 있으면 chat-create.js의 setupChatRoomFormToggle() 함수에 의해 모달 창이 열림
+      }
+    });
+  }
+
+  // 대댓글 버튼 클릭 이벤트 리스너 추가
+  const commentList = document.getElementById('comment-list');
+  if (commentList) {
+    commentList.addEventListener('click', (event) => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        handleLoginRequired(event, window.location.href);
+      } else {
+        if (event.target.classList.contains('submit-recomment')) {
+          const recommentInput = event.target.nextElementSibling;
+          recommentInput.style.display =
+            recommentInput.style.display === 'none' ? 'block' : 'none';
+        }
+      }
+    });
+  }
 });

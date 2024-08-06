@@ -49,6 +49,7 @@ async function likeComment(commentId) {
         },
       }
     );
+
     if (!response.ok) throw new Error('댓글 좋아요에 실패했습니다.');
     return await response.json();
   } catch (error) {
@@ -227,6 +228,8 @@ commentList.addEventListener('click', async (event) => {
       await submitRecomment(commentId, recommentContent);
       recommentInput.style.display = 'none'; // 입력 후 숨김
       window.location.reload();
+    } else {
+      alert('대댓글 내용을 입력하세요.');
     }
   }
 });

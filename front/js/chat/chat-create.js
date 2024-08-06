@@ -8,6 +8,17 @@ async function createChatRoom(roomName) {
 
         console.log(accessToken);
 
+        if (!accessToken) {
+            const confirmLogin = confirm('로그인이 되어있지 않습니다. 로그인을 하시겠습니까?');
+            if (confirmLogin) {
+                // 현재 페이지 URL을 localStorage에 저장
+                localStorage.setItem('currentPage', window.location.href);
+                // 로그인 페이지로 리다이렉트하면서 리다이렉트 URL을 전달
+                window.location.href = './log-in.html?redirect=/chat-list.html';
+            }
+            return; // accessToken이 없으면 함수 종료
+        }
+
         const response = await fetch(`${API_BASE_URL}/chatrooms`, {
             method: 'POST',
             headers: {

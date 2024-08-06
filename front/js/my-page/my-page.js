@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         // 포인트 정보 가져오기
-        const response = await fetch(`${API_BASE_URL}/user/me/point`, {
+        console.log(API_BASE_URL);
+        const response = await fetch(`${API_BASE_URL}/points/me`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

@@ -31,14 +31,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // 알림 표시
         alert(result.message);
 
-        // // 메인 페이지로 이동
-        // window.location.href = './main.html';
-        // 리다이렉트 URL 확인
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirectUrl = urlParams.get('redirect') || './main.html';
+        // localstorage에서 redirectUrl 가져오기
+        const redirectUrl = localStorage.getItem('redirectUrl') || './main.html';
 
         // 리다이렉트 URL로 이동
         window.location.href = redirectUrl;
+        // window.location.href = document.referrer;
+
+        // 리다이렉트 후 localStorage에서 redirectUrl 삭제
+        localStorage.removeItem('redirectUrl');
       } else if (
         result.message ===
         '아직 이메일 인증을 하지 않으셨습니다. 이메일 인증을 진행해 주세요.'
@@ -59,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // 출석 체크 함수
 async function checkAttendance(accessToken) {
   try {
-    const response = await fetch(`${API_BASE_URL}/user/me/point`, {
+    const response = await fetch(`${API_BASE_URL}/points/today`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
