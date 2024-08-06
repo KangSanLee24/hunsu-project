@@ -40,7 +40,7 @@ export class PostService {
 
   /* 게시글 생성 API*/
   async create(createPostDto: CreatePostDto, userId: number) {
-    const { title, content, category } = createPostDto;
+    const { title, content, category, urlsArray } = createPostDto;
     const user = await this.userRepository.findOne({
       where: { id: userId },
       withDeleted: true,
@@ -51,6 +51,22 @@ export class PostService {
       throw new UnauthorizedException(POST_MESSAGE.POST.UNAUTHORIZED);
     }
 
+    // urlsArray가 비어있다면 pass
+    if (urlsArray && urlsArray.length > 0) {
+      // 1. 실제 content에 사용된 urlsArray를 뽑아낸다.
+      const realUrlsArray = await this.filterImage(content);
+
+      // 2. 입력받은 urlsArray와 비교해서 urlsArray에만 존재하는 url들을 뽑아낸다.
+      const notUsedUrls = await this.filterOnlyOrlUrls(
+        urlsArray,
+        realUrlsArray
+      );
+
+      // 3. 뽑아낸 url들은 작성자가 작성 도중 파일을 업로드했다가 완료 시 삭제한 url이므로 aws s3에 지워준다.
+      await Promise.all(
+        notUsedUrls.map((fileUrl) => this.awsService.deleteFileFromS3(fileUrl))
+      );
+    }
     // 2. 게시글 저장
     const createdPost = this.postRepository.create({
       title,
@@ -206,6 +222,7 @@ export class PostService {
 
   /*게시글 수정 API*/
   async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
+    const { title, content, urlsArray, category } = updatePostDto;
     const post = await this.postRepository.findOne({
       where: { id },
       withDeleted: true,
@@ -221,7 +238,30 @@ export class PostService {
       throw new ForbiddenException(POST_MESSAGE.POST.UPDATE.FAILURE.FORBIDDEN);
     }
 
-    await this.postRepository.update({ id }, updatePostDto);
+    // 1. existingUrlsArray : 기존 작성물의 content에서 urls. (A)
+    const existingUrlsArray = await this.filterImage(post.content);
+    // 2. urlsArray : 작성 중 추가되었다 취소되었을 수도 있는 urls. (B)
+
+    // 3. newUrlsArray : 입력받은 content에서 urls. (C)
+    const newUrlsArray = await this.filterImage(content);
+
+    // 4. A와 B의 합집합에서 C를 뺀 notUsedUrls: string[]을 구한다.
+    const combinedUrls = [...new Set([...existingUrlsArray, ...urlsArray])]; // A U B
+    const notUsedUrls = await this.filterOnlyOrlUrls(
+      combinedUrls,
+      newUrlsArray
+    ); // (A U B) - C
+
+    // 5. notUsedUrls에 해당되는 파일을 AWS S3에서 제거한다.
+    await Promise.all(
+      notUsedUrls.map((fileUrl) => this.awsService.deleteFileFromS3(fileUrl))
+    );
+
+    const updatedPost = await this.postRepository.update(
+      { id },
+      { title, content, category }
+    );
+    console.log('🚀 ~ PostService ~ update ~ updatedPost:', updatedPost);
     return await this.postRepository.findOneBy({ id });
   }
 
@@ -232,7 +272,6 @@ export class PostService {
   ) {
     const post = await this.postRepository.findOne({
       where: { id },
-      relations: ['postImages'],
       withDeleted: true,
     });
 
@@ -245,10 +284,15 @@ export class PostService {
     if (post.userId !== userId) {
       throw new ForbiddenException(POST_MESSAGE.POST.DELETE.FAILURE.FORBIDDEN);
     }
+
+    // 게시글 content에서 URL 추출
+    const imageUrls = await this.filterImage(post.content);
+
     // AWS S3에서 이미지 삭제
-    // for문으로 s3 서비스의 삭제 메소드 이용해서 게시글에 속한 이미지 하나씩 삭제
-    for (const image of post.postImages) {
-      this.awsService.deleteFileFromS3(image.imgUrl);
+    if (imageUrls.length > 0) {
+      await Promise.all(
+        imageUrls.map((url) => this.awsService.deleteFileFromS3(url))
+      );
     }
 
     // 게시글 삭제로 포인트 차감
@@ -278,6 +322,16 @@ export class PostService {
     if (user.role !== Role.ADMIN) {
       throw new ForbiddenException(
         POST_MESSAGE.POST.FORCE_DELETE.FAILURE.FORBIDDEN
+      );
+    }
+
+    // 게시글 content에서 URL 추출
+    const imageUrls = await this.filterImage(post.content);
+
+    // 강제 삭제 시에도 AWS S3에서 이미지 삭제
+    if (imageUrls.length > 0) {
+      await Promise.all(
+        imageUrls.map((url) => this.awsService.deleteFileFromS3(url))
       );
     }
 
@@ -336,6 +390,10 @@ export class PostService {
     oldUrls: string[],
     newUrls: string[]
   ): Promise<string[]> {
+    // 배열이 아닌 경우 빈 배열 반환
+    if (!Array.isArray(oldUrls) || !Array.isArray(newUrls)) {
+      throw new TypeError('oldUrls and newUrls must be arrays');
+    }
     // newUrls 배열을 Set으로 변환하여 빠른 조회 가능하도록 함
     const newUrlSet = new Set(newUrls);
 
