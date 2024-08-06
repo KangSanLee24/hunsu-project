@@ -23,11 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      console.log(
-        '🚀 ~ signUpForm.addEventListener ~ JSON.stringify({ email, password, passwordConfirm, nickname }:',
-        JSON.stringify({ email, password, passwordConfirm, nickname })
-      );
-
       const response = await fetch(`${API_BASE_URL}/auth/sign-up`, {
         method: 'POST',
         headers: {
