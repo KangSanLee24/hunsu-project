@@ -122,10 +122,23 @@
   margin: 4px 2px; /* 버튼 간 여백 */
   cursor: pointer; /* 커서를 포인터로 변경 (클릭 가능 표시) */
   border-radius: 4px; /* 버튼 모서리 둥글게 만들기 */
+  transition: background-color 0.3s; /* 배경 색상 변경에 애니메이션 추가 */
 }
 
 .like-dislike button:hover {
   background-color: #e6e6fa; /* 버튼에 마우스를 올렸을 때 배경 색상 변경 */
+}
+
+/* 좋아요 버튼 활성화 상태 */
+.like-dislike .liked {
+  background-color: #cce5ff; /* 좋아요 클릭 시 배경 색상 */
+  color: #0056b3; /* 좋아요 클릭 시 텍스트 색상 */
+}
+
+/* 싫어요 버튼 활성화 상태 */
+.like-dislike .disliked {
+  background-color: #f8d7da; /* 싫어요 클릭 시 배경 색상 */
+  color: #721c24; /* 싫어요 클릭 시 텍스트 색상 */
 }
 
 .like-dislike button i {
