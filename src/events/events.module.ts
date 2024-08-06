@@ -10,9 +10,22 @@ import { AuthModule } from 'src/auth/auth.module';
 import { ChatService } from 'src/chat/chat.service';
 import { ChatImage } from 'src/chat/entities/chat-image.entity';
 import { AwsModule } from 'src/aws/aws.module';
+import { Point } from 'src/point/entities/point.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ChatRoom, ChatMember, ChatLog, ChatImage, User]), UserModule, AuthModule, AwsModule],
-  providers: [ChatGateway, ChatService]
+  imports: [
+    TypeOrmModule.forFeature([
+      ChatRoom,
+      ChatMember,
+      ChatLog,
+      ChatImage,
+      User,
+      Point,
+    ]),
+    UserModule,
+    AuthModule,
+    AwsModule,
+  ],
+  providers: [ChatGateway, ChatService],
 })
 export class EventsModule {}

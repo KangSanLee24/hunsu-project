@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // accessToken이 유효한 경우
         displayUserInfo(result.data.nickname);
       } else if (refreshToken) {
-        console.log('🚀 ~ fetchUserInfo ~ refreshToken:', refreshToken);
+        console.log('🚀 ~ 리프레시 토큰 재발급 시작!');
         // accessToken이 유효하지 않을 때
         const refreshResult = await fetchRefreshToken(refreshToken);
 
