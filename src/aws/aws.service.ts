@@ -52,10 +52,11 @@ export class AwsService {
 
   // 첨부 파일 삭제
   async deleteFileFromS3(fileUrl: string) {
-    const fileName = fileUrl.split('/').slice(-2).join('/');
+    const fileName = fileUrl.split('/').pop();
+
     const command = new DeleteObjectCommand({
       Bucket: this.configService.get('AWS_S3_BUCKET_NAME'), // S3 버킷 이름
-      Key: fileName, // 삭제될 파일의 이름
+      Key: `chats/${fileName}`, // 삭제될 파일의 이름
     });
 
     try {
@@ -70,7 +71,6 @@ export class AwsService {
 
   //이미지 삭제
   async deleteImageFromS3(fileUrl: string) {
-
     const fileName = fileUrl.split('/').slice(-2).join('/');
     const key = `chats/${fileName}`;
 
@@ -78,7 +78,7 @@ export class AwsService {
       Bucket: this.configService.get('AWS_S3_BUCKET_NAME'), // S3 버킷 이름
       Key: key, // 삭제할 파일의 이름
     });
-  
+
     try {
       await this.s3Client.send(command);
       console.log(`Successfully deleted: ${key}`);
