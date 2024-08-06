@@ -14,6 +14,9 @@ jobs:
     # 작업을 실행 할 VM의 OS 지정
     runs-on: ubuntu-22.04
 
+    # runtime 60분으로 확장
+    timeout-minutes: 60
+
     # 작업 내의 단위 작업(step)을 정의
     steps:
       # SSH 접속 후 명령을 통해서 배포 진행
