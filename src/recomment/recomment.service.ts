@@ -44,19 +44,19 @@ export class RecommentService {
     createRecommentDto: CreateRecommentDto
   ) {
     // 댓글에 대댓글에 대댓글이 가능해서 수정.
-    const findPost = await this.commentRepository.findOne({
+    const findComment = await this.commentRepository.findOne({
       where: { id: commentId, parentId: IsNull() },
     });
 
-    if (!findPost) {
+    if (!findComment) {
       throw new BadRequestException('댓글이 존재하지 않습니다.');
     }
 
     const newRecomment = await this.commentRepository.save({
-      parentId: commentId,
-      postId: findPost.postId,
-      userId: user.id,
-      content: createRecommentDto.content,
+      parentId: commentId, // 부모댓글 id
+      postId: findComment.postId, // 부모댓글이 달려있는 게시글 id
+      userId: user.id, // 대댓글을 쓴 사람 id
+      content: createRecommentDto.content, // 대댓글 내용
     });
 
     // 댓글 생성 포인트 지급
@@ -67,11 +67,15 @@ export class RecommentService {
     if (isValidPoint)
       this.pointService.savePointLog(user.id, PointType.COMMENT, true);
 
-    await this.alarmService.createAlarm(
-      findPost.userId, // 댓글 글쓴이(알람을 받을 사용자)에게
-      AlarmFromType.COMMENT, // 유형은 COMMENT
-      newRecomment.parentId // 어떤 댓글에(commentId) 새로운 대댓글이 달렸는지
-    );
+    // 알람을 줄 것인가 여부
+    // 부모댓글을 쓴 사람이 나인가?
+    if (user.id !== findComment.userId) {
+      await this.alarmService.createAlarm(
+        findComment.userId, // 부모댓글을 쓴 사용자 id
+        AlarmFromType.COMMENT, // 유형은 COMMENT
+        newRecomment.parentId // 어떤 댓글에(commentId) 새로운 대댓글이 달렸는지
+      );
+    }
 
     return newRecomment;
   }
