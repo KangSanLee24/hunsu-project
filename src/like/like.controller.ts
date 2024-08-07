@@ -7,6 +7,7 @@ import {
   UseGuards,
   ParseIntPipe,
   HttpStatus,
+  Patch,
 } from '@nestjs/common';
 import { LikeService } from './like.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -69,7 +70,7 @@ export class LikeController {
     };
   }
 
-  /** 게시글 싫어요 조회 API **/
+  /** 게시글 좋아요 조회 API **/
   @ApiTags('3. POST API')
   @ApiOperation({ summary: '게시글 좋아요 조회 API' })
   @Get('/posts/:postId/likes')
@@ -107,7 +108,7 @@ export class LikeController {
   @ApiOperation({ summary: '게시글 좋아요 생성 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Post('/posts/:postId/likes')
+  @Patch('/posts/:postId/likes')
   async postLike(
     @LogIn() user: User,
     @Param('postId', ParseIntPipe) postId: number

@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   HttpStatus,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { DislikeService } from './dislike.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -111,7 +112,7 @@ export class DislikeController {
   @ApiOperation({ summary: '게시글 싫어요 클릭 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Post('/posts/:postId/dislikes')
+  @Patch('/posts/:postId/dislikes')
   async postDislike(
     @LogIn() user: User,
     @Param('postId', ParseIntPipe) postId: number
