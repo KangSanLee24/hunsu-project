@@ -69,6 +69,7 @@ export class LikeController {
     };
   }
 
+  /** 게시글 싫어요 조회 API **/
   @ApiTags('3. POST API')
   @ApiOperation({ summary: '게시글 좋아요 조회 API' })
   @Get('/posts/:postId/likes')
@@ -82,39 +83,41 @@ export class LikeController {
     };
   }
 
+  /** 로그인한 사람의 게시글 좋아요 조회 API **/
+  @ApiTags('3. POST API')
+  @ApiOperation({ summary: '나의 게시글 좋아요 여부 조회 API' })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @Get('/posts/:postId/likes/me')
+  async getMyPostLike(
+    @LogIn() user: User,
+    @Param('postId', ParseIntPipe) postId: number
+  ) {
+    const userId = user.id;
+    const data = await this.likeService.getMyPostLike(userId, postId);
+    return {
+      status: HttpStatus.OK,
+      messgae: '나의 게시글 좋아요 여부 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 게시글 좋아요 클릭 API **/
   @ApiTags('3. POST API')
   @ApiOperation({ summary: '게시글 좋아요 생성 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post('/posts/:postId/likes')
-  async createPostLike(
+  async postLike(
     @LogIn() user: User,
     @Param('postId', ParseIntPipe) postId: number
   ) {
     const userId = user.id;
-    await this.likeService.createPostLike(userId, postId);
+    await this.likeService.postLike(userId, postId);
 
     return {
       status: HttpStatus.OK,
       message: POST_MESSAGE.LIKE.CREATE.SUCCESS,
-    };
-  }
-
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 좋아요 삭제 API' })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Delete('/posts/:postId/likes')
-  async deletePostLike(
-    @LogIn() user: User,
-    @Param('postId', ParseIntPipe) postId: number
-  ) {
-    const userId = user.id;
-    await this.likeService.deletePostLike(userId, postId);
-
-    return {
-      status: HttpStatus.OK,
-      message: POST_MESSAGE.LIKE.DELETE.SUCCESS,
     };
   }
 }

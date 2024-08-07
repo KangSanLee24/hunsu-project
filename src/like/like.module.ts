@@ -11,6 +11,8 @@ import { CommentLike } from './entities/comment-like.entity';
 import { PointLog } from 'src/point/entities/point-log.entity';
 import { Point } from 'src/point/entities/point.entity';
 import { PointModule } from 'src/point/point.module';
+import { PostDislike } from 'src/dislike/entities/post-dislike.entity';
+import { DislikeModule } from 'src/dislike/dislike.module';
 
 @Module({
   imports: [
@@ -23,9 +25,11 @@ import { PointModule } from 'src/point/point.module';
       Point,
       PointLog,
     ]),
+
     PointModule,
   ],
   controllers: [LikeController],
   providers: [LikeService],
+  exports: [LikeService],
 })
 export class LikeModule {}
