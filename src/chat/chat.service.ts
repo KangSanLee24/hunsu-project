@@ -338,25 +338,25 @@ export class ChatService {
   async getHotLiveChat(num: number) {
     const getHotLiveChat = await this.entityManager.query(
       `
-  select a.id, a.owner_id, a.title, a.count,
-	CASE
-	when b.user_id = a.owner_id then b.img_url
-	ELSE null
-	END as img_url
-  from (select a.id, a.user_id as owner_id, a.title, count(b.user_id) as count
-  from (select id, user_id ,title
-  from chat_rooms
-  where is_deleted = FALSE) a join chat_members b
-  on a.id  = b.room_id
-  GROUP by a.id
-  order by count DESC) a left join
-  (select room_id , user_id, img_url
-  from chat_Images
-  where (room_id, created_at) IN
-  (select room_id , max(created_at)
-  from chat_Images
-  group by room_id)) b
-  on a.id = b.room_id;
+      select a.id, a.owner_id, a.title, a.count,
+      CASE
+      when b.user_id = a.owner_id then b.img_url
+      ELSE null
+      END as img_url
+      from (select a.id, a.user_id as owner_id, a.title, count(b.user_id) as count
+      from (select id, user_id ,title
+      from chat_rooms
+      where is_deleted = FALSE) a join chat_members b
+      on a.id  = b.room_id
+      GROUP by a.id
+      order by count DESC) a left join
+      (select room_id , user_id, img_url
+      from chat_Images
+      where (room_id, created_at) IN
+      (select room_id , max(created_at)
+      from chat_Images
+      group by room_id)) b
+      on a.id = b.room_id;
       `
     );
 
@@ -380,5 +380,25 @@ export class ChatService {
       })
     );
     return data;
+  }
+
+  //마지막 고정 이미지
+  async findChatImage(chatRoomId: number) {
+
+    const findChatImage = await this.chatImageRepository.findOne({
+      where: { roomId: chatRoomId },
+      select: { 
+        userId: true,
+        imgUrl: true,      
+       },
+      order: { createdAt: 'DESC'}
+    });
+
+    const findUser = await this.userRepository.findOne({
+      where: { id: findChatImage.userId },
+      select: { nickname: true },
+    });
+
+    return {findChatImage, findUser};
   }
 }

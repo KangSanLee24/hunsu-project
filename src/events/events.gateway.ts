@@ -43,7 +43,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     socket.data.authorId = payload.authorId; 
 
     await this.chatService.joinChatRoom(+payload.roomId, +payload.authorId);
+    const {findChatImage, findUser} = await this.chatService.findChatImage(+payload.roomId);
 
+    //고정된 이미지 전송
+    this.server.to(payload.roomId).emit('lastImage', {author: findUser.nickname, fileUrl: findChatImage.imgUrl });
     //유저가 들어왔음을 알림
     this.server.to(payload.roomId).emit('userJoined', {message: `${payload.author} 님이 입장하셨습니다`});
   }
