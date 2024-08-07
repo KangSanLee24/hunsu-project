@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /** TIME 표기 함수 **/
   const yyyymmdd = (date) => {
     // 1. 한국 시간 보정
-    const korDate = Number(new Date(date)) + 1000 * 60 * 60 * 9;
+    const korDate = Number(new Date(date));
     const start = new Date(korDate);
     const time = start.toLocaleDateString('ko-KR', {
       year: '2-digit',
