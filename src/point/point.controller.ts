@@ -50,8 +50,8 @@ export class PointController {
    * @returns
    */
   @Get('ranks')
-  async pointLank(@Query('num') num: number) {
-    const data = await this.pointService.pointLank(+num);
+  async pointRank(@Query('num') num: number) {
+    const data = await this.pointService.pointRank(+num);
     return {
       status: 200,
       message: '종합 랭킹 조회에 성공했습니다.',
@@ -64,8 +64,8 @@ export class PointController {
    * @returns
    */
   @Get('ranks-weekly')
-  async pointWeeklyLank(@Query('num') num: number) {
-    const data = await this.pointService.pointWeeklyLank(+num);
+  async pointWeeklyRank(@Query('num') num: number) {
+    const data = await this.pointService.pointWeeklyRank(+num);
     return {
       status: 200,
       message: '주간 랭킹 조회에 성공했습니다.',

@@ -13,7 +13,13 @@
   </head>
   <body>
     <header>
-      <div class="logo">5ZIRAP</div>
+      <div
+        id="logo-home"
+        class="logo"
+        onClick="window.location.href='./main.html'"
+      >
+        5ZIRAP
+      </div>
       <nav>
         <ul>
           <li><a href="./log-in.html">로그인</a></li>
@@ -62,6 +68,9 @@
     <script type="module" src="/js/common/header.js"></script>
     <script type="module" src="/js/post/post-create.js"></script>
     <script>
+      // 전역변수로 이미지 URL 배열 선언
+      window.imageUrls = []; // 전역변수로 설정
+
       const editor = new toastui.Editor({
         el: document.querySelector('#editor'), // 에디터를 적용할 요소 (컨테이너)
         height: 'auto', // 에디터 영역의 높이 값 (OOOpx || auto)
@@ -74,7 +83,6 @@
             try {
               const formData = new FormData();
               formData.append('files', blob);
-              console.log('🚀 ~ addImageBlobHook ~ formData:', formData);
               const response = await fetch(`/api/posts/images`, {
                 method: 'POST',
                 headers: {
@@ -84,8 +92,9 @@
               });
 
               const result = await response.json();
-              console.log('🚀 ~ addImageBlobHook ~ result:', result);
-              callback(result.data, 'image alt attribute');
+              // URL을 배열에 추가
+              window.imageUrls.push(result.data[0]); // 업로드된 이미지 URL 저장
+              callback(result.data[0], 'image alt attribute');
             } catch (error) {
               console.error('업로드 실패 : ', error);
             }
