@@ -153,7 +153,6 @@ export class LikeService {
       userId,
       postId,
     });
-
     return like ? true : false;
   }
 

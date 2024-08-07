@@ -1,24 +1,14 @@
 import { API_BASE_URL } from '../../config/config.js';
 
-// URL에서 게시글 ID를 가져와서 상세 내용 로드
+/** 0. 게시글 상세 페이지에 필요한 변수 선언 **/
+// 0-1. URL에서 게시글 ID를 가져와서 상세 내용 로드
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get('id');
-
+// 0-2. 버튼 선언
 const submitLikeButton = document.getElementById('like-btn');
 const submitDislikeButton = document.getElementById('dislike-btn');
 
-// 게시글 상세 조회 API 호출
-async function fetchPost(postId) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/posts/${postId}`);
-    if (!response.ok) throw new Error('게시글을 불러오는 데 실패했습니다.');
-    return await response.json();
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-// 페이지 렌더링 메소드
+/** 1. 게시글 상세 페이지 랜더링 **/
 async function renderPostDetail(postId) {
   const post = await fetchPost(postId);
   marked.use({
@@ -26,7 +16,7 @@ async function renderPostDetail(postId) {
     mangle: false,
   });
 
-  // 게시글 내용 렌더링
+  // 1-1. 게시글 내용 랜더링
   if (post) {
     document.getElementById('post-category').innerText =
       post.data.category || 'N/A';
@@ -46,69 +36,102 @@ async function renderPostDetail(postId) {
   }
 }
 
-// 좋아요 API 호출
-async function updateLikes(postId) {
+/** 2. 게시글 상세 조회 API 호출 **/
+async function fetchPost(postId) {
   try {
-    const response = await fetch(`${API_BASE_URL}/posts/${postId}/likes`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      },
-    });
-    if (!response.ok) throw new Error('좋아요 업데이트에 실패했습니다.');
+    const response = await fetch(`${API_BASE_URL}/posts/${postId}`);
+    if (!response.ok) throw new Error('게시글을 불러오는 데 실패했습니다.');
     return await response.json();
   } catch (error) {
     console.error(error);
   }
 }
 
-// 싫어요 API 호출
-async function updateDislikes(postId) {
+/** 3. 나의 게시글 좋아요/싫어요 여부 조회 **/
+async function fetchLD(postId) {
   try {
-    const response = await fetch(`${API_BASE_URL}/posts/${postId}/dislikes`, {
-      method: 'POST',
+    // 1. 게시글 좋아요 눌렀는지 조회
+    const postLike = await fetch(`${API_BASE_URL}/posts/${postId}/likes/me`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
     });
-    if (!response.ok) throw new Error('싫어요 업데이트에 실패했습니다.');
-    return await response.json();
+    const resultPostLike = await postLike.json();
+    // 1-1. 눌렀다면
+    if (resultPostLike.data == true) {
+      submitLikeButton.classList.add('liked');
+      submitLikeButton.innerHTML = '❤️ 좋아요!';
+      submitDislikeButton.disabled = true;
+    }
+
+    // 2. 게시글 싫어요 눌렀는지 조회
+    const postDislike = await fetch(
+      `${API_BASE_URL}/posts/${postId}/dislikes/me`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      }
+    );
+    const resultPostDislike = await postDislike.json();
+    // 2-1. 눌렀다면
+    if (resultPostDislike.data == true) {
+      submitDislikeButton.classList.add('disliked');
+      submitDislikeButton.innerHTML = '💔 싫어요!';
+      submitLikeButton.disabled = true;
+    }
   } catch (error) {
-    console.error(error);
+    console.error('나의 게시글 좋아요/싫어요 여부 조회 API 실행 중 오류 발생');
   }
 }
-// 좋아요 취소 API 호출
-async function cancelLikes(postId) {
+
+/** 4. 게시글 좋아요 클릭 **/
+async function clickLikes(postId) {
   try {
+    // 4-1. 게시글 좋아요 클릭 API 호출
     const response = await fetch(`${API_BASE_URL}/posts/${postId}/likes`, {
-      method: 'DELETE',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
     });
-    if (!response.ok) throw new Error('좋아요 취소에 실패했습니다.');
-    return await response.json();
+    // 4-2. API response 결과가 ok가 아니면
+    if (!response.ok) {
+      alert('자신의 게시글에는 좋아요를 누를 수 없습니다.');
+      console.log('좋아요 업데이트에 실패했습니다.');
+    }
+    // 4-3. 새로고침
+    // window.location.reload();
   } catch (error) {
+    // 4-4. 도중에 에러가 뜬 경우
     console.error(error);
   }
 }
 
-// 싫어요 취소 API 호출
-async function cancelDislikes(postId) {
+/** 5. 게시글 싫어요 클릭 **/
+async function clickDislikes(postId) {
   try {
+    // 5-1. 게시글 싫어요 클릭 API 호출
     const response = await fetch(`${API_BASE_URL}/posts/${postId}/dislikes`, {
-      method: 'DELETE',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
     });
-    if (!response.ok) throw new Error('싫어요 취소에 실패했습니다.');
-    return await response.json();
+    // 5-2. API response 결과가 ok가 아니면
+    if (!response.ok) {
+      console.log('싫어요 업데이트에 실패했습니다.');
+    }
+    // 5-3. 새로고침
+    // window.location.reload();
   } catch (error) {
+    // 5-4. 도중에 에러가 뜬 경우
     console.error(error);
   }
 }
@@ -117,14 +140,14 @@ async function cancelDislikes(postId) {
 async function handleLike() {
   // 버튼이 이미 눌린 상태라면 좋아요를 취소합니다.
   if (submitLikeButton.classList.contains('liked')) {
-    await cancelLikes(postId);
+    await clickLikes(postId);
     submitLikeButton.classList.remove('liked');
     submitLikeButton.innerHTML = '👍 좋아요'; // 좋아요 취소 시 이모지 변경
     submitDislikeButton.disabled = false; // 싫어요 버튼 활성화
   } else {
-    await updateLikes(postId);
+    await clickLikes(postId);
     submitLikeButton.classList.add('liked');
-    submitLikeButton.innerHTML = '❤️ 좋아요'; // 좋아요 추가 시 이모지 변경
+    submitLikeButton.innerHTML = '❤️ 좋아요!'; // 좋아요 추가 시 이모지 변경
     submitDislikeButton.disabled = true; // 싫어요 버튼 활성화
   }
   await renderPostDetail(postId);
@@ -134,12 +157,12 @@ async function handleLike() {
 async function handleDislike() {
   // 버튼이 이미 눌린 상태라면 싫어요를 취소합니다.
   if (submitDislikeButton.classList.contains('disliked')) {
-    await cancelDislikes(postId);
+    await clickDislikes(postId);
     submitDislikeButton.classList.remove('disliked');
     submitDislikeButton.innerHTML = '👎 싫어요'; // 싫어요 취소 시 이모지와 텍스트
     submitLikeButton.disabled = false; // 좋아요 버튼 활성화
   } else {
-    await updateDislikes(postId);
+    await clickDislikes(postId);
     submitDislikeButton.classList.add('disliked');
     submitDislikeButton.innerHTML = '💔 싫어요!'; // 싫어요 추가 시 이모지와 텍스트
     submitLikeButton.disabled = true; // 좋아요 버튼 비활성화
@@ -151,7 +174,8 @@ async function handleDislike() {
 submitLikeButton.addEventListener('click', handleLike);
 submitDislikeButton.addEventListener('click', handleDislike);
 
-// 페이지 로드 시 게시글과 댓글을 렌더링
+/** 페이지 시작!! 0. 페이지 로드 시 게시글과 댓글을 렌더링 **/
 if (postId) {
   renderPostDetail(postId);
+  fetchLD(postId);
 }
