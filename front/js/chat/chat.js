@@ -42,13 +42,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentUser;
     let currentUserId;
     try{
-        currentUser = (await getAuthor()).author;
-        currentUserId = (await getAuthor()).authorId;
+        const authorData = await getAuthor();
+        currentUser = authorData.author;
+        currentUserId = authorData.authorId;
+        // currentUser = (await getAuthor()).author;
+        // currentUserId = (await getAuthor()).authorId;
     } catch(error){
         console.error('Failed to get author:', error);
     }
-
-    console.log(currentUser, currentUserId);
 
     // 채팅 목록을 자동으로 스크롤 하단으로 이동
     function scrollToBottom() {
@@ -94,11 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
         };
     }
-
-    // 웹소켓 연결 시 joinRoom 호출
-    socket.on('connect', () => {
-        joinRoom();
-    });
 
     // 방 입장 시 서버에 'joinRoom' 이벤트 전송
     socket.emit('joinRoom', { roomId, author: currentUser, authorId: currentUserId});
@@ -268,21 +264,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         notification.textContent = data.message;
         chatScroll.appendChild(notification);
         chatScroll.scrollTop = chatScroll.scrollHeight; // 최신 메시지로 스크롤
-
-        setTimeout(() => {
-            if(data.message.includes('방장')) {
-                alert('방장이 채팅방을 나갔습니다. 채팅 목록 페이지로 이동하시겠습니까?');
-                window.location.href = '/html/chat-list.html';
-            }
-        }, 1000)
     });
 
-    // 페이지 로드 후 사용자 상호작용을 위한 이벤트 핸들러 추가
-    document.body.addEventListener('click', () => {
-        window.addEventListener('beforeunload', (event) => {
-            const confirmationMessage = '정말로 이 페이지를 떠나시겠습니까?';
-            event.returnValue = confirmationMessage; // 표준
-            return confirmationMessage; // Chrome 및 다른 브라우저에서 필요
-        });
+    // 서버로부터 'ownerLeft' 이벤트 수신
+    socket.on('ownerLeft', () => {
+        console.log('ownerLeft');
+        alert('방장이 채팅방을 나갔습니다. 채팅 목록 페이지로 이동합니다.');
+        window.location.href = '/html/chat-list.html';
     });
+
+    socket.on('outRoom', () => {
+        alert('삭제된 채팅방입니다. 채팅 목록 페이지로 이동합니다.');
+        window.location.href = '/html/chat-list.html';
+    })
 });

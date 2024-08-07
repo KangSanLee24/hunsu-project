@@ -427,4 +427,14 @@ export class ChatService {
       return null;
     }
   }
+
+  //죽은 방인지 확인
+  async isChatRoom (chatRoomId: number) {
+
+    const isChatRoom = await this.chatRoomRepository.findOne({
+      where: {id: chatRoomId, isDeleted: false},
+    });
+
+    return isChatRoom;
+  }
 }
