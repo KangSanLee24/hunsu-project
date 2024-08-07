@@ -86,7 +86,6 @@ async function renderPostDetail(postId) {
       if (result.status === 200 && result.data.id == post.data.userId) {
         document.getElementById('post-update-btn').disabled = false;
         document.getElementById('post-delete-btn').disabled = false;
-        console.log('여기까지왔으면 바뀌어야됨');
       }
     } catch (error) {}
   }
