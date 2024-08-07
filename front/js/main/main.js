@@ -339,7 +339,6 @@ document.addEventListener('DOMContentLoaded', () => {
   /** 0. WEEKLY POINT RANK 랜더링 **/
   function renderWeeklyPointRank(data) {
     // 1. 들어온 데이터를 하나하나 HTML화
-    console.log(data);
     for (let i = 1; i <= data.length; i++) {
       // 1-1. 데이터로 row HTML 생성
       const row = document.createElement('div');

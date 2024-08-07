@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
       alert(result.message);
 
       // 4-A-3. 메인 페이지로 이동
-      window.location.href = './main.html';
+      window.location.href = localStorage.getItem('redirectUrl');
     } else {
       // 4-B. 기타 로그인 에러 처리
       alert(result.message || '네이버 로그인에 실패했습니다.');

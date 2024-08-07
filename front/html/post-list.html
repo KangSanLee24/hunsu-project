@@ -1,88 +1,103 @@
 <!doctype html>
 <html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>게시판 목록</title>
+    <link rel="stylesheet" href="/styles/style.css" />
+    <link rel="stylesheet" href="/styles/post-list.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>게시판 목록</title>
-  <link rel="stylesheet" href="/styles/style.css" />
-  <link rel="stylesheet" href="/styles/post-list.css" />
-  <script type="module" src="/js/common/header.js"></script>
-  <script type="module" src="/js/post/post-list.js"></script>
-</head>
+  <body>
+    <header>
+      <div
+        id="logo-home"
+        class="logo"
+        onClick="window.location.href='./main.html'"
+      >
+        5ZIRAP
+      </div>
+      <nav>
+        <ul>
+          <li><a href="./log-in.html">로그인</a></li>
+          <li><a href="./sign-up.html">회원가입</a></li>
+          <li><a id="userNickname"></a></li>
+        </ul>
+      </nav>
+    </header>
 
-<body>
-  <header>
-    <div class="logo">5ZIRAP</div>
-    <nav>
-      <ul>
-        <li><a href="./log-in.html">로그인</a></li>
-        <li><a href="./sign-up.html">회원가입</a></li>
-        <li><a id="userNickname"></a></li>
-      </ul>
-    </nav>
-  </header>
+    <main>
+      <table>
+        <thead>
+          <tr>
+            <th>번호</th>
+            <th>카테고리</th>
+            <th>제목</th>
+            <th>글쓴이</th>
+            <th>등록일</th>
+            <th>댓글</th>
+          </tr>
+        </thead>
+        <tbody id="board-list"></tbody>
+      </table>
 
-  <main>
-    <table>
-      <thead>
-        <tr>
-          <th>번호</th>
-          <th>카테고리</th>
-          <th>제목</th>
-          <th>글쓴이</th>
-          <th>등록일</th>
-          <th>댓글</th>
-        </tr>
-      </thead>
-      <tbody id="board-list"></tbody>
-    </table>
+      <div class="pagination">
+        <button id="prev-button" disabled>이전</button>
+        <span id="page-numbers"></span>
+        <span id="current-page-label"></span>
+        <button id="next-button">다음</button>
+      </div>
 
-    <div class="pagination">
-      <button id="prev-button" disabled>이전</button>
-      <span id="page-numbers"></span>
-      <span id="current-page-label"></span>
-      <button id="next-button">다음</button>
-    </div>
+      <div class="filter-container">
+        <select id="category-select">
+          <option value="">모든 카테고리</option>
+          <option value="FASHION">패션</option>
+          <option value="CHAT">잡담</option>
+          <option value="COOKING">요리</option>
+        </select>
 
-    <div class="filter-container">
-      <select id="category-select">
-        <option value="">모든 카테고리</option>
-        <option value="FASHION">패션</option>
-        <option value="CHAT">잡담</option>
-        <option value="COOKING">요리</option>
-      </select>
+        <select id="sort-select">
+          <option value="">정렬 방법</option>
+          <option value="ASC">오래된순</option>
+          <option value="DESC">최신순</option>
+        </select>
 
-      <select id="sort-select">
-        <option value="">정렬 방법</option>
-        <option value="ASC">오래된순</option>
-        <option value="DESC">최신순</option>
-      </select>
+        <input
+          type="text"
+          id="keyword-input"
+          placeholder="검색어를 입력하세요"
+        />
 
-      <input type="text" id="keyword-input" placeholder="검색어를 입력하세요" />
+        <button id="filter-button">검색</button>
+      </div>
+      <div class="write-button">
+        <button id="write-post">글쓰기</button>
+      </div>
+    </main>
 
-      <button id="filter-button">검색</button>
-    </div>
-    <div class="write-button">
-      <button id="write-post">글쓰기</button>
-    </div>
-  </main>
+    <footer>
+      <div class="footer-menu">
+        <button onclick="window.location.href='./chat-list.html'">
+          💬 Live Chat
+        </button>
+        <button onclick="window.location.href='./post-list.html'">
+          📝 게시판
+        </button>
+        <button onclick="window.location.href='./main.html'">🏠 홈으로</button>
+        <button id="alarmButton" class="footerAlarm" onclick="clickAlarmBtn()">
+          🔔 알람
+        </button>
+        <button
+          id="myPageButton"
+          class="my-page-button"
+          onclick="clickMyPageBtn()"
+        >
+          🏆 마이페이지
+        </button>
+      </div>
+    </footer>
 
-  <footer>
-    <div class="footer-menu">
-      <button onclick="window.location.href='./chat-list.html'">
-        💬 Live Chat
-      </button>
-      <button onclick="window.location.href='./post-list.html'">
-        📝 게시판
-      </button>
-      <button onclick="window.location.href='./main.html'">🏠 홈으로</button>
-      <button id="alarmButton" class="footerAlarm">
-        🔔 알람
-      </button>
-      <button id="myPageButton" class="my-page-button">🏆 마이페이지</button>
-    </div>
-  </footer>
-</body>
-
+    <script type="module" src="/js/common/header.js"></script>
+    <script type="module" src="/js/post/post-list.js"></script>
+  </body>
 </html>
