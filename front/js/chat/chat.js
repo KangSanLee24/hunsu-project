@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="chat-message-bubble">
                     <span class="chat-message-body">${message.body}</span>
                 </div>
+                <span class="chat-message-time">${message.chatTime}</span>
             </div>
         `;
         } else if (message.fileUrl) {
@@ -76,6 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="chat-message-bubble">
                     <img src="${message.fileUrl}" alt="Chat Image" style="max-width: 100%; height: auto;" />
                 </div>
+                <span class="chat-message-time">${message.imageTime}</span>
             </div>
         `;
         }

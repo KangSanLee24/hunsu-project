@@ -60,9 +60,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleMessage(@MessageBody() payload: { roomId: string; author: string; body: string }, socket: Socket) {
     this.logger.log(`Message received: ${payload.body}`);
 
-    await this.chatService.sendChatRoom(+payload.roomId, payload.author, payload.body);
+    const chatTime = await this.chatService.sendChatRoom(+payload.roomId, payload.author, payload.body);
 
-    this.server.to(payload.roomId).emit('chat', {author: payload.author, body: payload.body});
+    this.server.to(payload.roomId).emit('chat', {author: payload.author, body: payload.body, chatTime});
     return payload;
   }
 
@@ -71,7 +71,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleImage(@MessageBody() payload: { roomId: string; author: string; fileUrl: string }, @ConnectedSocket() socket: Socket) {
     this.logger.log(`Message received: ${payload.fileUrl}`);
 
-    this.server.to(payload.roomId).emit('chatImage', {author: payload.author, fileUrl: payload.fileUrl });
+    const imageTime = await this.chatService.imageTime(+payload.roomId, payload.author, payload.fileUrl);
+
+    this.server.to(payload.roomId).emit('chatImage', {author: payload.author, fileUrl: payload.fileUrl, imageTime });
     return payload;
   }
 

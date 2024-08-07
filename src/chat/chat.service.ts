@@ -227,11 +227,15 @@ export class ChatService {
       select: { id: true },
     });
 
-    await this.chatLogRepository.save({
+    const chatLog = await this.chatLogRepository.save({
       roomId: chatRoomId,
       content: message,
       memberId: findUser.id,
     });
+
+    const chatTime = format(new Date(chatLog.createdAt), 'HH:mm');
+
+    return chatTime;
   }
 
   //채팅방 이미지 저장
@@ -265,6 +269,24 @@ export class ChatService {
     return fileUrl;
   }
 
+  //이미지 시간 조회
+  async imageTime (roomId: number, author: string, fileUrl: string) {
+
+    const findUser = await this.userRepository.findOne({
+      where: { nickname: author },
+      select: { id: true },
+    });
+
+    const imageLog = await this.chatImageRepository.findOne({
+      where: { roomId: roomId, userId: findUser.id, imgUrl: fileUrl },
+      select: { createdAt: true }
+    });
+
+    const imageTime = format(new Date(imageLog.createdAt), 'HH:mm');
+
+    return imageTime;
+  }
+  
   //채팅방 검색
   async chatRoomSearch(title?: string, sort?: Order) {
     const findChatRoom = await this.chatRoomRepository.find({

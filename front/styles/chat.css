@@ -93,6 +93,11 @@ code {
   word-break: break-word;
 }
 
+.chat-message-time {
+  font-size: 0.8em; /* 예시로 작은 글씨 크기 설정 */
+  color: #888; /* 예시로 회색 텍스트 색상 설정 */
+}
+
 .chat-message-author {
   font-size: 0.81em;
   font-weight: 600;
