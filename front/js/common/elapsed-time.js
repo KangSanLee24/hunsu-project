@@ -1,7 +1,7 @@
 /** 4. 시간 표시 함수 **/
 export const elapsedTime = (date) => {
   // 4-1. 한국시간으로 보정 (9시간)
-  const korDate = Number(new Date(date)) + 1000 * 60 * 60 * 9;
+  const korDate = Number(new Date(date));
   // 4-2. start(알람생성시각), end(현재시각)
   const start = new Date(korDate);
   const end = new Date();
