@@ -231,7 +231,7 @@ export class PointService {
   async pointWeeklyRank(num: number) {
     const pointRank = await this.pointLogRepository.query(
       `
-      SELECT b.nickname, SUM(a.point) AS point
+      SELECT b.id, b.nickname, SUM(a.point) AS point
       FROM point_logs a
       JOIN users b ON a.user_id = b.id
       WHERE a.created_at >=  DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 8) DAY)  
@@ -242,11 +242,18 @@ export class PointService {
       `
     );
 
-    const data = pointRank.map((point) => ({
-      point: point.point,
-      nickname: point.nickname,
-    }));
-
+    const data = await Promise.all(
+      pointRank.map(async (point: any) => {
+        const accPoint = await this.pointRepository.findOneBy({
+          userId: point.id,
+        });
+        return {
+          accPoint: accPoint.accPoint,
+          point: point.point,
+          nickname: point.nickname,
+        };
+      })
+    );
     return data;
   }
 

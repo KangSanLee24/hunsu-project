@@ -36,7 +36,7 @@ export class CommentService {
     @InjectRepository(CommentDislike)
     private commentDislikeRepository: Repository<CommentDislike>,
     private readonly pointService: PointService
-  ) { }
+  ) {}
 
   // 댓글 생성
   async createComment(
@@ -67,6 +67,7 @@ export class CommentService {
       postId,
       ...createCommentDto,
     });
+    const nickname = user.nickname;
 
     // 댓글 생성 포인트 지급
     const isValidPoint = await this.pointService.validatePointLog(
@@ -78,13 +79,16 @@ export class CommentService {
       this.pointService.savePointLog(userId, PointType.COMMENT, true, postId);
     }
 
-    const nickname = user.nickname;
+    // 알람을 줄 것인지 여부
+    // 댓글을 다는 사람(로그인한 사람)이 게시글을 쓴 사람이 아닌 경우에만 알람
 
-    await this.alarmService.createAlarm(
-      data.userId, // 게시글 글쓴이(알람을 받을 사용자)에게
-      AlarmFromType.POST, // 유형은 POST
-      data.postId // 어떤 게시글에(postId) 새로운 댓글이 달렸는지
-    );
+    if (userId !== post.userId) {
+      await this.alarmService.createAlarm(
+        post.userId, // 게시글 글쓴이(알람을 받을 사용자)에게
+        AlarmFromType.POST, // 유형은 POST
+        post.id // 어떤 게시글에(postId) 새로운 댓글이 달렸는지
+      );
+    }
 
     // 응답 데이터 구성
     return {

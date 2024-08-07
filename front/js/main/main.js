@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="point-rank-ranking-var">${rankMark(i)}</span>
                 </div>                  
                 <div class="point-rank-nickname">
-                <span>${data[i - 1].nickname}</span>
+                <span>${levelMark(data[i - 1].accPoint)}${data[i - 1].nickname}</span>
                 </div>                  
                   <div class="point-rank-point">
                   <span>${data[i - 1].point}</span>
