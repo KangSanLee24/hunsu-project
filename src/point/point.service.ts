@@ -78,26 +78,16 @@ export class PointService {
       ),
     };
 
-    // 3-1. 오늘 포인트 타입별 획득 포인트 횟수 조회
+    // 3-1. 오늘 포인트 타입별 획득 포인트 횟수 = 획득 점수 / 기본 점수
     const todayCounts = {
-      attention: await this.findTodayPointCountById(
-        userId,
-        PointType.ATTENTION
-      ),
-      weeklyAttention: await this.findTodayPointCountById(
-        userId,
-        PointType.WEEKLY_ATTENTION
-      ),
-      post: await this.findTodayPointCountById(userId, PointType.POST),
-      comment: await this.findTodayPointCountById(userId, PointType.COMMENT),
-      postLike: await this.findTodayPointCountById(userId, PointType.POST_LIKE),
-      commentLike: await this.findTodayPointCountById(
-        userId,
-        PointType.COMMENT_LIKE
-      ),
+      attention: todayPoints.attention / PointScore.ATTENTION,
+      post: todayPoints.post / PointScore.POST,
+      postLike: todayPoints.postLike / PointScore.POST_LIKE,
+      comment: todayPoints.comment / PointScore.COMMENT,
+      commentLike: todayPoints.commentLike / PointScore.COMMENT_LIKE,
     };
 
-    // 4. 최대 횟수 계산
+    // 4. 최대 횟수 계산 = 최대 점수 / 기본 점수
     const maxCounts = {
       attention: MaxPointScore.ATTENTION / PointScore.ATTENTION,
       weeklyAttention:
@@ -108,12 +98,11 @@ export class PointService {
       commentLike: MaxPointScore.COMMENT_LIKE / PointScore.COMMENT_LIKE,
     };
 
-    // 5. 결과 반환
+    // 5. 결과 반환 : todayPoints 삭제.
     return {
       id: userId,
       nickname: user.nickname, // 닉네임 추가
       totalPoint,
-      today: todayPoints,
       counts: todayCounts,
       maxCounts,
     };

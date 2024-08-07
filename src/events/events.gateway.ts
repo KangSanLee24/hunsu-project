@@ -43,10 +43,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     socket.data.authorId = payload.authorId; 
 
     await this.chatService.joinChatRoom(+payload.roomId, +payload.authorId);
-    const {findChatImage, findUser} = await this.chatService.findChatImage(+payload.roomId);
+    const resultImage = await this.chatService.findChatImage(+payload.roomId);
 
-    //고정된 이미지 전송
-    this.server.to(payload.roomId).emit('lastImage', {author: findUser.nickname, fileUrl: findChatImage.imgUrl });
+    if(resultImage) {
+      const { findChatImage, findUser } = resultImage;
+      //고정된 이미지 전송
+      this.server.to(payload.roomId).emit('lastImage', {author: findUser.nickname, fileUrl: findChatImage.imgUrl });
+    }
+
     //유저가 들어왔음을 알림
     this.server.to(payload.roomId).emit('userJoined', {message: `${payload.author} 님이 입장하셨습니다`});
   }
@@ -56,10 +60,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleMessage(@MessageBody() payload: { roomId: string; author: string; body: string }, socket: Socket) {
     this.logger.log(`Message received: ${payload.body}`);
 
-    await this.chatService.sendChatRoom(+payload.roomId, payload.author, payload.body);
+    const isChatRoom = await this.chatService.isChatRoom(+payload.roomId);
 
-    this.server.to(payload.roomId).emit('chat', {author: payload.author, body: payload.body});
-    return payload;
+    if(isChatRoom) {
+      const chatTime = await this.chatService.sendChatRoom(+payload.roomId, payload.author, payload.body);
+
+      this.server.to(payload.roomId).emit('chat', {author: payload.author, body: payload.body, chatTime});
+      return payload;
+    } else {
+      this.server.to(payload.roomId).emit('outRoom', {});
+    }
   }
 
   //이미지 전송
@@ -67,8 +77,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleImage(@MessageBody() payload: { roomId: string; author: string; fileUrl: string }, @ConnectedSocket() socket: Socket) {
     this.logger.log(`Message received: ${payload.fileUrl}`);
 
-    this.server.to(payload.roomId).emit('chatImage', {author: payload.author, fileUrl: payload.fileUrl });
-    return payload;
+    const isChatRoom = await this.chatService.isChatRoom(+payload.roomId);
+
+    if(isChatRoom) {
+      const imageTime = await this.chatService.imageTime(+payload.roomId, payload.author, payload.fileUrl);
+
+      this.server.to(payload.roomId).emit('chatImage', {author: payload.author, fileUrl: payload.fileUrl, imageTime });
+      return payload;
+    }else {
+      this.server.to(payload.roomId).emit('outRoom', {});
+    }
   }
 
   handleConnection(socket: Socket) {
@@ -88,7 +106,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if(checkChatOwner == true) {
       await this.chatService.outChatRoom(+roomId, +authorId);
-      this.server.to(roomId).emit('userLeft', { message: `방장 ${author} 님이 퇴장하셨습니다` });
+      this.server.to(roomId).emit('ownerLeft', {});
     } else {
       await this.chatService.outChatRoom(+roomId, +authorId);
       this.server.to(roomId).emit('userLeft', { message: `${author} 님이 퇴장하셨습니다` });
