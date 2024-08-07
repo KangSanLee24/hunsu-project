@@ -4,17 +4,54 @@ import { API_BASE_URL } from '../../config/config.js';
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get('id');
 
+const postUpdateButton = document.getElementById('post-update-btn');
+const postDeleteButton = document.getElementById('post-delete-btn');
+
 const submitLikeButton = document.getElementById('like-btn');
 const submitDislikeButton = document.getElementById('dislike-btn');
 
+const accessToken = localStorage.getItem('accessToken');
+
+/** accessToken으로 내 정보 조회 API */
+async function fetchAccessToken(accessToken) {
+  const response = await fetch(`${API_BASE_URL}/users/me`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return await response.json();
+}
+
 // 게시글 상세 조회 API 호출
-async function fetchPost(postId) {
+async function fetchPost() {
   try {
     const response = await fetch(`${API_BASE_URL}/posts/${postId}`);
     if (!response.ok) throw new Error('게시글을 불러오는 데 실패했습니다.');
     return await response.json();
   } catch (error) {
     console.error(error);
+  }
+}
+
+// 게시글 삭제 API 호출
+async function deletePost() {
+  const confirmDelete = confirm('게시글을 삭제하시겠습니까?');
+  if (confirmDelete) {
+    const response = await fetch(`${API_BASE_URL}/posts/${postId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.ok) {
+      alert('게시글이 삭제되었습니다.');
+      window.location.href = './post-list.html';
+    } else {
+      alert('게시글 삭제 실패');
+    }
   }
 }
 
@@ -39,10 +76,19 @@ async function renderPostDetail(postId) {
       post.data.numDislikes || '0';
     document.getElementById('post-title').innerText =
       post.data.title || '제목 없음';
-    document.getElementById('post-image').src = post.data.imageUrl || ''; // 이미지 URL이 있는 경우
     // marked 라이브러리로 마크다운 형식으로 표시
     document.getElementById('post-content').innerHTML =
       marked.parse(post.data.content) || '내용 없음';
+
+    try {
+      // accessToken으로 사용자 정보 체크
+      const result = await fetchAccessToken(accessToken);
+      if (result.status === 200 && result.data.id == post.data.userId) {
+        document.getElementById('post-update-btn').disabled = false;
+        document.getElementById('post-delete-btn').disabled = false;
+        console.log('여기까지왔으면 바뀌어야됨');
+      }
+    } catch (error) {}
   }
 }
 
@@ -150,6 +196,10 @@ async function handleDislike() {
 // 버튼 클릭 이벤트 리스너 추가
 submitLikeButton.addEventListener('click', handleLike);
 submitDislikeButton.addEventListener('click', handleDislike);
+postUpdateButton.addEventListener('click', () => {
+  window.location.href = `post-create.html?id=${postId}`;
+});
+postDeleteButton.addEventListener('click', deletePost);
 
 // 페이지 로드 시 게시글과 댓글을 렌더링
 if (postId) {
