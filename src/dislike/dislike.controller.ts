@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   HttpStatus,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { DislikeService } from './dislike.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -73,6 +74,7 @@ export class DislikeController {
     };
   }
 
+  /** 게시글 싫어요 조회 API **/
   @ApiTags('3. POST API')
   @ApiOperation({ summary: '게시글 싫어요 조회 API' })
   @Get('/posts/:postId/dislikes')
@@ -86,59 +88,41 @@ export class DislikeController {
     };
   }
 
+  /** 로그인한 사람의 게시글 싫어요 조회 API **/
   @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 싫어요 생성 API' })
-  @ApiBearerAuth()
+  @ApiOperation({ summary: '나의 게시글 싫어요 여부 조회 API' })
   @UseGuards(AuthGuard('jwt'))
-  @Post('/posts/:postId/dislikes')
-  async createPostDislike(
+  @ApiBearerAuth()
+  @Get('/posts/:postId/dislikes/me')
+  async getMyPostDislike(
     @LogIn() user: User,
     @Param('postId', ParseIntPipe) postId: number
   ) {
     const userId = user.id;
-    await this.dislikeService.createPostDislike(userId, postId);
+    const data = await this.dislikeService.getMyPostDislike(userId, postId);
+    return {
+      status: HttpStatus.OK,
+      messgae: '나의 게시글 싫어요 여부 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 게시글 싫어요 클릭 API **/
+  @ApiTags('3. POST API')
+  @ApiOperation({ summary: '게시글 싫어요 클릭 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('/posts/:postId/dislikes')
+  async postDislike(
+    @LogIn() user: User,
+    @Param('postId', ParseIntPipe) postId: number
+  ) {
+    const userId = user.id;
+    await this.dislikeService.postDislike(userId, postId);
 
     return {
       status: HttpStatus.OK,
       message: POST_MESSAGE.DISLIKE.CREATE.SUCCESS,
     };
   }
-
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 싫어요 삭제 API' })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Delete('/posts/:postId/dislikes')
-  async deletePostDislike(
-    @LogIn() user: User,
-    @Param('postId', ParseIntPipe) postId: number
-  ) {
-    const userId = user.id;
-    await this.dislikeService.deletePostDislike(userId, postId);
-
-    return {
-      status: HttpStatus.OK,
-      message: POST_MESSAGE.DISLIKE.DELETE.SUCCESS,
-    };
-  }
-
-  // @Get()
-  // findAll() {
-  //   return this.dislikeService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.dislikeService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateDislikeDto: UpdateDislikeDto) {
-  //   return this.dislikeService.update(+id, updateDislikeDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.dislikeService.remove(+id);
-  // }
 }

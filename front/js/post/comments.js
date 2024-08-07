@@ -81,19 +81,23 @@ async function dislikeComment(commentId) {
 function addCommentToList(comment) {
   const commentItem = document.createElement('li');
   commentItem.innerHTML = `
-                <p>${comment.nickname} 
-                | 작성일: ${elapsedTime(comment.createdAt)} 
-                | 좋아요: ${comment.likes || 0} 
-                | 싫어요: ${comment.dislikes || 0}
-                </p>
-                <p>${comment.content}</p>
-                <button class="recomment-btn" data-comment-id="${comment.id}">대댓글 작성</button>
-                <div class="recomment-input" style="display: none;">
-                  <textarea placeholder="대댓글을 입력하세요..." rows="2"></textarea>
-                  <button class="submit-recomment">작성</button>
+              <div class="comment-header">
+                <span>${comment.nickname} | 작성일: ${elapsedTime(comment.createdAt)} | </span>
+                <div class="comment-like-btn-count">
+                  <button class="comment-like-btn" data-comment-id="${comment.id}">👍</button>
+                  <span class="comment-like-count"> ${comment.likes || 0} </span>
                 </div>
-                <button class="comment-like-btn" data-comment-id="${comment.id}">좋아요</button>
-                <button class="comment-dislike-btn" data-comment-id="${comment.id}">싫어요</button>
+                <div class="comment-dislike-btn-count">
+                  <button class="comment-dislike-btn" data-comment-id="${comment.id}">👎</button>
+                  <span class="comment-dislike-count"> ${comment.dislikes || 0} </span>
+                </div>             
+              </div>
+              <p>${comment.content}</p>
+              <button class="recomment-btn" data-comment-id="${comment.id}">대댓글 작성</button>
+              <div class="recomment-input" style="display: none;">
+                <textarea placeholder="대댓글을 입력하세요..." rows="2"></textarea>
+                <button class="submit-recomment">작성</button>
+              </div>  
             `;
 
   // 대댓글이 있는 경우 렌더링
