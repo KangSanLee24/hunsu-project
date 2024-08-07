@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function addMessage(message) {
         const messageElement = document.createElement('div');
         messageElement.className = `chat-message ${currentUser === message.author ? 'outgoing' : ''}`;
+
         if(message.body){
             messageElement.innerHTML = `
             <div class="chat-message-wrapper">
@@ -82,13 +83,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         chatScroll.appendChild(messageElement);
         scrollToBottom();
 
-        // 이미지 로드 후 스크롤 하단으로 이동
-        const img = messageElement.querySelector('img');
-        img.onload = () => {
-            chatScroll.appendChild(messageElement);
-            scrollToBottom(); // 이미지가 로드된 후 스크롤
+        if(message.fileUrl) {
+            // 이미지 로드 후 스크롤 하단으로 이동
+            const img = messageElement.querySelector('img');
+            img.onload = () => {
+                chatScroll.appendChild(messageElement);
+                scrollToBottom(); // 이미지가 로드된 후 스크롤
+            };
         };
     }
+
+    // 웹소켓 연결 시 joinRoom 호출
+    socket.on('connect', () => {
+        joinRoom();
+    });
 
     // 방 입장 시 서버에 'joinRoom' 이벤트 전송
     socket.emit('joinRoom', { roomId, author: currentUser, authorId: currentUserId});
@@ -265,5 +273,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 window.location.href = '/html/chat-list.html';
             }
         }, 1000)
+    });
+
+    // 페이지 로드 후 사용자 상호작용을 위한 이벤트 핸들러 추가
+    document.body.addEventListener('click', () => {
+        window.addEventListener('beforeunload', (event) => {
+            const confirmationMessage = '정말로 이 페이지를 떠나시겠습니까?';
+            event.returnValue = confirmationMessage; // 표준
+            return confirmationMessage; // Chrome 및 다른 브라우저에서 필요
+        });
     });
 });

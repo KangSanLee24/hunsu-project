@@ -394,11 +394,15 @@ export class ChatService {
       order: { createdAt: 'DESC'}
     });
 
-    const findUser = await this.userRepository.findOne({
-      where: { id: findChatImage.userId },
-      select: { nickname: true },
-    });
-
-    return {findChatImage, findUser};
+    if(findChatImage) {
+      const findUser = await this.userRepository.findOne({
+        where: { id: findChatImage.userId },
+        select: { nickname: true },
+      });
+  
+      return {findChatImage, findUser};
+    } else {
+      return null;
+    }
   }
 }

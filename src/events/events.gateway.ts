@@ -43,10 +43,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     socket.data.authorId = payload.authorId; 
 
     await this.chatService.joinChatRoom(+payload.roomId, +payload.authorId);
-    const {findChatImage, findUser} = await this.chatService.findChatImage(+payload.roomId);
+    const resultImage = await this.chatService.findChatImage(+payload.roomId);
 
-    //고정된 이미지 전송
-    this.server.to(payload.roomId).emit('lastImage', {author: findUser.nickname, fileUrl: findChatImage.imgUrl });
+    if(resultImage) {
+      const { findChatImage, findUser } = resultImage;
+      //고정된 이미지 전송
+      this.server.to(payload.roomId).emit('lastImage', {author: findUser.nickname, fileUrl: findChatImage.imgUrl });
+    }
+
     //유저가 들어왔음을 알림
     this.server.to(payload.roomId).emit('userJoined', {message: `${payload.author} 님이 입장하셨습니다`});
   }
@@ -94,4 +98,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.to(roomId).emit('userLeft', { message: `${author} 님이 퇴장하셨습니다` });
     }
   }
+  // //나가기
+  // @SubscribeMessage('leftRoom')
+  // async handleleftRoom(@MessageBody() payload: { roomId: string; author: string; authorId: number}, @ConnectedSocket() socket: Socket) {
+    
+  //   socket.leave(payload.roomId);
+
+  //   const checkChatOwner = await this.chatService.checkChatOwner(+payload.roomId, +payload.authorId);
+
+  //   if(checkChatOwner == true) {
+  //     await this.chatService.outChatRoom(+payload.roomId, +payload.authorId);
+  //     this.server.to(payload.roomId).emit('userLeft', { message: `방장 ${payload.author} 님이 퇴장하셨습니다` });
+  //   } else {
+  //     await this.chatService.outChatRoom(+payload.roomId, +payload.authorId);
+  //     this.server.to(payload.roomId).emit('userLeft', { message: `${payload.author} 님이 퇴장하셨습니다` });
+  //   }
+  // }
 }
