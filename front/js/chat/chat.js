@@ -135,6 +135,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         authorName.textContent = `${ImageMessage.author}`; // 작성자 정보 업데이트
     });
 
+    //서버로부터 'lastImage' 이벤트 수신
+    socket.on('lastImage', (ImageMessage) => {
+        
+        // 채팅방 상단에 고정할 이미지 표시
+        const fixedImageDiv = document.getElementById('fixedImage');
+        fixedImageDiv.style.display = 'block'; // 이미지 표시
+
+        // 고정핀 텍스트가 이미 존재하는 경우 변경하지 않음
+        if (!fixedImageDiv.querySelector('.fixed-header')) {
+            const header = document.createElement('div');
+            header.className = 'fixed-header';
+            header.textContent = '📌 고정된 이미지';
+            fixedImageDiv.appendChild(header);
+        }
+
+        // 이미지 업데이트
+        const img = document.getElementById('fixedImageContent');
+        img.src = ImageMessage.fileUrl; // 서버에서 받은 새로운 이미지 URL로 업데이트
+
+        // 작성자 정보 업데이트
+        const authorName = document.getElementById('authorName');
+        authorName.textContent = `${ImageMessage.author}`; // 작성자 정보 업데이트
+    })
+
     // 메시지 전송 버튼 클릭 이벤트 처리   
     sendButton.addEventListener('click', () => {
         const accessToken = localStorage.getItem('accessToken');
