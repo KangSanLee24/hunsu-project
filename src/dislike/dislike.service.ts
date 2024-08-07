@@ -101,7 +101,7 @@ export class DislikeService {
       throw new NotFoundException(COMMENT_MESSAGE.COMMENT.NOT_FOUND);
     }
 
-    // 내 싫어요 남아있는지 확인
+    // 내 싫어요 남아있는지 확인 //
     if (!existingCommentDislike) {
       throw new NotFoundException(
         COMMENT_MESSAGE.DISLIKE.DELETE.FAILURE.NO_DISLIKE
