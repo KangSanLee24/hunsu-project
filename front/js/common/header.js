@@ -1,6 +1,11 @@
 import { API_BASE_URL } from '../../config/config.js';
+import { levelMark } from './level-rank.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+  // 0. 현재 페이지 위치 URL을 localStorage에 저장
+  const redirectUrl = window.location.href;
+  const preUrl = localStorage.setItem('redirectUrl', redirectUrl);
+
   const accessToken = localStorage.getItem('accessToken');
   const refreshToken = localStorage.getItem('refreshToken');
   const loginLink = document.querySelector('a[href="./log-in.html"]');
@@ -14,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showLoginOptions();
   }
 
-  /** 로그인 회원가입 버튼 보이고, 닉네임 숨기기 */
+  /** 1. 로그인 X상태 - 로그인 회원가입 버튼 보이고, 닉네임 숨기기 */
   function showLoginOptions() {
     if (loginLink) loginLink.style.display = 'inline-block';
     if (signUpLink) signUpLink.style.display = 'inline-block';
@@ -26,13 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 로그인 회원가입 버튼 숨기고, 닉네임과 로그아웃 버튼을 표시 */
-  function displayUserInfo(nickname) {
+  /** 2. 로그인 O상태 - 로그인 회원가입 버튼 숨기고, 닉네임과 로그아웃 버튼을 표시 */
+  function displayUserInfo(id, point, nickname) {
     if (loginLink) loginLink.style.display = 'none';
     if (signUpLink) signUpLink.style.display = 'none';
 
-    userNickname.innerHTML = `${nickname}님`;
-    userNickname.style.display = 'inline-block';
+    // 알람 연결
+    const userId = id;
+    // alarmSSE(userId);
+
+    // 닉네임 표기부분
+    userNickname.innerHTML = `<span class="nickname">${levelMark(point)}${nickname}</span><span class="nim">님</span>`;
+    userNickname.style.display = 'flex';
 
     // 기존 로그아웃 버튼이 있으면 제거
     let logoutLink = document.getElementById('logoutLink');
@@ -41,15 +51,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 로그아웃 버튼 생성
-    logoutLink = createElement('a', null, '로그아웃');
+    logoutLink = createElement('a', null, `&nbsp;로그아웃`);
     logoutLink.id = 'logoutLink';
+    logoutLink.className = 'logout-link';
     logoutLink.href = '#';
-    logoutLink.addEventListener('click', () => {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      alert('로그아웃 되었습니다.');
-      showLoginOptions();
-      window.location.href = './main.html'; // 로그아웃 후 main.html로 이동
+    logoutLink.addEventListener('click', async () => {
+      if (window.confirm('로그아웃 하시겠습니까?')) {
+        await logout();
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        alert('로그아웃 되었습니다.');
+        showLoginOptions();
+        window.location.href = localStorage.getItem('redirectUrl'); // 로그아웃 후 main.html로 이동
+      }
     });
 
     // 닉네임과 로그아웃 버튼을 나란히 배치
@@ -57,6 +71,23 @@ document.addEventListener('DOMContentLoaded', () => {
     userInfoContainer.appendChild(userNickname);
     userInfoContainer.appendChild(logoutLink);
     headerNav.appendChild(userInfoContainer);
+  }
+
+  // 로그아웃 API 호출 함수
+  async function logout() {
+    const accessToken = localStorage.getItem('accessToken');
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/log-out`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('로그아웃 중 오류 발생:', error);
+    }
   }
 
   /** accessToken으로 내 정보 조회 API */
@@ -89,7 +120,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (result.status === 200) {
         // accessToken이 유효한 경우
-        displayUserInfo(result.data.nickname);
+        displayUserInfo(
+          result.data.id,
+          result.data.point,
+          result.data.nickname
+        );
       } else if (refreshToken) {
         // accessToken이 유효하지 않을 때
         const refreshResult = await fetchRefreshToken(refreshToken);
@@ -102,7 +137,11 @@ document.addEventListener('DOMContentLoaded', () => {
           // 새 accessToken으로 내 정보 조회
           const newResult = await fetchAccessToken(newAccessToken);
           if (newResult.status === 200) {
-            displayUserInfo(newResult.data.nickname);
+            displayUserInfo(
+              newResult.data.id,
+              newResult.data.point,
+              newResult.data.nickname
+            );
           } else {
             // 재조회 실패시 로그인 옵션 표시
             showLoginOptions();
@@ -143,8 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         '로그인이 되어있지 않습니다. 로그인을 하시겠습니까?'
       );
       if (confirmLogin) {
-        // 현재 페이지 URL을 localStorage에 저장
-        localStorage.setItem('redirectUrl', redirectUrl);
         // 로그인 페이지로 리다이렉트하면서 리다이렉트 URL을 전달
         window.location.href = './log-in.html';
       } else {
@@ -154,36 +191,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 버튼 종류 배열
-  // 해당 버튼 클릭 후 지정한 위치로 가야할 때
-  // localstorage 저장 식
-  const buttons = [
-    'myPageButton',
-    'write-post',
-    'alarmButton',
-    'submit-comment',
-  ];
+  /** SSE 알람 **/
+  function alarmSSE(userId) {
+    const eventSource = new EventSource(`${API_BASE_URL}/alarms/sse/${userId}`);
 
-  // 버튼별 리디렉션 URL
-  const redirects = {
-    // 지정 페이지 (토큰 있어야지만 접속 가능한 페이지)
-    myPageButton: './my-page.html',
-    'write-post': './post-create.html',
-    alarmButton: './alarm.html',
+    // 1. SSE - 메시지 받기
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log('알람: ', data);
+    };
 
-    // 이전페이지 (단순히 이전페이지로 돌아갈때)
-    'submit-comment': window.location.href,
-  };
+    // 2. SSE - 알람 활성화 알림
+    eventSource.onopen = () => {
+      console.log('알람 기능이 활성화되었습니다.');
+    };
 
-  // 버튼 클릭 이벤트 리스너
-  buttons.forEach((buttonId) => {
-    const button = document.getElementById(buttonId);
-    if (button) {
-      button.addEventListener('click', (event) =>
-        handleLoginRequired(event, redirects[buttonId])
-      );
-    }
-  });
+    // 3. SSE - 알람 비활성화 알림
+    eventSource.onclose = () => {
+      console.log('알람 기능이 비활성화되었습니다.');
+    };
+
+    // 4. SSE - 알람 에러
+    eventSource.onerror = (error) => {
+      console.error('알람 기능에서 에러가 발생했습니다: ', error);
+    };
+  }
 
   // 댓글 작성 textarea 클릭 이벤트 리스너 추가
   const commentContentTextarea = document.getElementById('comment-content');
@@ -226,4 +258,40 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  const clickAlarmBtn = function () {
+    // 로그인 상태인지 확인
+    if (!accessToken) {
+      // 로그인 상태가 아니라면
+      if (window.confirm('로그인 하시겠습니까?')) {
+        // 로그인 페이지로 이동
+        window.location.href = './log-in.html';
+      } else {
+        // 비워둠
+      }
+    } else {
+      // 로그인 상태라면
+      window.location.href = './alarm.html';
+    }
+  };
+
+  const clickMyPageBtn = function () {
+    // 로그인 상태인지 확인
+    if (!accessToken) {
+      // 로그인 상태가 아니라면
+      if (window.confirm('로그인 하시겠습니까?')) {
+        // 로그인 페이지로 이동
+        window.location.href = './log-in.html';
+      } else {
+        // 비워둠
+      }
+    } else {
+      // 로그인 상태라면
+      window.location.href = './my-page.html';
+    }
+  };
+
+  // 전역선언
+  window.clickAlarmBtn = clickAlarmBtn;
+  window.clickMyPageBtn = clickMyPageBtn;
 });

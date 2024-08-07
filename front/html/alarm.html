@@ -1,78 +1,88 @@
 <!doctype html>
 <html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>알람</title>
+    <link rel="stylesheet" href="/styles/style.css" />
+    <link rel="stylesheet" href="/styles/alarm.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>알람</title>
-  <link rel="stylesheet" href="/styles/style.css" />
-  <link rel="stylesheet" href="/styles/alarm.css" />
-</head>
+  <body>
+    <header>
+      <div
+        id="logo-home"
+        class="logo"
+        onClick="window.location.href='./main.html'"
+      >
+        5ZIRAP
+      </div>
+      <nav>
+        <ul>
+          <li><a href="./log-in.html">로그인</a></li>
+          <li><a href="./sign-up.html">회원가입</a></li>
+          <li><a id="userNickname"></a></li>
+        </ul>
+      </nav>
+    </header>
 
-<body>
-  <header>
-    <div class="logo">5ZIRAP</div>
-    <nav>
-      <ul>
-        <li><a href="./log-in.html">로그인</a></li>
-        <li><a href="./sign-up.html">회원가입</a></li>
-        <li><a id="userNickname"></a></li>
-      </ul>
-    </nav>
-  </header>
+    <main>
+      <h1>🔔 알람</h1>
+      <hr />
+      <table id="alarm-list-table">
+        <thead>
+          <tr>
+            <th>유형</th>
+            <th>알람 메시지</th>
+            <th>알람 일시</th>
+            <th>읽음</th>
+            <th>삭제</th>
+          </tr>
+        </thead>
+        <tbody id="alarm-list"></tbody>
+      </table>
+      <p id="after-alarm-list"></p>
 
-  <main>
-    <h1>🔔 알람</h1>
-    <hr />
-    <table id="alarm-list-table">
-      <thead>
-        <tr>
-          <th>유형</th>
-          <th>알람 메시지</th>
-          <th>알람 일시</th>
-          <th>읽음</th>
-          <th>삭제</th>
-        </tr>
-      </thead>
-      <tbody id="alarm-list"></tbody>
-    </table>
-    <p id="after-alarm-list"></p>
+      <div class="pagination">
+        <button id="prev-button" disabled>이전</button>
+        <span id="page-numbers"></span>
+        <span id="current-page-label"></span>
+        <button id="next-button">다음</button>
+      </div>
 
-    <div class="pagination">
-      <button id="prev-button" disabled>이전</button>
-      <span id="page-numbers"></span>
-      <span id="current-page-label"></span>
-      <button id="next-button">다음</button>
-    </div>
+      <div class="filter-container">
+        <button id="filter-button" onClick="readAllAlarm()">
+          모두 읽음 처리 ✔️
+        </button>
+        <button id="filter-button" onClick="deleteAllAlarm()">
+          읽은 알람 모두 삭제 ❌
+        </button>
+      </div>
+    </main>
 
-    <div class="filter-container">
-      <button id="filter-button" onClick="readAllAlarm()">
-        모두 읽음 처리 ✔️
-      </button>
-      <button id="filter-button" onClick="deleteAllAlarm()">
-        읽은 알람 모두 삭제 ❌
-      </button>
-    </div>
-  </main>
+    <footer>
+      <div class="footer-menu">
+        <button onclick="window.location.href='./chat-list.html'">
+          💬 Live Chat
+        </button>
+        <button onclick="window.location.href='./post-list.html'">
+          📝 게시판
+        </button>
+        <button onclick="window.location.href='./main.html'">🏠 홈으로</button>
+        <button id="alarmButton" class="footerAlarm" onclick="clickAlarmBtn()">
+          🔔 알람
+        </button>
+        <button
+          id="myPageButton"
+          class="my-page-button"
+          onclick="clickMyPageBtn()"
+        >
+          🏆 마이페이지
+        </button>
+      </div>
+    </footer>
 
-  <footer>
-    <div class="footer-menu">
-      <button onclick="window.location.href='./chat-list.html'">
-        💬 Live Chat
-      </button>
-      <button onclick="window.location.href='./post-list.html'">
-        📝 게시판
-      </button>
-      <button onclick="window.location.href='./main.html'">🏠 홈으로</button>
-      <button id="alarmButton" class="footerAlarm">
-        🔔 알람
-      </button>
-      <button id="myPageButton" class="my-page-button">🏆 마이페이지</button>
-    </div>
-  </footer>
-
-  <script type="module" src="/js/common/header.js"></script>
-  <script type="module" src="/js/alarm/alarm.js" defer></script>
-</body>
-
+    <script type="module" src="/js/common/header.js"></script>
+    <script type="module" src="/js/alarm/alarm.js" defer></script>
+  </body>
 </html>

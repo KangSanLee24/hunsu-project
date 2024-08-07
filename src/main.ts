@@ -4,15 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json } from 'express';
-// import * as dotenv from 'dotenv';
-// import * as path from 'path';
-
-// // NODE_ENV에 따라 다른 .env 파일을 로드
-// const envFilePath =
-//   process.env.NODE_ENV === 'development'
-//     ? '.env.development'
-//     : '.env.production';
-// dotenv.config({ path: path.resolve(__dirname, envFilePath) });
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -35,7 +26,7 @@ async function bootstrap() {
 
   // CORS 설정
   app.enableCors({
-    origin: ['http://3.37.69.47:3000'],
+    origin: ['http://localhost:3000'],
     methods: ['POST', 'GET', 'OPTIONS'],
     allowedHeaders: ['POST', 'GET'],
     credentials: true,

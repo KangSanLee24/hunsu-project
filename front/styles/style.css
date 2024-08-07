@@ -7,6 +7,10 @@
   font-style: normal;
 }
 
+.footer-menu > button,
+header,
+main,
+footer,
 body {
   font-family: 'Jua', sans-serif;
   font-weight: 400;
@@ -57,10 +61,6 @@ nav a {
   font-size: 18px;
 }
 
-nav a:hover {
-  color: red;
-}
-
 header .logo {
   font-size: 24px;
   font-weight: bold;
@@ -68,9 +68,56 @@ header .logo {
 }
 
 header .logo:hover {
-  color: red;
+  color: rgb(201, 51, 51);
 }
 
+/* 헤더 : 닉네임 + 로그아웃 부분 */
+.user-info {
+  max-width: 285px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: row;
+  justify-content: baseline;
+}
+#userNickname {
+  width: 175px;
+  justify-content: baseline;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.nickname {
+  color: rgb(238, 165, 82);
+  width: 175px;
+  text-align: right;
+  justify-content: baseline;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.nim {
+  width: 15px;
+  min-width: 15px;
+  display: flex;
+  text-align: right;
+  align-items: end;
+  justify-content: center;
+}
+.logout-link {
+  width: 95px;
+  min-width: 95px;
+  display: flex;
+  text-align: right;
+  align-items: end;
+  justify-content: center;
+}
+.logout-link:hover {
+  color: rgb(201, 51, 51);
+}
+
+/* MAIN 위아래 */
 main {
   padding-top: 80px;
   /* 헤더 높이에 맞춰 여백 추가 */
@@ -78,6 +125,7 @@ main {
   /* 푸터 높이에 맞춰 여백 추가 */
 }
 
+/* FOOTER */
 footer {
   position: fixed;
   bottom: 0;
@@ -104,7 +152,7 @@ footer button {
 }
 
 footer button:hover {
-  color: red;
+  color: rgb(201, 51, 51);
 }
 
 /* 반응형 디자인 */

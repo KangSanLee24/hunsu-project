@@ -15,7 +15,13 @@
 
 <body>
   <header>
-    <div class="logo">5ZIRAP</div>
+    <div
+        id="logo-home"
+        class="logo"
+        onClick="window.location.href='./main.html'"
+      >
+        5ZIRAP
+      </div>
     <nav>
       <ul>
         <li><a href="./log-in.html">로그인</a></li>
@@ -90,10 +96,16 @@
         📝 게시판
       </button>
       <button onclick="window.location.href='./main.html'">🏠 홈으로</button>
-      <button id="alarmButton" class="footerAlarm">
+      <button id="alarmButton" class="footerAlarm" onclick="clickAlarmBtn()">
         🔔 알람
       </button>
-      <button id="myPageButton" class="my-page-button">🏆 마이페이지</button>
+      <button
+        id="myPageButton"
+        class="my-page-button"
+        onclick="clickMyPageBtn()"
+      >
+        🏆 마이페이지
+      </button>
     </div>
   </footer>
 </body>

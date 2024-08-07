@@ -160,7 +160,7 @@ export class AlarmController {
 
   /** 7. 신규 생성 이벤트 알람 (SSE) **/
   @ApiOperation({ summary: '7. 신규 생성 이벤트 알람 (SSE)' })
-  @Sse(':userId')
+  @Sse('sse/:userId')
   newEventAlarm(@Param('userId') userId: number) {
     const data = this.alarmService.newEventAlarm(userId);
     return data;
