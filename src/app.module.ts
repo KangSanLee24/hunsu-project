@@ -22,7 +22,7 @@ import { AlarmModule } from './alarm/alarm.module';
 import { PointModule } from './point/point.module';
 import { HashtagModule } from './hashtag/hashtag.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { ScheduleService } from './schedule/schedule.service'; 
+import { ScheduleService } from './schedule/schedule.service';
 
 @Module({
   imports: [
@@ -33,6 +33,10 @@ import { ScheduleService } from './schedule/schedule.service';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: configValidationSchema,
+      envFilePath:
+        process.env.NODE_ENV === 'development'
+          ? '.env.development'
+          : '.env.production',
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     ScheduleModule.forRoot(),

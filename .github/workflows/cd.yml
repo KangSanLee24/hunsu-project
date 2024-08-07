@@ -39,4 +39,4 @@ jobs:
 
       # SSH 접속 후 명령을 통해서 배포 진행
       - name: Deploy to EC2
-        run: ssh ec2 'cd /home/ubuntu/hunsu-project && git switch main && git pull && echo "${{ secrets.ENV }}" > .env && ./scripts/run.sh'
+        run: ssh ec2 'cd /home/ubuntu/hunsu-project && git switch main && git pull && echo "${{ secrets.ENV }}" > .env.production && chmod 777 ./scripts/run.sh && ./scripts/run.sh'
