@@ -1,12 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env
 
 # node, npm, yarn 명령어 사용을 위한 설정 (.bashrc 파일에 추가되어 있는 내용)
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# 환경 변수 설정
-export NODE_ENV=production
+# # 환경 변수 설정
+# export NODE_ENV='production'
 
 # 의존성 설치
 # yarn --frozen-lockfile
@@ -20,7 +20,7 @@ npm run build
 pm2 delete hunsu-project
 
 # 서버를 PM2로 실행
-pm2 --name hunsu-project start  dist/main.js
+NODE_ENV=production pm2 --name hunsu-project  start dist/main.js
 
 # PM2 설정 저장 (선택사항, startup 설정을 해놨다면)
 pm2 save
