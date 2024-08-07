@@ -6,7 +6,6 @@ const postId = urlParams.get('id');
 
 const submitLikeButton = document.getElementById('like-btn');
 const submitDislikeButton = document.getElementById('dislike-btn');
-// const imageContainer = document.getElementById('image-container'); // 이미지를 표시할 컨테이너
 
 // 게시글 상세 조회 API 호출
 async function fetchPost(postId) {
@@ -22,7 +21,6 @@ async function fetchPost(postId) {
 // 페이지 렌더링 메소드
 async function renderPostDetail(postId) {
   const post = await fetchPost(postId);
-  console.log(post.data.images);
   marked.use({
     headerIds: false,
     mangle: false,
