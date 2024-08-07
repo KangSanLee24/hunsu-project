@@ -45,6 +45,7 @@ main {
   margin-bottom: 20px;
   width: 90%;
   max-width: 800px;
+  text-align: center;
   /* text-align: center; */
 }
 
@@ -90,8 +91,9 @@ main {
 }
 
 h2 {
-  margin: 0 0 10px;
+  margin: 10px 0 10px;
   /* 제목의 하단 여백 */
+  text-align: center;
 }
 
 ul {
@@ -142,6 +144,18 @@ ul {
   font-size: 16px;
   /* 글자 크기를 작게 조정 */
   font-weight: bold;
+}
+
+.my-posts-comments {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.my-posts,
+.my-comments {
+  width: 48%;
+  /* 두 섹션이 균등하게 공간을 차지하도록 설정 */
 }
 
 .posts-comments {
@@ -197,4 +211,28 @@ ul {
 .item-list .item-time {
   color: #888;
   font-size: 14px;
+}
+
+.item-list {
+  margin-bottom: 60px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pagination button {
+  margin: 0 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+#updateProfileBtn {
+  background-color: #000000;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
 }

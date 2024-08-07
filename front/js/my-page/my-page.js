@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         // 포인트 정보 가져오기
-        console.log(API_BASE_URL);
         const response = await fetch(`${API_BASE_URL}/points/me`, {
             method: 'GET',
             headers: {
@@ -66,6 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// 포인트 보기
 function displayUserPoints(data) {
     if (!data) {
         console.error('displayUserPoints: 데이터가 정의되지 않았거나 null입니다.');
@@ -133,6 +133,7 @@ function displayUserPoints(data) {
     }
 }
 
+// 작성한 게시글 표시
 function displayUserPosts(posts) {
     const myPostsList = document.getElementById('myPostsList');
     myPostsList.innerHTML = '';
@@ -152,6 +153,7 @@ function displayUserPosts(posts) {
     });
 }
 
+// 작성한 댓글 표시
 function displayUserComments(comments) {
     const myCommentsList = document.getElementById('myCommentsList');
     myCommentsList.innerHTML = '';
@@ -171,3 +173,37 @@ function displayUserComments(comments) {
         myCommentsList.appendChild(listItem);
     });
 }
+
+// 닉네임변경 버튼 함수
+window.clickupdateProfileBtn = async function () {
+    let nickname = '';
+
+    // 내 정보 조회 API
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/me`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+        });
+
+        if (!response.ok) {
+            alert('현재 닉네임을 가져오는데 실패했습니다.');
+            return;
+        }
+
+        // user로 저장
+        const user = await response.json();
+        // nickname 추출
+        nickname = user.data.nickname;
+    } catch (error) {
+        console.error(error);
+        return;
+    }
+
+    // localstorage에 nickname 저장
+    localStorage.setItem('nickname', nickname);
+
+    // 내 정보 수정으로 이동
+    window.location.href = './update-profile.html';
+};
