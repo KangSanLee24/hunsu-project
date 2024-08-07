@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('refreshToken', result.data.refreshToken);
 
       // 4-A-2. '로그인에 성공했습니다.' alert
+      checkAttendance(accessToken);
       alert(result.message);
 
       // 4-A-3. 메인 페이지로 이동
@@ -56,4 +57,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /** 실행 **/
   naverLogIn(userId, certification);
+
+  // 출석 체크 함수
+  async function checkAttendance(accessToken) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/points/today`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const result = await response.json();
+      console.log('출석 체크 API 응답:', result);
+
+      if (!response.ok) {
+        throw new Error('출석 체크에 실패했습니다.');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Error during attendance check:', error);
+      return { error: error.message };
+    }
+  }
 });
