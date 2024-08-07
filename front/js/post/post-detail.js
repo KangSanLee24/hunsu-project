@@ -81,19 +81,72 @@ async function updateDislikes(postId) {
     console.error(error);
   }
 }
+// 좋아요 취소 API 호출
+async function cancelLikes(postId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/posts/${postId}/likes`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+    if (!response.ok) throw new Error('좋아요 취소에 실패했습니다.');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// 싫어요 취소 API 호출
+async function cancelDislikes(postId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/posts/${postId}/dislikes`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+    if (!response.ok) throw new Error('싫어요 취소에 실패했습니다.');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 // 좋아요 버튼 클릭 핸들러
 async function handleLike() {
-  await updateLikes(postId);
+  // 버튼이 이미 눌린 상태라면 좋아요를 취소합니다.
+  if (submitLikeButton.classList.contains('liked')) {
+    await cancelLikes(postId);
+    submitLikeButton.classList.remove('liked');
+    submitLikeButton.innerHTML = '👍 좋아요'; // 좋아요 취소 시 이모지 변경
+    submitDislikeButton.disabled = false; // 싫어요 버튼 활성화
+  } else {
+    await updateLikes(postId);
+    submitLikeButton.classList.add('liked');
+    submitLikeButton.innerHTML = '❤️ 좋아요'; // 좋아요 추가 시 이모지 변경
+    submitDislikeButton.disabled = true; // 싫어요 버튼 활성화
+  }
   await renderPostDetail(postId);
-  submitLikeButton.classList.add('liked');
 }
 
 // 싫어요 버튼 클릭 핸들러
 async function handleDislike() {
-  await updateDislikes(postId);
+  // 버튼이 이미 눌린 상태라면 싫어요를 취소합니다.
+  if (submitDislikeButton.classList.contains('disliked')) {
+    await cancelDislikes(postId);
+    submitDislikeButton.classList.remove('disliked');
+    submitDislikeButton.innerHTML = '👎 싫어요'; // 싫어요 취소 시 이모지와 텍스트
+    submitLikeButton.disabled = false; // 좋아요 버튼 활성화
+  } else {
+    await updateDislikes(postId);
+    submitDislikeButton.classList.add('disliked');
+    submitDislikeButton.innerHTML = '💔 싫어요!'; // 싫어요 추가 시 이모지와 텍스트
+    submitLikeButton.disabled = true; // 좋아요 버튼 비활성화
+  }
   await renderPostDetail(postId);
-  submitDislikeButton.classList.add('disliked');
 }
 
 // 버튼 클릭 이벤트 리스너 추가
