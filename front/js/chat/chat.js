@@ -42,13 +42,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentUser;
     let currentUserId;
     try{
-        currentUser = (await getAuthor()).author;
-        currentUserId = (await getAuthor()).authorId;
+        const authorData = await getAuthor();
+        currentUser = authorData.author;
+        currentUserId = authorData.authorId;
+        // currentUser = (await getAuthor()).author;
+        // currentUserId = (await getAuthor()).authorId;
     } catch(error){
         console.error('Failed to get author:', error);
     }
-
-    console.log(currentUser, currentUserId);
 
     // 채팅 목록을 자동으로 스크롤 하단으로 이동
     function scrollToBottom() {
@@ -59,6 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function addMessage(message) {
         const messageElement = document.createElement('div');
         messageElement.className = `chat-message ${currentUser === message.author ? 'outgoing' : ''}`;
+
         if(message.body){
             messageElement.innerHTML = `
             <div class="chat-message-wrapper">
@@ -66,6 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="chat-message-bubble">
                     <span class="chat-message-body">${message.body}</span>
                 </div>
+                <span class="chat-message-time">${message.chatTime}</span>
             </div>
         `;
         } else if (message.fileUrl) {
@@ -75,6 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="chat-message-bubble">
                     <img src="${message.fileUrl}" alt="Chat Image" style="max-width: 100%; height: auto;" />
                 </div>
+                <span class="chat-message-time">${message.imageTime}</span>
             </div>
         `;
         }
@@ -82,11 +86,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         chatScroll.appendChild(messageElement);
         scrollToBottom();
 
-        // 이미지 로드 후 스크롤 하단으로 이동
-        const img = messageElement.querySelector('img');
-        img.onload = () => {
-            chatScroll.appendChild(messageElement);
-            scrollToBottom(); // 이미지가 로드된 후 스크롤
+        if(message.fileUrl) {
+            // 이미지 로드 후 스크롤 하단으로 이동
+            const img = messageElement.querySelector('img');
+            img.onload = () => {
+                chatScroll.appendChild(messageElement);
+                scrollToBottom(); // 이미지가 로드된 후 스크롤
+            };
         };
     }
 
@@ -258,12 +264,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         notification.textContent = data.message;
         chatScroll.appendChild(notification);
         chatScroll.scrollTop = chatScroll.scrollHeight; // 최신 메시지로 스크롤
-
-        setTimeout(() => {
-            if(data.message.includes('방장')) {
-                alert('방장이 채팅방을 나갔습니다. 채팅 목록 페이지로 이동하시겠습니까?');
-                window.location.href = '/html/chat-list.html';
-            }
-        }, 1000)
     });
+
+    // 서버로부터 'ownerLeft' 이벤트 수신
+    socket.on('ownerLeft', () => {
+        console.log('ownerLeft');
+        alert('방장이 채팅방을 나갔습니다. 채팅 목록 페이지로 이동합니다.');
+        window.location.href = '/html/chat-list.html';
+    });
+
+    socket.on('outRoom', () => {
+        alert('삭제된 채팅방입니다. 채팅 목록 페이지로 이동합니다.');
+        window.location.href = '/html/chat-list.html';
+    })
 });
