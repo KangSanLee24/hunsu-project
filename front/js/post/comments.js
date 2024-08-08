@@ -197,7 +197,7 @@ async function clickLikeComment(commentId) {
       console.log('댓글 좋아요 업데이트에 실패했습니다.');
     }
     // 0-3. 새로고침
-    // window.location.reload();
+    window.location.reload();
   } catch (error) {
     // 0-4. 도중에 에러가 뜬 경우
     alert('댓글 좋아요에서 오류가 발생했습니다.');
@@ -225,36 +225,13 @@ async function clickDislikeComment(commentId) {
       console.log('댓글 싫어요 업데이트에 실패했습니다.');
     }
     // 0-3. 새로고침
-    // window.location.reload();
+    window.location.reload();
   } catch (error) {
     // 0-4. 도중에 에러가 뜬 경우
     alert('댓글 싫어요에서 오류가 발생했습니다.');
     console.error(error);
   }
 }
-
-/** 댓글 [좋아요]/[싫어요] 버튼 클릭 이벤트 핸들러 **/
-// 1. 댓글 [좋아요] 버튼 클릭 이벤트 핸들러
-async function handleLikeButtonClick(event) {
-  const commentId = event.target.dataset.commentId;
-  await clickLikeComment(commentId);
-  // window.location.reload(); // 댓글 목록 새로고침
-}
-// 2. 댓글 [싫어요] 버튼 클릭 이벤트 핸들러
-async function handleDislikeButtonClick(event) {
-  const commentId = event.target.dataset.commentId;
-  await clickDislikeComment(commentId);
-  // window.location.reload(); // 댓글 목록 새로고침
-}
-// 3. 댓글 리스트에 [좋아요] 및 [싫어요] 버튼 클릭 이벤트 리스너
-commentList.addEventListener('click', async (event) => {
-  console.log('df');
-  if (event.target.classList.contains('comment-like-btn')) {
-    await handleLikeButtonClick(event);
-  } else if (event.target.classList.contains('comment-dislike-btn')) {
-    await handleDislikeButtonClick(event);
-  }
-});
 
 /** [댓글 작성] 및 [대댓글] 버튼 **/
 // 1. [댓글 작성] 버튼 클릭 이벤트 리스너
