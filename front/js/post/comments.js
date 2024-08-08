@@ -194,7 +194,6 @@ async function clickLikeComment(commentId) {
     // 0-2. API response 결과가 ok가 아니면
     if (!response.ok) {
       alert('자신의 댓글에는 좋아요를 누를 수 없습니다.');
-      console.log('댓글 좋아요 업데이트에 실패했습니다.');
     }
     // 0-3. 새로고침
     window.location.reload();
@@ -222,7 +221,6 @@ async function clickDislikeComment(commentId) {
     // 0-2. API response 결과가 ok가 아니면
     if (!response.ok) {
       alert('자신의 댓글에는 싫어요를 누를 수 없습니다.');
-      console.log('댓글 싫어요 업데이트에 실패했습니다.');
     }
     // 0-3. 새로고침
     window.location.reload();

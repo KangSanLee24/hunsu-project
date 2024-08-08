@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 알람 연결
     const userId = id;
-    // alarmSSE(userId);
+    alarmSSE(userId);
 
     // 닉네임 표기부분
     userNickname.innerHTML = `<span class="nickname">${levelMark(point)}${nickname}</span><span class="nim">님</span>`;
@@ -193,12 +193,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /** SSE 알람 **/
   function alarmSSE(userId) {
-    const eventSource = new EventSource(`${API_BASE_URL}/alarms/sse/${userId}`);
+    const eventSource = new EventSource(
+      `${API_BASE_URL}/alarms/sse/${userId}`,
+      { withCredentials: true }
+    );
 
     // 1. SSE - 메시지 받기
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log('알람: ', data);
+      alert(`알람: ${data.message}`);
     };
 
     // 2. SSE - 알람 활성화 알림
@@ -306,7 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = './post-create.html';
     }
   };
-
 
   // 전역선언
   window.clickAlarmBtn = clickAlarmBtn;

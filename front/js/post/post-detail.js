@@ -72,7 +72,7 @@ async function fetchLD(postId) {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
     });
-    console.log(postLike);
+
     const resultPostLike = await postLike.json();
     // 1-1. 눌렀다면
     if (resultPostLike.data == true) {
@@ -119,7 +119,7 @@ async function clickLikes(postId) {
     // 4-2. API response 결과가 ok가 아니면
     if (!response.ok) {
       alert('자신의 게시글에는 좋아요를 누를 수 없습니다.');
-      console.log('게시글 좋아요 업데이트에 실패했습니다.');
+
       return false;
     }
     // 4-3. 새로고침
@@ -147,7 +147,6 @@ async function clickDislikes(postId) {
     // 5-2. API response 결과가 ok가 아니면
     if (!response.ok) {
       alert('자신의 게시글에는 싫어요를 누를 수 없습니다.');
-      console.log('게시글 싫어요 업데이트에 실패했습니다.');
       return false;
     }
     // 5-3. 새로고침
@@ -198,7 +197,7 @@ async function handleLike() {
   // 버튼이 이미 눌린 상태라면 좋아요를 취소합니다.
   if (submitLikeButton.classList.contains('liked')) {
     const clicked = await clickLikes(postId);
-    console.log(clicked);
+
     if (clicked !== false) {
       submitLikeButton.classList.remove('liked');
       submitLikeButton.innerHTML = '👍 좋아요'; // 좋아요 취소 시 이모지 변경
