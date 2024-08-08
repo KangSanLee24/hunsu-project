@@ -25,100 +25,92 @@ export class LikeService {
     private readonly commentRepository: Repository<Comment>,
     @InjectRepository(PostLike)
     private readonly postLikeRepository: Repository<PostLike>,
-    // @InjectRepository(PostDislike)
-    // private readonly postDislikeRepository: Repository<PostDislike>,
     @InjectRepository(CommentLike)
     private readonly commentLikeRepository: Repository<CommentLike>,
     private readonly pointService: PointService
   ) {}
 
-  // 댓글 좋아요 조회 API
+  /** 댓글 좋아요 조회 API **/
   async getCommentLikes(commentId: number) {
+    // 1. 댓글이 존재하니?
     const existingComment = await this.commentRepository.findOneBy({
       id: commentId,
     });
-
-    // 댓글 존재 확인
+    // 1-1. 존재하지 않으면 에러처리
     if (!existingComment) {
       throw new NotFoundException(COMMENT_MESSAGE.COMMENT.NOT_FOUND);
     }
 
-    // 댓글 좋아요 카운트
+    // 2. 총 댓글 좋아요 카운트
     const count = await this.commentLikeRepository.countBy({ commentId });
-
     return count;
   }
 
-  // 댓글 좋아요 생성 API
-  async createCommentLike(userId, commentId) {
+  /** 로그인한 사람의 댓글 좋아요 조회 API **/
+  async getMyCommentLike(userId: number, commentId: number) {
+    // 1. 댓글이 존재하는지?
     const existingComment = await this.commentRepository.findOneBy({
       id: commentId,
     });
-    const commentLike = await this.commentLikeRepository.findOneBy({
-      userId: userId,
-      commentId: commentId,
-    });
-
-    // 댓글 존재 확인
+    // 1-1. 존재하지 않으면 에러처리
     if (!existingComment) {
       throw new NotFoundException(COMMENT_MESSAGE.COMMENT.NOT_FOUND);
     }
 
-    // 댓글 작성자 ID 비교 후 동일 유저이면 좋아요 금지
-    else if (existingComment.userId === userId) {
+    // 2. 해당 댓글에 좋아요를 눌렀는지?
+    const like = await this.commentLikeRepository.findOneBy({
+      userId,
+      commentId,
+    });
+
+    return like ? true : false;
+  }
+
+  /** 댓글 좋아요 클릭 API **/
+  async clickCommentLike(userId: number, commentId: number) {
+    // 1. 좋아요를 누를 댓글 정보
+    const existingComment = await this.commentRepository.findOneBy({
+      id: commentId,
+    });
+    // 1-1. 댓글이 존재하지 않으면 에러처리
+    if (!existingComment) {
+      throw new NotFoundException(COMMENT_MESSAGE.COMMENT.NOT_FOUND);
+    }
+    // 1-2. 본인의 댓글에는 좋아요를 누를 수 없도록
+    if (existingComment.userId === userId) {
       throw new BadRequestException(
         COMMENT_MESSAGE.LIKE.CREATE.FAILURE.NO_SELF
       );
     }
 
-    // 댓글 좋아요 눌렀었는지 확인
-    if (commentLike) {
-      throw new BadRequestException(
-        COMMENT_MESSAGE.LIKE.CREATE.FAILURE.ALREADY
-      );
-    }
-
-    // 댓글 좋아요 생성 포인트 지급
-    const isValidPoint = await this.pointService.validatePointLog(
-      userId,
-      PointType.COMMENT_LIKE
-    );
-    if (isValidPoint)
-      this.pointService.savePointLog(userId, PointType.COMMENT_LIKE, true);
-
-    await this.commentLikeRepository.save({
-      userId,
-      commentId,
-    });
-  }
-
-  // 댓글 좋아요 삭제 API
-  async deleteCommentLike(userId, commentId) {
-    const existingComment = await this.commentRepository.findOneBy({
-      id: commentId,
-    });
+    // 2. 내가 좋아요를 누른 상태인지 아닌지 확인
     const commentLike = await this.commentLikeRepository.findOneBy({
       userId: userId,
       commentId: commentId,
     });
-
-    // 댓글 존재 확인
-    if (!existingComment) {
-      throw new NotFoundException(COMMENT_MESSAGE.COMMENT.NOT_FOUND);
-    }
-
-    // 내 좋아요 남아있는지 확인
     if (!commentLike) {
-      throw new NotFoundException(COMMENT_MESSAGE.LIKE.DELETE.FAILURE.NO_LIKE);
+      // 2-1A. 댓글 좋아요 명단에 내가 없다면 => 댓글 좋아요 등록
+      await this.commentLikeRepository.save({
+        userId,
+        commentId,
+      });
+      // 2-1B. 댓글 좋아요에 따른 포인트 지급
+      const isValidPoint = await this.pointService.validatePointLog(
+        userId,
+        PointType.COMMENT_LIKE
+      );
+      if (isValidPoint) {
+        this.pointService.savePointLog(userId, PointType.COMMENT_LIKE, true);
+      }
+    } else {
+      // 2-2A. 댓글 좋아요 명단에 내가 있다면 => 댓글 좋아요 취소
+      await this.commentLikeRepository.delete({
+        userId,
+        commentId,
+      });
+      // 2-2B. 댓글 좋아요 취소에 따른 포인트 차감
+      this.pointService.savePointLog(userId, PointType.COMMENT_LIKE, false);
     }
-
-    // 댓글 삭제로 포인트 차감
-    this.pointService.savePointLog(userId, PointType.COMMENT_LIKE, false);
-
-    await this.commentLikeRepository.delete({
-      userId,
-      commentId,
-    });
   }
 
   /** 게시글 좋아요 조회 API **/
@@ -171,18 +163,6 @@ export class LikeService {
       throw new BadRequestException(POST_MESSAGE.LIKE.CREATE.FAILURE.NO_SELF);
     }
 
-    // // 2. 혹시 내가 싫어요를 누른 글인지 확인
-    // const postDislike = await this.postDislikeRepository.findOneBy({
-    //   userId,
-    //   postId,
-    // });
-    // // 2-1. 이미 싫어요를 누른 글이라면 에러처리
-    // if (postDislike) {
-    //   throw new BadRequestException(
-    //     POST_MESSAGE.LIKE.CREATE.FAILURE.ALREADY_DISLIKE
-    //   );
-    // }
-
     // 3. 내가 좋아요를 누른 상태인지 아닌지를 확인
     const postLike = await this.postLikeRepository.findOneBy({
       userId,
@@ -199,8 +179,9 @@ export class LikeService {
         userId,
         PointType.POST_LIKE
       );
-      if (isValidPoint)
+      if (isValidPoint) {
         this.pointService.savePointLog(userId, PointType.POST_LIKE, true);
+      }
     } else {
       // 3-2-A. 게시글 좋아요 명단에 내가 있다면 => 게시글 좋아요 취소
       await this.postLikeRepository.delete({
