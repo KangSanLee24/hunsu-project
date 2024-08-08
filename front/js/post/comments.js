@@ -5,6 +5,7 @@ import { elapsedTime } from '../common/elapsed-time.js';
 // 0-1. URL에서 게시글 ID를 가져와서 댓글 로드
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get('id');
+
 // 0-2. 기타 선언
 const submitCommentButton = document.getElementById('submit-comment');
 const commentContentInput = document.getElementById('comment-content');
@@ -194,7 +195,6 @@ async function clickLikeComment(commentId) {
     // 0-2. API response 결과가 ok가 아니면
     if (!response.ok) {
       alert('자신의 댓글에는 좋아요를 누를 수 없습니다.');
-      console.log('댓글 좋아요 업데이트에 실패했습니다.');
     }
     // 0-3. 새로고침
     window.location.reload();
@@ -222,7 +222,6 @@ async function clickDislikeComment(commentId) {
     // 0-2. API response 결과가 ok가 아니면
     if (!response.ok) {
       alert('자신의 댓글에는 싫어요를 누를 수 없습니다.');
-      console.log('댓글 싫어요 업데이트에 실패했습니다.');
     }
     // 0-3. 새로고침
     window.location.reload();

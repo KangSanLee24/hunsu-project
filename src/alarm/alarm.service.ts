@@ -16,8 +16,7 @@ import { Comment } from 'src/comment/entities/comment.entity';
 import { AlarmFromType } from './types/alarm-from.type';
 import { ALARM_MESSAGES } from 'src/constants/alarm-message.constant';
 import { ConfigService } from '@nestjs/config';
-import { Observable, Subject, filter, from, map } from 'rxjs';
-import { FindAllAlarmsDto } from './dto/find-all-alarms.dto';
+import { Observable, Subject, filter, map } from 'rxjs';
 import { paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
@@ -72,7 +71,7 @@ export class AlarmService {
     });
 
     // 3. 신규 생성 이벤트 등록
-    this.newEventRegister(userId);
+    this.newEventRegister(userId, notification);
 
     // 3. 반환
     return alarm;
@@ -289,26 +288,25 @@ export class AlarmService {
   /** 7. 신규 생성 이벤트 알람 (SSE) **/
   newEventAlarm(userId: number): Observable<any> {
     // 1. 이벤트 발생하면 [감지기] 작동
-    const newAlarm = this.observer.pipe(
+    return this.observer.pipe(
       // 2. 알람 소유주의 알람만 전송하도록
-      filter((user) => user.id !== userId),
+      filter((user) => {
+        return user.id == userId;
+      }),
       // 3. 알람 전송
       map((user) => {
-        console.log('user', user);
         return {
           data: {
-            message: ALARM_MESSAGES.ALARM_CREATED.NEW,
+            message: user.data,
           },
         } as MessageEvent;
       })
     );
-
-    return newAlarm;
   }
 
   /** 신규 생성 이벤트 등록(SSE) (+) **/
-  newEventRegister(userId: number) {
+  newEventRegister(userId: number, data: any) {
     // 알람 명단에 대상자 추가
-    this.users$.next({ id: userId });
+    this.users$.next({ id: userId, data });
   }
 }
