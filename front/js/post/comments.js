@@ -5,6 +5,7 @@ import { elapsedTime } from '../common/elapsed-time.js';
 // 0-1. URL에서 게시글 ID를 가져와서 댓글 로드
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get('id');
+
 // 0-2. 기타 선언
 const submitCommentButton = document.getElementById('submit-comment');
 const commentContentInput = document.getElementById('comment-content');
