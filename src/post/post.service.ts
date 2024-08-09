@@ -36,7 +36,7 @@ export class PostService {
 
     private readonly awsService: AwsService,
     private readonly pointService: PointService
-  ) { }
+  ) {}
 
   /* 게시글 생성 API*/
   async create(createPostDto: CreatePostDto, userId: number) {
@@ -295,10 +295,10 @@ export class PostService {
     }
 
     // 게시글 삭제로 포인트 차감
-    this.pointService.savePointLog(userId, PointType.POST, false);
+    // await this.pointService.savePointLog(userId, PointType.POST, false);
 
     // DB에서 게시글 삭제
-    this.postRepository.remove(post);
+    await this.postRepository.remove(post);
   }
 
   /*게시글 강제 삭제 API*/
