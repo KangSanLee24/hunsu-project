@@ -15,7 +15,13 @@
 
 <body>
   <header>
-    <div class="logo">5ZIRAP</div>
+    <div
+        id="logo-home"
+        class="logo"
+        onClick="window.location.href='./main.html'"
+      >
+        5ZIRAP
+      </div>
     <nav>
       <ul>
         <li><a href="./log-in.html">로그인</a></li>
@@ -33,53 +39,44 @@
         <span class="date">| 작성일: <span id="post-date"></span></span>
         <span class="like">| 좋아요: <span id="post-likes"></span></span>
         <span class="dislike">| 싫어요: <span id="post-dislikes"></span></span>
+        <!-- 작성자 수정 삭제 버튼 -->
+        <button id="post-update-btn" disabled="true">수정</button>
+        <button id="post-delete-btn" disabled="true">삭제</button>
         <h2 id="post-title">게시글 제목</h2>
-        <div id="image-container">
-          <img id="post-image" src="" alt="" />
-        </div>
+        
 
-        <p id="post-content">게시글 내용</p>
-        <div id="container">
-          <!--/* 에디터 콘텐츠 렌더링 영역 */-->
-          <div id="editorContent">
-            <!-- 좋아요 및 싫어요 버튼 위치 -->
-            <div class="like-dislike">
-              <button id="like-btn">
-                <i class="fa fa-thumbs-up"></i> &#128518; 좋아요
-                <span id="post-likes"></span>
-              </button>
-              <button id="dislike-btn">
-                <i class="fa fa-thumbs-down"></i> &#128553; 싫어요
-                <span id="post-dislikes"></span>
-              </button>
-            </div>
-          </div>
-          <div class="comments">
-            <h3>댓글</h3>
-            <div class="comment-input">
-              <textarea id="comment-content" placeholder="댓글을 입력하세요..." rows="4"></textarea>
-              <button id="submit-comment">댓글 작성</button>
-            </div>
-            <ul id="comment-list">
-              <!-- 댓글 좋아요 및 싫어요 버튼 위치 -->
-              <li>
-                <p>댓글 내용</p>
-                <span>작성일: <span class="comment-date"></span></span>
-                <div class="comment-like-dislike">
-                  <button class="comment-like-btn">
-                    <i class="fa fa-thumbs-up"></i> &#128518; 좋아요
-                    <span class="comment-likes"></span>
-                  </button>
-                  <button class="comment-dislike-btn">
-                    <i class="fa fa-thumbs-down"></i> &#128553; 싫어요
-                    <span class="comment-dislikes"></span>
-                  </button>
-                </div>
-              </li>
-            </ul>
+          <p id="post-content">게시글 내용</p>
+          <div id="container">
+            <!--/* 에디터 콘텐츠 렌더링 영역 */-->
+            <div id="editorContent">
+          <!-- 좋아요 및 싫어요 버튼 위치 -->
+          <div class="like-dislike">
+            <button id="like-btn">
+              <i class="fa fa-thumbs-up"></i>👍 좋아요
+              <span id="post-likes"></span>
+            </button>
+            <button id="dislike-btn">
+              <i class="fa fa-thumbs-down"></i>👎 싫어요
+              <span id="post-dislikes"></span>
+            </button>
           </div>
         </div>
-  </main>
+        <div class="comments">
+          <h3>댓글</h3>
+          <div class="comment-input">
+            <textarea
+              id="comment-content"
+              placeholder="댓글을 입력하세요..."
+              rows="4"
+            ></textarea>
+            <button id="submit-comment">댓글 작성</button>
+          </div>
+          <ul id="comment-list">
+            <!-- 여기에 댓글 목록 데이터가 들어옴 -->
+          </ul>
+        </div>
+      </div>
+    </main>
 
   <footer>
     <div class="footer-menu">
@@ -90,10 +87,16 @@
         📝 게시판
       </button>
       <button onclick="window.location.href='./main.html'">🏠 홈으로</button>
-      <button id="alarmButton" class="footerAlarm">
+      <button id="alarmButton" class="footerAlarm" onclick="clickAlarmBtn()">
         🔔 알람
       </button>
-      <button id="myPageButton" class="my-page-button">🏆 마이페이지</button>
+      <button
+        id="myPageButton"
+        class="my-page-button"
+        onclick="clickMyPageBtn()"
+      >
+        🏆 마이페이지
+      </button>
     </div>
   </footer>
 </body>

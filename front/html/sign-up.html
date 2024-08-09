@@ -1,76 +1,65 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>회원가입</title>
-    <link rel="stylesheet" href="/styles/sign-up.css" />
-  </head>
-  <body>
-    <!-- 회원가입 페이지 -->
-    <div class="container">
-      <h1>회원 가입</h1>
-      <form>
-        <label for="signup-email">이메일 (Email)</label>
-        <input
-          type="email"
-          id="signup-email"
-          placeholder="example@example.com"
-          required
-        />
 
-        <label for="signup-password">비밀번호 (Password)</label>
-        <input
-          type="password"
-          id="signup-password"
-          placeholder="********"
-          required
-        />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>회원가입</title>
+  <link rel="stylesheet" href="/styles/sign-up.css" />
+</head>
 
-        <label for="confirm-signup-password"
-          >비밀번호 확인 (Password Confirm)</label
-        >
-        <input
-          type="password"
-          id="confirm-signup-password"
-          placeholder="********"
-          required
-        />
+<body>
+  <!-- 회원가입 페이지 -->
+  <div class="container">
+    <h1>회원 가입</h1>
+    <form>
+      <label for="signup-email">이메일 (Email)</label>
+      <input type="email" id="signup-email" placeholder="example@example.com" required />
 
-        <label for="nickname">닉네임 (Nickname)</label>
-        <input type="text" id="nickname" placeholder="홍길동" required />
+      <label for="signup-password">비밀번호 (Password)</label>
+      <input type="password" id="signup-password" placeholder="********" required />
 
-        <button type="submit">회원 가입하기</button>
-      </form>
+      <label for="confirm-signup-password">비밀번호 확인 (Password Confirm)</label>
+      <input type="password" id="confirm-signup-password" placeholder="********" required />
+
+      <label for="nickname">닉네임 (Nickname)</label>
+      <input type="text" id="nickname" placeholder="홍길동" required />
+      <!-- 회원가입 버튼 -->
+      <button type="submit">회원 가입하기</button>
+      <!-- [홈으로] 버튼 -->
+      <button type="submit" onclick="window.location.href='./main.html'">홈으로</button>
+    </form>
+  </div>
+
+  <div id="notification" class="notification hidden">
+    <div class="notification-content">
+      <p>
+        회원가입이 성공적으로 완료되었습니다. 이메일 인증 페이지로 이동합니다.
+      </p>
+      <button id="confirm-btn">확인</button>
     </div>
+  </div>
 
-    <div id="notification" class="notification hidden">
-      <div class="notification-content">
-        <p>
-          회원가입이 성공적으로 완료되었습니다. 이메일 인증 페이지로 이동합니다.
-        </p>
-        <button id="confirm-btn">확인</button>
-      </div>
-    </div>
+  <!-- 스타일을 추가해 알림을 화면에 표시 -->
+  <style>
+    .notification {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      border: 1px solid black;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
 
-    <!-- 스타일을 추가해 알림을 화면에 표시 -->
-    <style>
-      .notification {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: white;
-        border: 1px solid black;
-        padding: 20px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-      }
-      .hidden {
-        display: none;
-      }
-    </style>
+    .hidden {
+      display: none;
+    }
+  </style>
 
-    <script type="module" src="/js/auth/sign-up.js" type="module"></script>
-  </body>
+  <script type="module" src="/js/auth/sign-up.js" type="module"></script>
+</body>
+
 </html>

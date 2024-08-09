@@ -113,7 +113,7 @@ export class AuthService {
         accPoint: 0,
       });
       // 4-2-3. 인증 이메일 발송
-      await this.mailService.sendEmail(newMember.email);
+      this.mailService.sendEmail(newMember.email);
 
       // 4-2-4. 성공: 트랜잭션 묶음 종료: commit
       await queryRunner.commitTransaction();

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>닉네임 변경</title>
+    <link rel="stylesheet" href="/styles/update-profile.css" />
+</head>
+
+<body>
+    <!-- 닉네임 변경 페이지 -->
+    <div class="container">
+        <h1>닉네임 변경</h1>
+        <form>
+            <label for="nickname">현재 닉네임 (Current nickname)</label>
+            <input type="text" id="current-nickname" placeholder="홍길동" required readonly />
+            <label for="nickname">변경할 닉네임 (Nickname to Change)</label>
+            <input type="text" id="nickname" placeholder="홍길동" required />
+            <button id="update-profile-btn" type="submit">닉네임 수정하기</button>
+        </form>
+    </div>
+
+    <!-- 스타일을 추가해 알림을 화면에 표시 -->
+    <style>
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 1px solid black;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+
+    <script type="module" src="/js/user/update-profile.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</body>
+
+</html>

@@ -41,13 +41,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentUser;
   let currentUserId;
   try {
-    currentUser = (await getAuthor()).author;
-    currentUserId = (await getAuthor()).authorId;
+    const authorData = await getAuthor();
+    currentUser = authorData.author;
+    currentUserId = authorData.authorId;
+    // currentUser = (await getAuthor()).author;
+    // currentUserId = (await getAuthor()).authorId;
   } catch (error) {
     console.error('Failed to get author:', error);
   }
-
-  console.log(currentUser, currentUserId);
 
   // 채팅 목록을 자동으로 스크롤 하단으로 이동
   function scrollToBottom() {
@@ -58,6 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function addMessage(message) {
     const messageElement = document.createElement('div');
     messageElement.className = `chat-message ${currentUser === message.author ? 'outgoing' : ''}`;
+
     if (message.body) {
       messageElement.innerHTML = `
             <div class="chat-message-wrapper">
@@ -65,6 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="chat-message-bubble">
                     <span class="chat-message-body">${message.body}</span>
                 </div>
+                <span class="chat-message-time">${message.chatTime}</span>
             </div>
         `;
     } else if (message.fileUrl) {
@@ -74,6 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="chat-message-bubble">
                     <img src="${message.fileUrl}" alt="Chat Image" style="max-width: 100%; height: auto;" />
                 </div>
+                <span class="chat-message-time">${message.imageTime}</span>
             </div>
         `;
     }
@@ -81,12 +85,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     chatScroll.appendChild(messageElement);
     scrollToBottom();
 
-    // 이미지 로드 후 스크롤 하단으로 이동
-    const img = messageElement.querySelector('img');
-    img.onload = () => {
-      chatScroll.appendChild(messageElement);
-      scrollToBottom(); // 이미지가 로드된 후 스크롤
-    };
+    if (message.fileUrl) {
+      // 이미지 로드 후 스크롤 하단으로 이동
+      const img = messageElement.querySelector('img');
+      img.onload = () => {
+        chatScroll.appendChild(messageElement);
+        scrollToBottom(); // 이미지가 로드된 후 스크롤
+      };
+    }
   }
 
   // 방 입장 시 서버에 'joinRoom' 이벤트 전송
@@ -116,6 +122,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('새로운 이미지 수신:', ImageMessage);
     addMessage(ImageMessage);
 
+    // 채팅방 상단에 고정할 이미지 표시
+    const fixedImageDiv = document.getElementById('fixedImage');
+    fixedImageDiv.style.display = 'block'; // 이미지 표시
+
+    // 고정핀 텍스트가 이미 존재하는 경우 변경하지 않음
+    if (!fixedImageDiv.querySelector('.fixed-header')) {
+      const header = document.createElement('div');
+      header.className = 'fixed-header';
+      header.textContent = '📌 고정된 이미지';
+      fixedImageDiv.appendChild(header);
+    }
+
+    // 이미지 업데이트
+    const img = document.getElementById('fixedImageContent');
+    img.src = ImageMessage.fileUrl; // 서버에서 받은 새로운 이미지 URL로 업데이트
+
+    // 작성자 정보 업데이트
+    const authorName = document.getElementById('authorName');
+    authorName.textContent = `${ImageMessage.author}`; // 작성자 정보 업데이트
+  });
+
+  //서버로부터 'lastImage' 이벤트 수신
+  socket.on('lastImage', (ImageMessage) => {
     // 채팅방 상단에 고정할 이미지 표시
     const fixedImageDiv = document.getElementById('fixedImage');
     fixedImageDiv.style.display = 'block'; // 이미지 표시
@@ -236,14 +265,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     notification.textContent = data.message;
     chatScroll.appendChild(notification);
     chatScroll.scrollTop = chatScroll.scrollHeight; // 최신 메시지로 스크롤
+  });
 
-    setTimeout(() => {
-      if (data.message.includes('방장')) {
-        alert(
-          '방장이 채팅방을 나갔습니다. 채팅 목록 페이지로 이동하시겠습니까?'
-        );
-        window.location.href = '/html/chat-list.html';
-      }
-    }, 1000);
+  // 서버로부터 'ownerLeft' 이벤트 수신
+  socket.on('ownerLeft', () => {
+    console.log('ownerLeft');
+    alert('방장이 채팅방을 나갔습니다. 채팅 목록 페이지로 이동합니다.');
+    window.location.href = '/html/chat-list.html';
+  });
+
+  socket.on('outRoom', () => {
+    alert('삭제된 채팅방입니다. 채팅 목록 페이지로 이동합니다.');
+    window.location.href = '/html/chat-list.html';
   });
 });

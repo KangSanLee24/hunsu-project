@@ -339,7 +339,6 @@ document.addEventListener('DOMContentLoaded', () => {
   /** 0. WEEKLY POINT RANK 랜더링 **/
   function renderWeeklyPointRank(data) {
     // 1. 들어온 데이터를 하나하나 HTML화
-    console.log(data);
     for (let i = 1; i <= data.length; i++) {
       // 1-1. 데이터로 row HTML 생성
       const row = document.createElement('div');
@@ -349,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="point-rank-ranking-var">${rankMark(i)}</span>
                 </div>                  
                 <div class="point-rank-nickname">
-                <span>${data[i - 1].nickname}</span>
+                <span>${levelMark(data[i - 1].accPoint)}${data[i - 1].nickname}</span>
                 </div>                  
                   <div class="point-rank-point">
                   <span>${data[i - 1].point}</span>
@@ -478,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /** TIME 표기 함수 **/
   const yyyymmdd = (date) => {
     // 1. 한국 시간 보정
-    const korDate = Number(new Date(date)) + 1000 * 60 * 60 * 9;
+    const korDate = Number(new Date(date));
     const start = new Date(korDate);
     const time = start.toLocaleDateString('ko-KR', {
       year: '2-digit',

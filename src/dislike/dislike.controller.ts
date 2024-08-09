@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   HttpStatus,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { DislikeService } from './dislike.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -22,6 +23,7 @@ import { POST_MESSAGE } from 'src/constants/post-message.constant';
 export class DislikeController {
   constructor(private readonly dislikeService: DislikeService) {}
 
+  /** 댓글 싫어요 조회 API **/
   @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '댓글 싫어요 조회 API' })
   @Get('/comments/:commentId/dislikes')
@@ -29,7 +31,6 @@ export class DislikeController {
     @Param('commentId', ParseIntPipe) commentId: number
   ) {
     const data = await this.dislikeService.getCommentDislikes(commentId);
-
     return {
       status: HttpStatus.OK,
       message: COMMENT_MESSAGE.DISLIKE.FIND.SUCCESS,
@@ -37,17 +38,40 @@ export class DislikeController {
     };
   }
 
+  /** 로그인한 사람의 댓글 싫어요 여부 조회 API **/
   @ApiTags('4. COMMENT API')
-  @ApiOperation({ summary: '댓글 싫어요 생성 API' })
-  @ApiBearerAuth()
+  @ApiOperation({ summary: '나의 댓글 싫어요 여부 조회 API' })
   @UseGuards(AuthGuard('jwt'))
-  @Post('/comments/:commentId/dislikes')
-  async createCommentDislike(
+  @ApiBearerAuth()
+  @Get('/comments/:commentId/dislikes/me')
+  async getMyCommentDislike(
     @LogIn() user: User,
     @Param('commentId', ParseIntPipe) commentId: number
   ) {
     const userId = user.id;
-    await this.dislikeService.createCommentDislike(userId, commentId);
+    const data = await this.dislikeService.getMyCommentDislike(
+      userId,
+      commentId
+    );
+    return {
+      status: HttpStatus.OK,
+      messgae: '나의 댓글 싫어요 여부 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 댓글 싫어요 클릭 API **/
+  @ApiTags('4. COMMENT API')
+  @ApiOperation({ summary: '댓글 싫어요 클릭 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('/comments/:commentId/dislikes')
+  async clickCommentDislike(
+    @LogIn() user: User,
+    @Param('commentId', ParseIntPipe) commentId: number
+  ) {
+    const userId = user.id;
+    await this.dislikeService.clickCommentDislike(userId, commentId);
 
     return {
       status: HttpStatus.OK,
@@ -55,24 +79,7 @@ export class DislikeController {
     };
   }
 
-  @ApiTags('4. COMMENT API')
-  @ApiOperation({ summary: '댓글 싫어요 삭제 API' })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Delete('/comments/:commentId/dislikes')
-  async deleteCommentDislike(
-    @LogIn() user: User,
-    @Param('commentId', ParseIntPipe) commentId: number
-  ) {
-    const userId = user.id;
-    await this.dislikeService.deleteCommentDislike(userId, commentId);
-
-    return {
-      status: HttpStatus.OK,
-      message: COMMENT_MESSAGE.DISLIKE.DELETE.SUCCESS,
-    };
-  }
-
+  /** 게시글 싫어요 조회 API **/
   @ApiTags('3. POST API')
   @ApiOperation({ summary: '게시글 싫어요 조회 API' })
   @Get('/posts/:postId/dislikes')
@@ -86,59 +93,41 @@ export class DislikeController {
     };
   }
 
+  /** 로그인한 사람의 게시글 싫어요 조회 API **/
   @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 싫어요 생성 API' })
-  @ApiBearerAuth()
+  @ApiOperation({ summary: '나의 게시글 싫어요 여부 조회 API' })
   @UseGuards(AuthGuard('jwt'))
-  @Post('/posts/:postId/dislikes')
-  async createPostDislike(
+  @ApiBearerAuth()
+  @Get('/posts/:postId/dislikes/me')
+  async getMyPostDislike(
     @LogIn() user: User,
     @Param('postId', ParseIntPipe) postId: number
   ) {
     const userId = user.id;
-    await this.dislikeService.createPostDislike(userId, postId);
+    const data = await this.dislikeService.getMyPostDislike(userId, postId);
+    return {
+      status: HttpStatus.OK,
+      messgae: '나의 게시글 싫어요 여부 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 게시글 싫어요 클릭 API **/
+  @ApiTags('3. POST API')
+  @ApiOperation({ summary: '게시글 싫어요 클릭 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('/posts/:postId/dislikes')
+  async clickPostDislike(
+    @LogIn() user: User,
+    @Param('postId', ParseIntPipe) postId: number
+  ) {
+    const userId = user.id;
+    await this.dislikeService.clickPostDislike(userId, postId);
 
     return {
       status: HttpStatus.OK,
       message: POST_MESSAGE.DISLIKE.CREATE.SUCCESS,
     };
   }
-
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 싫어요 삭제 API' })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Delete('/posts/:postId/dislikes')
-  async deletePostDislike(
-    @LogIn() user: User,
-    @Param('postId', ParseIntPipe) postId: number
-  ) {
-    const userId = user.id;
-    await this.dislikeService.deletePostDislike(userId, postId);
-
-    return {
-      status: HttpStatus.OK,
-      message: POST_MESSAGE.DISLIKE.DELETE.SUCCESS,
-    };
-  }
-
-  // @Get()
-  // findAll() {
-  //   return this.dislikeService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.dislikeService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateDislikeDto: UpdateDislikeDto) {
-  //   return this.dislikeService.update(+id, updateDislikeDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.dislikeService.remove(+id);
-  // }
 }

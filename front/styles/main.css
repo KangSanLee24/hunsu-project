@@ -40,6 +40,7 @@ h2:hover {
   flex-direction: row;
   overflow: scroll;
   overflow-y: hidden;
+  height: 335px;
 }
 
 /* 1-1. HOT - LIVECHAT CONTAINER 스크롤바 속성 */
@@ -340,6 +341,9 @@ ul.hot-post-rank-tabs li.current {
   border-radius: 10px;
   margin-right: 5px;
   padding: 10px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 /* 2-2-1. POINTT RANK TABS*/
@@ -347,6 +351,9 @@ ul.point-rank-tabs {
   margin: 0px;
   padding: 0px;
   list-style: none;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 /* 2-2-2. POINT RANK TAB LISTS */
@@ -358,6 +365,9 @@ ul.point-rank-tabs li {
   display: inline-block;
   padding: 10px 15px;
   cursor: pointer;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 /* 2-2-3. POINT RANK TAB LISTS CURRENT */
@@ -365,6 +375,9 @@ ul.point-rank-tabs li.current {
   border-radius: 10px 10px 0px 0px;
   background: rgb(36, 36, 36);
   color: white;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 /* 2-2-4. POINT RANK TAB RANKING BOX */
@@ -454,6 +467,9 @@ ul.hashtag-rank-tabs {
   margin: 0px;
   padding: 0px;
   list-style: none;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 /* 2-3-2. HASHTAG RANK TAB LISTS */
@@ -465,6 +481,9 @@ ul.hashtag-rank-tabs li {
   display: inline-block;
   padding: 10px 15px;
   cursor: pointer;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 /* 2-3-3. HASHTAG RANK TAB LISTS CURRENT */
@@ -472,6 +491,9 @@ ul.hashtag-rank-tabs li.current {
   border-radius: 10px 10px 0px 0px;
   background: rgb(36, 36, 36);
   color: white;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 /* 2-3-4. HASHTAG RANK TAB RANKING BOX */

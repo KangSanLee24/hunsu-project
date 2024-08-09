@@ -227,11 +227,15 @@ export class ChatService {
       select: { id: true },
     });
 
-    await this.chatLogRepository.save({
+    const chatLog = await this.chatLogRepository.save({
       roomId: chatRoomId,
       content: message,
       memberId: findUser.id,
     });
+
+    const chatTime = format(new Date(chatLog.createdAt), 'HH:mm');
+
+    return chatTime;
   }
 
   //채팅방 이미지 저장
@@ -265,6 +269,24 @@ export class ChatService {
     return fileUrl;
   }
 
+  //이미지 시간 조회
+  async imageTime (roomId: number, author: string, fileUrl: string) {
+
+    const findUser = await this.userRepository.findOne({
+      where: { nickname: author },
+      select: { id: true },
+    });
+
+    const imageLog = await this.chatImageRepository.findOne({
+      where: { roomId: roomId, userId: findUser.id, imgUrl: fileUrl },
+      select: { createdAt: true }
+    });
+
+    const imageTime = format(new Date(imageLog.createdAt), 'HH:mm');
+
+    return imageTime;
+  }
+  
   //채팅방 검색
   async chatRoomSearch(title?: string, sort?: Order) {
     const findChatRoom = await this.chatRoomRepository.find({
@@ -338,25 +360,25 @@ export class ChatService {
   async getHotLiveChat(num: number) {
     const getHotLiveChat = await this.entityManager.query(
       `
-  select a.id, a.owner_id, a.title, a.count,
-	CASE
-	when b.user_id = a.owner_id then b.img_url
-	ELSE null
-	END as img_url
-  from (select a.id, a.user_id as owner_id, a.title, count(b.user_id) as count
-  from (select id, user_id ,title
-  from chat_rooms
-  where is_deleted = FALSE) a join chat_members b
-  on a.id  = b.room_id
-  GROUP by a.id
-  order by count DESC) a left join
-  (select room_id , user_id, img_url
-  from chat_Images
-  where (room_id, created_at) IN
-  (select room_id , max(created_at)
-  from chat_Images
-  group by room_id)) b
-  on a.id = b.room_id;
+      select a.id, a.owner_id, a.title, a.count,
+      CASE
+      when b.user_id = a.owner_id then b.img_url
+      ELSE null
+      END as img_url
+      from (select a.id, a.user_id as owner_id, a.title, count(b.user_id) as count
+      from (select id, user_id ,title
+      from chat_rooms
+      where is_deleted = FALSE) a join chat_members b
+      on a.id  = b.room_id
+      GROUP by a.id
+      order by count DESC) a left join
+      (select room_id , user_id, img_url
+      from chat_Images
+      where (room_id, created_at) IN
+      (select room_id , max(created_at)
+      from chat_Images
+      group by room_id)) b
+      on a.id = b.room_id;
       `
     );
 
@@ -380,5 +402,39 @@ export class ChatService {
       })
     );
     return data;
+  }
+
+  //마지막 고정 이미지
+  async findChatImage(chatRoomId: number) {
+
+    const findChatImage = await this.chatImageRepository.findOne({
+      where: { roomId: chatRoomId },
+      select: { 
+        userId: true,
+        imgUrl: true,      
+       },
+      order: { createdAt: 'DESC'}
+    });
+
+    if(findChatImage) {
+      const findUser = await this.userRepository.findOne({
+        where: { id: findChatImage.userId },
+        select: { nickname: true },
+      });
+  
+      return {findChatImage, findUser};
+    } else {
+      return null;
+    }
+  }
+
+  //죽은 방인지 확인
+  async isChatRoom (chatRoomId: number) {
+
+    const isChatRoom = await this.chatRoomRepository.findOne({
+      where: {id: chatRoomId, isDeleted: false},
+    });
+
+    return isChatRoom;
   }
 }

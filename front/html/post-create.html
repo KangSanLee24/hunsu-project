@@ -13,7 +13,13 @@
   </head>
   <body>
     <header>
-      <div class="logo">5ZIRAP</div>
+      <div
+        id="logo-home"
+        class="logo"
+        onClick="window.location.href='./main.html'"
+      >
+        5ZIRAP
+      </div>
       <nav>
         <ul>
           <li><a href="./log-in.html">로그인</a></li>
@@ -28,9 +34,9 @@
       <input type="text" id="post-title" placeholder="제목을 입력하세요." />
       <!-- 제목 입력 -->
       <select id="post-category">
-        <option value="CHAT">잡담</option>
-        <option value="FASHION">패션</option>
-        <option value="COOKING">요리</option>
+        <option value="CHAT">CHAT</option>
+        <option value="FASHION">FASHION</option>
+        <option value="COOKING">COOKING</option>
       </select>
       <div class="editor-text-box" id="editor"></div>
       <!-- 에디터가 렌더링될 DIV -->
@@ -65,11 +71,44 @@
       // 전역변수로 이미지 URL 배열 선언
       window.imageUrls = []; // 전역변수로 설정
 
+      // URL에서 게시글 ID를 가져와서 상세 내용 로드
+      const urlParams = new URLSearchParams(window.location.search);
+      const postId = urlParams.get('id');
+
+      //postId가 존재하고 숫자이면 해당 숫자로 게시글 상세 조회
+      async function fetchPost(postId) {
+        try {
+          const response = await fetch(
+            `http://3.37.69.47:3000/api/posts/${postId}`
+          );
+          if (!response.ok)
+            throw new Error('게시글을 불러오는 데 실패했습니다.');
+          return await response.json();
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      // 게시글 수정 시 제목, 카테고리, 내용을 채워넣기
+      async function loadPost() {
+        if (postId) {
+          const postData = await fetchPost(postId);
+          if (postData) {
+            document.getElementById('post-title').value = postData.data.title;
+            document.getElementById('post-category').value =
+              postData.data.category;
+            editor.setMarkdown(postData.data.content); // 에디터에 내용 세팅
+          }
+        }
+      }
+
+      loadPost();
+
       const editor = new toastui.Editor({
         el: document.querySelector('#editor'), // 에디터를 적용할 요소 (컨테이너)
         height: 'auto', // 에디터 영역의 높이 값 (OOOpx || auto)
         initialEditType: 'markdown', // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
-        initialValue: '내용을 입력해 주세요.', // 내용의 초기 값으로, 반드시 마크다운 문자열 형태여야 함
+        initialValue: '', // 내용의 초기 값으로, 반드시 마크다운 문자열 형태여야 함
         previewStyle: 'vertical', // 마크다운 프리뷰 스타일 (tab || vertical)
         placeholder: '내용을 입력해 주세요.',
         hooks: {

@@ -7,6 +7,7 @@ import {
   UseGuards,
   ParseIntPipe,
   HttpStatus,
+  Patch,
 } from '@nestjs/common';
 import { LikeService } from './like.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -20,12 +21,12 @@ import { POST_MESSAGE } from 'src/constants/post-message.constant';
 export class LikeController {
   constructor(private readonly likeService: LikeService) {}
 
+  /** 댓글 좋아요 조회 API **/
   @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '댓글 좋아요 조회 API' })
   @Get('/comments/:commentId/likes')
   async getCommentLikes(@Param('commentId', ParseIntPipe) commentId: number) {
     const data = await this.likeService.getCommentLikes(commentId);
-
     return {
       status: HttpStatus.OK,
       message: COMMENT_MESSAGE.LIKE.FIND.SUCCESS,
@@ -33,17 +34,37 @@ export class LikeController {
     };
   }
 
+  /** 로그인한 사람의 댓글 좋아요 여부 조회 API **/
   @ApiTags('4. COMMENT API')
-  @ApiOperation({ summary: '댓글 좋아요 생성 API' })
-  @ApiBearerAuth()
+  @ApiOperation({ summary: '나의 댓글 좋아요 여부 조회 API' })
   @UseGuards(AuthGuard('jwt'))
-  @Post('/comments/:commentId/likes')
-  async createCommentLike(
+  @ApiBearerAuth()
+  @Get('/comments/:commentId/likes/me')
+  async getMyCommentLike(
     @LogIn() user: User,
     @Param('commentId', ParseIntPipe) commentId: number
   ) {
     const userId = user.id;
-    await this.likeService.createCommentLike(userId, commentId);
+    const data = await this.likeService.getMyCommentLike(userId, commentId);
+    return {
+      status: HttpStatus.OK,
+      messgae: '나의 댓글 좋아요 여부 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 댓글 좋아요 클릭 API **/
+  @ApiTags('4. COMMENT API')
+  @ApiOperation({ summary: '댓글 좋아요 클릭 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('/comments/:commentId/likes')
+  async clickCommentLike(
+    @LogIn() user: User,
+    @Param('commentId', ParseIntPipe) commentId: number
+  ) {
+    const userId = user.id;
+    await this.likeService.clickCommentLike(userId, commentId);
 
     return {
       status: HttpStatus.OK,
@@ -51,24 +72,7 @@ export class LikeController {
     };
   }
 
-  @ApiTags('4. COMMENT API')
-  @ApiOperation({ summary: '댓글 좋아요 삭제 API' })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Delete('/comments/:commentId/likes')
-  async deleteCommentLike(
-    @LogIn() user: User,
-    @Param('commentId', ParseIntPipe) commentId: number
-  ) {
-    const userId = user.id;
-    await this.likeService.deleteCommentLike(userId, commentId);
-
-    return {
-      status: HttpStatus.OK,
-      message: COMMENT_MESSAGE.LIKE.DELETE.SUCCESS,
-    };
-  }
-
+  /** 게시글 좋아요 조회 API **/
   @ApiTags('3. POST API')
   @ApiOperation({ summary: '게시글 좋아요 조회 API' })
   @Get('/posts/:postId/likes')
@@ -82,39 +86,41 @@ export class LikeController {
     };
   }
 
+  /** 로그인한 사람의 게시글 좋아요 조회 API **/
   @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 좋아요 생성 API' })
-  @ApiBearerAuth()
+  @ApiOperation({ summary: '나의 게시글 좋아요 여부 조회 API' })
   @UseGuards(AuthGuard('jwt'))
-  @Post('/posts/:postId/likes')
-  async createPostLike(
+  @ApiBearerAuth()
+  @Get('/posts/:postId/likes/me')
+  async getMyPostLike(
     @LogIn() user: User,
     @Param('postId', ParseIntPipe) postId: number
   ) {
     const userId = user.id;
-    await this.likeService.createPostLike(userId, postId);
+    const data = await this.likeService.getMyPostLike(userId, postId);
+    return {
+      status: HttpStatus.OK,
+      messgae: '나의 게시글 좋아요 여부 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 게시글 좋아요 클릭 API **/
+  @ApiTags('3. POST API')
+  @ApiOperation({ summary: '게시글 좋아요 클릭 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('/posts/:postId/likes')
+  async postLike(
+    @LogIn() user: User,
+    @Param('postId', ParseIntPipe) postId: number
+  ) {
+    const userId = user.id;
+    await this.likeService.postLike(userId, postId);
 
     return {
       status: HttpStatus.OK,
       message: POST_MESSAGE.LIKE.CREATE.SUCCESS,
-    };
-  }
-
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 좋아요 삭제 API' })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Delete('/posts/:postId/likes')
-  async deletePostLike(
-    @LogIn() user: User,
-    @Param('postId', ParseIntPipe) postId: number
-  ) {
-    const userId = user.id;
-    await this.likeService.deletePostLike(userId, postId);
-
-    return {
-      status: HttpStatus.OK,
-      message: POST_MESSAGE.LIKE.DELETE.SUCCESS,
     };
   }
 }
