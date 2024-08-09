@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('refreshToken', result.data.refreshToken);
 
       // 4-A-2. '로그인에 성공했습니다.' alert
-      checkAttendance(accessToken);
+      checkAttendance(result.data.accessToken);
       alert(result.message);
 
       // 4-A-3. 메인 페이지로 이동
