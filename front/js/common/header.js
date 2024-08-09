@@ -191,35 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** SSE 알람 **/
-  function alarmSSE(userId) {
-    const eventSource = new EventSource(
-      `${API_BASE_URL}/alarms/sse/${userId}`,
-      { withCredentials: true }
-    );
-
-    // 1. SSE - 메시지 받기
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      alert(`알람: ${data.message}`);
-    };
-
-    // 2. SSE - 알람 활성화 알림
-    eventSource.onopen = () => {
-      console.log('알람 기능이 활성화되었습니다.');
-    };
-
-    // 3. SSE - 알람 비활성화 알림
-    eventSource.onclose = () => {
-      console.log('알람 기능이 비활성화되었습니다.');
-    };
-
-    // 4. SSE - 알람 에러
-    eventSource.onerror = (error) => {
-      console.error('알람 기능에서 에러가 발생했습니다: ', error);
-    };
-  }
-
   // 댓글 작성 textarea 클릭 이벤트 리스너 추가
   const commentContentTextarea = document.getElementById('comment-content');
   if (commentContentTextarea) {
@@ -315,3 +286,36 @@ document.addEventListener('DOMContentLoaded', () => {
   window.clickMyPageBtn = clickMyPageBtn;
   window.clickCreatePostBtn = clickCreatePostBtn;
 });
+
+/** SSE 알람 **/
+function alarmSSE(userId) {
+  const eventSource = new EventSource(`${API_BASE_URL}/alarms/sse/${userId}`);
+
+  // 1. SSE - 메시지 받기
+  eventSource.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    console.log(`알람: ${data.message}`);
+    alert(`알람: ${data.message}`);
+  };
+
+  // 2. SSE - 알람 활성화 알림
+  eventSource.onopen = () => {
+    console.log('알람 기능이 활성화되었습니다.');
+  };
+
+  // 3. SSE - 알람 비활성화 알림
+  eventSource.onclose = () => {
+    console.log('알람 기능이 비활성화되었습니다.');
+  };
+
+  // 4. SSE - 알람 에러
+  eventSource.onerror = (error) => {
+    console.error('알람 기능에서 에러가 발생했습니다: ', error);
+  };
+
+  // 페이지 이탈 시 SSE 연결 종료
+  window.addEventListener('unload', (e) => {
+    e.preventDefault();
+    eventSource.close();
+  });
+}
