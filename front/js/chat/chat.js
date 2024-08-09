@@ -1,68 +1,67 @@
-import { API_BASE_URL } from "../../config/config.js";
+import { API_BASE_URL } from '../../config/config.js';
 
 async function getAuthor() {
-    try{
-        const accessToken = localStorage.getItem('accessToken');
+  try {
+    const accessToken = localStorage.getItem('accessToken');
 
-        const response = await fetch(`${API_BASE_URL}/users/me`, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-            }
-          });
-    
-          const result = await response.json();
-          const author = result.data.nickname;
-          const authorId = result.data.id;
+    const response = await fetch(`${API_BASE_URL}/users/me`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
-          return { author, authorId } ;
-    }catch {
-        console.error('Error:', error);
-        throw error;
-    }
+    const result = await response.json();
+    const author = result.data.nickname;
+    const authorId = result.data.id;
+
+    return { author, authorId };
+  } catch {
+    console.error('Error:', error);
+    throw error;
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const socket = io('http://3.37.69.47:3000');
 
-    const socket = io('http://localhost:3000');
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomId = urlParams.get('roomId');
+  const roomName = urlParams.get('roomName');
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomId = urlParams.get('roomId');
-    const roomName = urlParams.get('roomName');
+  const chatScroll = document.getElementById('chatscroll');
+  const messageInput = document.getElementById('messageInput');
+  const sendButton = document.getElementById('sendButton');
+  const roomNameElement = document.getElementById('roomName');
+  const fileInput = document.getElementById('fileInput');
+  const imagePreview = document.getElementById('imagePreview');
+  let file = null; // 파일 변수 초기화
 
-    const chatScroll = document.getElementById('chatscroll');
-    const messageInput = document.getElementById('messageInput');
-    const sendButton = document.getElementById('sendButton');
-    const roomNameElement = document.getElementById('roomName');
-    const fileInput = document.getElementById('fileInput'); 
-    const imagePreview = document.getElementById('imagePreview');
-    let file = null; // 파일 변수 초기화
+  let currentUser;
+  let currentUserId;
+  try {
+    const authorData = await getAuthor();
+    currentUser = authorData.author;
+    currentUserId = authorData.authorId;
+    // currentUser = (await getAuthor()).author;
+    // currentUserId = (await getAuthor()).authorId;
+  } catch (error) {
+    console.error('Failed to get author:', error);
+  }
 
-    let currentUser;
-    let currentUserId;
-    try{
-        const authorData = await getAuthor();
-        currentUser = authorData.author;
-        currentUserId = authorData.authorId;
-        // currentUser = (await getAuthor()).author;
-        // currentUserId = (await getAuthor()).authorId;
-    } catch(error){
-        console.error('Failed to get author:', error);
-    }
+  // 채팅 목록을 자동으로 스크롤 하단으로 이동
+  function scrollToBottom() {
+    chatScroll.scrollTop = chatScroll.scrollHeight;
+  }
 
-    // 채팅 목록을 자동으로 스크롤 하단으로 이동
-    function scrollToBottom() {
-        chatScroll.scrollTop = chatScroll.scrollHeight;
-    }
+  // 메시지를 채팅 목록에 추가하는 함수
+  function addMessage(message) {
+    const messageElement = document.createElement('div');
+    messageElement.className = `chat-message ${currentUser === message.author ? 'outgoing' : ''}`;
 
-    // 메시지를 채팅 목록에 추가하는 함수
-    function addMessage(message) {
-        const messageElement = document.createElement('div');
-        messageElement.className = `chat-message ${currentUser === message.author ? 'outgoing' : ''}`;
-
-        if(message.body){
-            messageElement.innerHTML = `
+    if (message.body) {
+      messageElement.innerHTML = `
             <div class="chat-message-wrapper">
                 <span class="chat-message-author">${message.author}</span>
                 <div class="chat-message-bubble">
@@ -71,8 +70,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <span class="chat-message-time">${message.chatTime}</span>
             </div>
         `;
-        } else if (message.fileUrl) {
-            messageElement.innerHTML = `
+    } else if (message.fileUrl) {
+      messageElement.innerHTML = `
             <div class="chat-message-wrapper">
                 <span class="chat-message-author">${message.author}</span>
                 <div class="chat-message-bubble">
@@ -81,200 +80,202 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <span class="chat-message-time">${message.imageTime}</span>
             </div>
         `;
-        }
+    }
 
+    chatScroll.appendChild(messageElement);
+    scrollToBottom();
+
+    if (message.fileUrl) {
+      // 이미지 로드 후 스크롤 하단으로 이동
+      const img = messageElement.querySelector('img');
+      img.onload = () => {
         chatScroll.appendChild(messageElement);
-        scrollToBottom();
+        scrollToBottom(); // 이미지가 로드된 후 스크롤
+      };
+    }
+  }
 
-        if(message.fileUrl) {
-            // 이미지 로드 후 스크롤 하단으로 이동
-            const img = messageElement.querySelector('img');
-            img.onload = () => {
-                chatScroll.appendChild(messageElement);
-                scrollToBottom(); // 이미지가 로드된 후 스크롤
-            };
-        };
+  // 방 입장 시 서버에 'joinRoom' 이벤트 전송
+  socket.emit('joinRoom', {
+    roomId,
+    author: currentUser,
+    authorId: currentUserId,
+  });
+
+  // 방 입장 시 'userJoined' 이벤트 수신
+  socket.on('userJoined', (data) => {
+    const notification = document.createElement('div');
+    notification.classList.add('notification');
+    notification.textContent = data.message;
+    chatScroll.appendChild(notification);
+    chatScroll.scrollTop = chatScroll.scrollHeight; // 최신 메시지로 스크롤
+  });
+
+  // 서버로부터 'chat' 이벤트 수신
+  socket.on('chat', (newMessage) => {
+    console.log('새로운 메시지 수신:', newMessage);
+    addMessage(newMessage);
+  });
+
+  // 서버로부터 'chatImage' 이벤트 수신
+  socket.on('chatImage', (ImageMessage) => {
+    console.log('새로운 이미지 수신:', ImageMessage);
+    addMessage(ImageMessage);
+
+    // 채팅방 상단에 고정할 이미지 표시
+    const fixedImageDiv = document.getElementById('fixedImage');
+    fixedImageDiv.style.display = 'block'; // 이미지 표시
+
+    // 고정핀 텍스트가 이미 존재하는 경우 변경하지 않음
+    if (!fixedImageDiv.querySelector('.fixed-header')) {
+      const header = document.createElement('div');
+      header.className = 'fixed-header';
+      header.textContent = '📌 고정된 이미지';
+      fixedImageDiv.appendChild(header);
     }
 
-    // 방 입장 시 서버에 'joinRoom' 이벤트 전송
-    socket.emit('joinRoom', { roomId, author: currentUser, authorId: currentUserId});
+    // 이미지 업데이트
+    const img = document.getElementById('fixedImageContent');
+    img.src = ImageMessage.fileUrl; // 서버에서 받은 새로운 이미지 URL로 업데이트
 
-    // 방 입장 시 'userJoined' 이벤트 수신
-    socket.on('userJoined', (data) => {
-        const notification = document.createElement('div');
-        notification.classList.add('notification');
-        notification.textContent = data.message;
-        chatScroll.appendChild(notification);
-        chatScroll.scrollTop = chatScroll.scrollHeight; // 최신 메시지로 스크롤
-    });
+    // 작성자 정보 업데이트
+    const authorName = document.getElementById('authorName');
+    authorName.textContent = `${ImageMessage.author}`; // 작성자 정보 업데이트
+  });
 
-    // 서버로부터 'chat' 이벤트 수신
-    socket.on('chat', (newMessage) => {
-        console.log('새로운 메시지 수신:', newMessage);
-        addMessage(newMessage);
-    });
+  //서버로부터 'lastImage' 이벤트 수신
+  socket.on('lastImage', (ImageMessage) => {
+    // 채팅방 상단에 고정할 이미지 표시
+    const fixedImageDiv = document.getElementById('fixedImage');
+    fixedImageDiv.style.display = 'block'; // 이미지 표시
 
-    // 서버로부터 'chatImage' 이벤트 수신
-    socket.on('chatImage', (ImageMessage) => {
-        console.log('새로운 이미지 수신:', ImageMessage);
-        addMessage(ImageMessage);
-
-
-        // 채팅방 상단에 고정할 이미지 표시
-        const fixedImageDiv = document.getElementById('fixedImage');
-        fixedImageDiv.style.display = 'block'; // 이미지 표시
-
-        // 고정핀 텍스트가 이미 존재하는 경우 변경하지 않음
-        if (!fixedImageDiv.querySelector('.fixed-header')) {
-            const header = document.createElement('div');
-            header.className = 'fixed-header';
-            header.textContent = '📌 고정된 이미지';
-            fixedImageDiv.appendChild(header);
-        }
-
-        // 이미지 업데이트
-        const img = document.getElementById('fixedImageContent');
-        img.src = ImageMessage.fileUrl; // 서버에서 받은 새로운 이미지 URL로 업데이트
-
-        // 작성자 정보 업데이트
-        const authorName = document.getElementById('authorName');
-        authorName.textContent = `${ImageMessage.author}`; // 작성자 정보 업데이트
-    });
-
-    //서버로부터 'lastImage' 이벤트 수신
-    socket.on('lastImage', (ImageMessage) => {
-        
-        // 채팅방 상단에 고정할 이미지 표시
-        const fixedImageDiv = document.getElementById('fixedImage');
-        fixedImageDiv.style.display = 'block'; // 이미지 표시
-
-        // 고정핀 텍스트가 이미 존재하는 경우 변경하지 않음
-        if (!fixedImageDiv.querySelector('.fixed-header')) {
-            const header = document.createElement('div');
-            header.className = 'fixed-header';
-            header.textContent = '📌 고정된 이미지';
-            fixedImageDiv.appendChild(header);
-        }
-
-        // 이미지 업데이트
-        const img = document.getElementById('fixedImageContent');
-        img.src = ImageMessage.fileUrl; // 서버에서 받은 새로운 이미지 URL로 업데이트
-
-        // 작성자 정보 업데이트
-        const authorName = document.getElementById('authorName');
-        authorName.textContent = `${ImageMessage.author}`; // 작성자 정보 업데이트
-    })
-
-    // 메시지 전송 버튼 클릭 이벤트 처리   
-    sendButton.addEventListener('click', () => {
-        const accessToken = localStorage.getItem('accessToken');
-        const inputValue = messageInput.value.trim();
-        const imageExists = file ? true : false;
-
-        if (inputValue.length === 0 && !imageExists) return;
-
-        if(inputValue.length > 0){
-            console.log('전송할 메시지:', inputValue);
-            socket.emit('chat', { roomId, author: currentUser, body: inputValue });
-            messageInput.value = ''; // 입력 필드 비우기
-            messageInput.style.fontWeight = 'normal'; // 기본 스타일로 되돌리기
-            messageInput.style.color = 'black'; // 기본 색상
-        }
-
-        if(imageExists) {
-            console.log('전송할 이미지:', file);
-
-            // 서버로 이미지 전송
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('roomId', roomId);
-            formData.append('author', currentUser);
-
-            fetch(`${API_BASE_URL}/chatrooms/${roomId}/image`, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                  }
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                const { fileUrl } = data;
-                socket.emit('chatImage', { roomId, author: currentUser, fileUrl });
-            })
-            .catch(error => console.error('Error:', error));
-
-            // 파일 입력 필드 초기화
-            fileInput.value = '';
-            imagePreview.style.display = 'none'; // 메시지 전송 후 이미지 미리보기 숨기기
-            imagePreview.style.backgroundImage = ''; // 이미지 배경 초기화
-            file = null; // 파일 변수 초기화
-        }
-    });
-
-    // 스페이스바 입력 시 스타일 변경
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === '#') {
-            messageInput.style.fontWeight = 'bode'; 
-            messageInput.style.color = 'red';  
-        }
-    });
-    
-    // 스페이스바 입력 시 스타일 변경
-    messageInput.addEventListener('keydown', (e) => {
-        if (e.key === ' ') {
-            messageInput.style.fontWeight = 'normal'; 
-            messageInput.style.color = 'black';  
-        }
-    });
-
-    // Enter 키 입력 시 메시지 전송
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault(); // 기본 Enter 동작 방지
-            sendButton.click(); // 전송 버튼 클릭 이벤트와 동일
-        }
-    });
-
-    // 파일 선택 시 이미지 미리보기
-    fileInput.addEventListener('change', (e) => {
-        file = e.target.files[0];
-
-        if(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imagePreview.innerHTML = `<img src="${e.target.result}" alt="Image Preview" />`;
-                imagePreview.style.display = 'block'; // 이미지 미리보기 표시
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // 방 이름을 화면에 표시
-    if (roomNameElement && roomName) {
-        roomNameElement.textContent = decodeURIComponent(roomName);
+    // 고정핀 텍스트가 이미 존재하는 경우 변경하지 않음
+    if (!fixedImageDiv.querySelector('.fixed-header')) {
+      const header = document.createElement('div');
+      header.className = 'fixed-header';
+      header.textContent = '📌 고정된 이미지';
+      fixedImageDiv.appendChild(header);
     }
 
-    // 서버로부터 'userLeft' 이벤트 수신
-    socket.on('userLeft', (data) => {
-        console.log('이벤트 수신');
-        const notification = document.createElement('div');
-        notification.classList.add('notification');
-        notification.textContent = data.message;
-        chatScroll.appendChild(notification);
-        chatScroll.scrollTop = chatScroll.scrollHeight; // 최신 메시지로 스크롤
-    });
+    // 이미지 업데이트
+    const img = document.getElementById('fixedImageContent');
+    img.src = ImageMessage.fileUrl; // 서버에서 받은 새로운 이미지 URL로 업데이트
 
-    // 서버로부터 'ownerLeft' 이벤트 수신
-    socket.on('ownerLeft', () => {
-        console.log('ownerLeft');
-        alert('방장이 채팅방을 나갔습니다. 채팅 목록 페이지로 이동합니다.');
-        window.location.href = '/html/chat-list.html';
-    });
+    // 작성자 정보 업데이트
+    const authorName = document.getElementById('authorName');
+    authorName.textContent = `${ImageMessage.author}`; // 작성자 정보 업데이트
+  });
 
-    socket.on('outRoom', () => {
-        alert('삭제된 채팅방입니다. 채팅 목록 페이지로 이동합니다.');
-        window.location.href = '/html/chat-list.html';
-    })
+  // 메시지 전송 버튼 클릭 이벤트 처리
+  sendButton.addEventListener('click', () => {
+    const accessToken = localStorage.getItem('accessToken');
+    const inputValue = messageInput.value.trim();
+    const imageExists = file ? true : false;
+
+    if (inputValue.length === 0 && !imageExists) return;
+
+    if (inputValue.length > 0) {
+      console.log('전송할 메시지:', inputValue);
+      socket.emit('chat', { roomId, author: currentUser, body: inputValue });
+      messageInput.value = ''; // 입력 필드 비우기
+      messageInput.style.fontWeight = 'normal'; // 기본 스타일로 되돌리기
+      messageInput.style.color = 'black'; // 기본 색상
+    }
+
+    if (imageExists) {
+      console.log('전송할 이미지:', file);
+
+      // 서버로 이미지 전송
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('roomId', roomId);
+      formData.append('author', currentUser);
+
+      fetch(`${API_BASE_URL}/chatrooms/${roomId}/image`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          const { fileUrl } = data;
+          socket.emit('chatImage', { roomId, author: currentUser, fileUrl });
+        })
+        .catch((error) => console.error('Error:', error));
+
+      // 파일 입력 필드 초기화
+      fileInput.value = '';
+      imagePreview.style.display = 'none'; // 메시지 전송 후 이미지 미리보기 숨기기
+      imagePreview.style.backgroundImage = ''; // 이미지 배경 초기화
+      file = null; // 파일 변수 초기화
+    }
+  });
+
+  // 스페이스바 입력 시 스타일 변경
+  messageInput.addEventListener('keypress', (e) => {
+    if (e.key === '#') {
+      messageInput.style.fontWeight = 'bode';
+      messageInput.style.color = 'red';
+    }
+  });
+
+  // 스페이스바 입력 시 스타일 변경
+  messageInput.addEventListener('keydown', (e) => {
+    if (e.key === ' ') {
+      messageInput.style.fontWeight = 'normal';
+      messageInput.style.color = 'black';
+    }
+  });
+
+  // Enter 키 입력 시 메시지 전송
+  messageInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // 기본 Enter 동작 방지
+      sendButton.click(); // 전송 버튼 클릭 이벤트와 동일
+    }
+  });
+
+  // 파일 선택 시 이미지 미리보기
+  fileInput.addEventListener('change', (e) => {
+    file = e.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imagePreview.innerHTML = `<img src="${e.target.result}" alt="Image Preview" />`;
+        imagePreview.style.display = 'block'; // 이미지 미리보기 표시
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // 방 이름을 화면에 표시
+  if (roomNameElement && roomName) {
+    roomNameElement.textContent = decodeURIComponent(roomName);
+  }
+
+  // 서버로부터 'userLeft' 이벤트 수신
+  socket.on('userLeft', (data) => {
+    console.log('이벤트 수신');
+    const notification = document.createElement('div');
+    notification.classList.add('notification');
+    notification.textContent = data.message;
+    chatScroll.appendChild(notification);
+    chatScroll.scrollTop = chatScroll.scrollHeight; // 최신 메시지로 스크롤
+  });
+
+  // 서버로부터 'ownerLeft' 이벤트 수신
+  socket.on('ownerLeft', () => {
+    console.log('ownerLeft');
+    alert('방장이 채팅방을 나갔습니다. 채팅 목록 페이지로 이동합니다.');
+    window.location.href = '/html/chat-list.html';
+  });
+
+  socket.on('outRoom', () => {
+    alert('삭제된 채팅방입니다. 채팅 목록 페이지로 이동합니다.');
+    window.location.href = '/html/chat-list.html';
+  });
 });
