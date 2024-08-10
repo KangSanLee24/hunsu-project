@@ -266,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 1-0. 썸네일 있는지 확인 (없으면 기본 이미지를 썸네일로 적용)
       const thumbnail = data[i].imgUrl
         ? data[i].imgUrl
-        : 'http://3.37.69.47:3000/images/logo_long.png';
+        : 'http://localhost:3000/images/logo_long.png';
       // 1-1. 데이터로 row HTML 생성
       const row = document.createElement('div');
       row.innerHTML = `        

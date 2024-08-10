@@ -24,7 +24,7 @@ async function getAuthor() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const socket = io('http://3.37.69.47:3000');
+  const socket = io('http://localhost:3000');
 
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get('roomId');
