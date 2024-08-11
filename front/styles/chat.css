@@ -261,3 +261,7 @@ code {
   font-weight: bold; /* 글씨 굵게 */
   font-size: small;
 }
+
+.close-image {
+  z-index: 10; /* 이미지 위에 표시되도록 z-index 설정 */
+}

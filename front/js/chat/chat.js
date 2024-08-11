@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const roomNameElement = document.getElementById('roomName');
   const fileInput = document.getElementById('fileInput');
   const imagePreview = document.getElementById('imagePreview');
+  
   let file = null; // 파일 변수 초기화
 
   let currentUser;
@@ -245,8 +246,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        imagePreview.innerHTML = `<img src="${e.target.result}" alt="Image Preview" />`;
+        imagePreview.innerHTML = `
+            <img src="${e.target.result}" alt="Image Preview" />
+            <span class="close-image" id="closeImage" style="position: absolute; left: 80px; cursor: pointer; font-size: 20px; z-index: 10;">❎</span>`;
         imagePreview.style.display = 'block'; // 이미지 미리보기 표시
+
+        const closeImage = document.getElementById('closeImage');
+
+        closeImage.addEventListener('click', () => {
+            // 파일 입력 필드 초기화
+            fileInput.value = '';
+            imagePreview.style.display = 'none'; 
+            imagePreview.style.backgroundImage = ''; // 이미지 배경 초기화
+            file = null; // 파일 변수 초기화
+          });
       };
       reader.readAsDataURL(file);
     }
