@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         closeImage.addEventListener('click', () => {
             // 파일 입력 필드 초기화
             fileInput.value = '';
-            imagePreview.style.display = 'none'; // 메시지 전송 후 이미지 미리보기 숨기기
+            imagePreview.style.display = 'none'; 
             imagePreview.style.backgroundImage = ''; // 이미지 배경 초기화
             file = null; // 파일 변수 초기화
           });
