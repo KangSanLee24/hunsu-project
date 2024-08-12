@@ -57,20 +57,13 @@ export const POST_MESSAGE = {
     FIND: {
       SUCCESS: '게시글 좋아요 조회에 성공하였습니다.',
     },
-    // 게시글 좋아요 생성
-    CREATE: {
-      SUCCESS: '게시글 좋아요 반전에 성공하였습니다.',
+    // 게시글 좋아요 클릭
+    CLICK: {
+      SUCCESS: '게시글 좋아요 클릭에 성공하였습니다.',
       FAILURE: {
         NO_SELF: '자신의 게시글에 좋아요를 누를 수 없습니다.',
         ALREADY: '이미 좋아요를 누른 게시글입니다.',
-        ALREADY_DISLIKE: '싫어요를 누른 게시글에는 좋아요를 누를 수 없습니다.',
-      },
-    },
-    // 게시글 좋아요 삭제
-    DELETE: {
-      SUCCESS: '게시글 좋아요 삭제에 성공하였습니다.',
-      FAILURE: {
-        NO_LIKE: '삭제할 좋아요가 존재하지 않습니다.',
+        ALREADY_DISLIKE: '싫어요를 누른 상태에서는 좋아요를 누를 수 없습니다.',
       },
     },
   },
@@ -80,20 +73,13 @@ export const POST_MESSAGE = {
     FIND: {
       SUCCESS: '게시글 싫어요 조회에 성공하였습니다.',
     },
-    // 게시글 싫어요 생성
-    CREATE: {
-      SUCCESS: '게시글 싫어요 반전에 성공하였습니다.',
+    // 게시글 싫어요 클릭
+    CLICK: {
+      SUCCESS: '게시글 싫어요 클릭에 성공하였습니다.',
       FAILURE: {
         NO_SELF: '자신의 게시글에 싫어요를 누를 수 없습니다.',
         ALREADY: '이미 싫어요를 누른 게시글입니다.',
-        ALREADY_LIKE: '좋아요를 누른 게시글에는 싫어요를 누를 수 없습니다.',
-      },
-    },
-    // 게시글 싫어요 삭제
-    DELETE: {
-      SUCCESS: '게시글 싫어요 삭제에 성공하였습니다.',
-      FAILURE: {
-        NO_DISLIKE: '삭제할 좋아요가 존재하지 않습니다.',
+        ALREADY_LIKE: '좋아요를 누른 상태에서는 싫어요를 누를 수 없습니다.',
       },
     },
   },

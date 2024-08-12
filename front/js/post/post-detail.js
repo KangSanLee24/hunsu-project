@@ -116,15 +116,13 @@ async function clickLikes(postId) {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
     });
-
-    // 4-2. API response 결과가 ok가 아니면
+    // 4-2. fetch 받아온 result를 json으로
+    const result = await response.json();
+    // 4-3. API response 결과가 ok가 아니면
     if (!response.ok) {
-      alert('자신의 게시글에는 좋아요를 누를 수 없습니다.');
-
+      alert(result.message);
       return false;
     }
-    // 4-3. 새로고침
-    // window.location.reload();
     return true;
   } catch (error) {
     // 4-4. 도중에 에러가 뜬 경우
@@ -145,13 +143,13 @@ async function clickDislikes(postId) {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
     });
-    // 5-2. API response 결과가 ok가 아니면
+    // 5-2. fetch 받아온 result를 json으로
+    const result = await response.json();
+    // 5-3. API response 결과가 ok가 아니면
     if (!response.ok) {
-      alert('자신의 게시글에는 싫어요를 누를 수 없습니다.');
+      alert(result.message);
       return false;
     }
-    // 5-3. 새로고침
-    // window.location.reload();
     return true;
   } catch (error) {
     // 5-4. 도중에 에러가 뜬 경우

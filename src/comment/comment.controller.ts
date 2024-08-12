@@ -178,7 +178,7 @@ export class CommentController {
 
     return {
       status: HttpStatus.OK,
-      message: COMMENT_MESSAGE.LIKE.CREATE.SUCCESS,
+      message: COMMENT_MESSAGE.LIKE.CLICK.SUCCESS,
     };
   }
 
@@ -234,7 +234,7 @@ export class CommentController {
 
     return {
       status: HttpStatus.OK,
-      message: COMMENT_MESSAGE.DISLIKE.CREATE.SUCCESS,
+      message: COMMENT_MESSAGE.DISLIKE.CLICK.SUCCESS,
     };
   }
 }
