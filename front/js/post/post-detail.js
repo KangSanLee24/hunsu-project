@@ -17,9 +17,10 @@ const accessToken = localStorage.getItem('accessToken');
 /** 1. 게시글 상세 페이지 랜더링 **/
 async function renderPostDetail(postId) {
   const post = await fetchPost(postId);
-  marked.use({
+  marked.setOptions({
     headerIds: false,
     mangle: false,
+    breaks: true, // 줄바꿈을 <br>로 변환하도록 설정
   });
 
   // 1-1. 게시글 내용 랜더링
@@ -65,7 +66,7 @@ async function fetchPost(postId) {
 async function fetchLD(postId) {
   try {
     // 1. 게시글 좋아요 눌렀는지 조회
-    const postLike = await fetch(`${API_BASE_URL}/posts/${postId}/likes/me`, {
+    const postLike = await fetch(`../api/posts/${postId}/likes/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

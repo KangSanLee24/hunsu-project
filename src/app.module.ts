@@ -5,8 +5,6 @@ import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { RecommentModule } from './recomment/recomment.module';
-import { LikeModule } from './like/like.module';
-import { DislikeModule } from './dislike/dislike.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configValidationSchema } from './configs/env-validation.config';
@@ -45,8 +43,6 @@ import { ScheduleService } from './schedule/schedule.service';
     PostModule,
     CommentModule,
     RecommentModule,
-    LikeModule,
-    DislikeModule,
     AwsModule,
     MailModule,
     ChatModule,

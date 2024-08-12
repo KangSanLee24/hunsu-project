@@ -27,7 +27,7 @@ import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
 @ApiTags('4. COMMENT API')
 @Controller('/posts/:postId/comments')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) { }
+  constructor(private readonly commentService: CommentService) {}
 
   /** 댓글 생성 **/
   @UseGuards(AuthGuard('jwt'))
@@ -58,9 +58,7 @@ export class CommentController {
   /** 댓글 목록 조회 **/
   @ApiOperation({ summary: '2. 댓글 목록 조회 API' })
   @Get()
-  async findAll(
-    @Param('postId', ParseIntPipe) postId: number
-  ) {
+  async findAll(@Param('postId', ParseIntPipe) postId: number) {
     const data = await this.commentService.findCommentsByPostId(postId);
 
     return {
@@ -130,6 +128,113 @@ export class CommentController {
     return {
       status: HttpStatus.OK,
       message: COMMENT_MESSAGE.COMMENT.FORCE_DELETE.SUCCESS,
+    };
+  }
+
+  /** 댓글 좋아요 조회 API **/
+  @ApiTags('4. COMMENT API')
+  @ApiOperation({ summary: '댓글 좋아요 조회 API' })
+  @Get(':commentId/likes')
+  async getCommentLikes(@Param('commentId', ParseIntPipe) commentId: number) {
+    const data = await this.commentService.getCommentLikes(commentId);
+    return {
+      status: HttpStatus.OK,
+      message: COMMENT_MESSAGE.LIKE.FIND.SUCCESS,
+      data,
+    };
+  }
+
+  /** 로그인한 사람의 댓글 좋아요 여부 조회 API **/
+  @ApiTags('4. COMMENT API')
+  @ApiOperation({ summary: '나의 댓글 좋아요 여부 조회 API' })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @Get(':commentId/likes/me')
+  async getMyCommentLike(
+    @LogIn() user: User,
+    @Param('commentId', ParseIntPipe) commentId: number
+  ) {
+    const userId = user.id;
+    const data = await this.commentService.getMyCommentLike(userId, commentId);
+    return {
+      status: HttpStatus.OK,
+      messgae: '나의 댓글 좋아요 여부 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 댓글 좋아요 클릭 API **/
+  @ApiTags('4. COMMENT API')
+  @ApiOperation({ summary: '댓글 좋아요 클릭 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch(':commentId/likes')
+  async clickCommentLike(
+    @LogIn() user: User,
+    @Param('commentId', ParseIntPipe) commentId: number
+  ) {
+    const userId = user.id;
+    await this.commentService.clickCommentLike(userId, commentId);
+
+    return {
+      status: HttpStatus.OK,
+      message: COMMENT_MESSAGE.LIKE.CREATE.SUCCESS,
+    };
+  }
+
+  /** 댓글 싫어요 조회 API **/
+  @ApiTags('4. COMMENT API')
+  @ApiOperation({ summary: '댓글 싫어요 조회 API' })
+  @Get(':commentId/dislikes')
+  async getCommentDislikes(
+    @Param('commentId', ParseIntPipe) commentId: number
+  ) {
+    const data = await this.commentService.getCommentDislikes(commentId);
+    return {
+      status: HttpStatus.OK,
+      message: COMMENT_MESSAGE.DISLIKE.FIND.SUCCESS,
+      data,
+    };
+  }
+
+  /** 로그인한 사람의 댓글 싫어요 여부 조회 API **/
+  @ApiTags('4. COMMENT API')
+  @ApiOperation({ summary: '나의 댓글 싫어요 여부 조회 API' })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @Get(':commentId/dislikes/me')
+  async getMyCommentDislike(
+    @LogIn() user: User,
+    @Param('commentId', ParseIntPipe) commentId: number
+  ) {
+    const userId = user.id;
+    const data = await this.commentService.getMyCommentDislike(
+      userId,
+      commentId
+    );
+    return {
+      status: HttpStatus.OK,
+      messgae: '나의 댓글 싫어요 여부 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 댓글 싫어요 클릭 API **/
+  @ApiTags('4. COMMENT API')
+  @ApiOperation({ summary: '댓글 싫어요 클릭 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch(':commentId/dislikes')
+  async clickCommentDislike(
+    @LogIn() user: User,
+    @Param('commentId', ParseIntPipe) commentId: number
+  ) {
+    const userId = user.id;
+    await this.commentService.clickCommentDislike(userId, commentId);
+
+    return {
+      status: HttpStatus.OK,
+      message: COMMENT_MESSAGE.DISLIKE.CREATE.SUCCESS,
     };
   }
 }

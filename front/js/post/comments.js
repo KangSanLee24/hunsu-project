@@ -94,7 +94,7 @@ async function fetchLD(commentId) {
   try {
     // 1. 댓글 좋아요 눌렀는지 조회
     const commentLike = await fetch(
-      `${API_BASE_URL}/comments/${commentId}/likes/me`,
+      `${API_BASE_URL}/posts/${postId}/comments/${commentId}/likes/me`,
       {
         method: 'GET',
         headers: {
@@ -183,7 +183,7 @@ async function clickLikeComment(commentId) {
   try {
     // 0-1. 댓글 좋아요 클릭 API 호출
     const response = await fetch(
-      `${API_BASE_URL}/comments/${commentId}/likes`,
+      `${API_BASE_URL}/posts/${postId}/comments/${commentId}/likes`,
       {
         method: 'PATCH',
         headers: {
@@ -196,8 +196,8 @@ async function clickLikeComment(commentId) {
     if (!response.ok) {
       alert('자신의 댓글에는 좋아요를 누를 수 없습니다.');
     }
-    // 0-3. 새로고침
-    window.location.reload();
+    // 0-3. 댓글목록 새로 불러오기
+    fetchComments();
   } catch (error) {
     // 0-4. 도중에 에러가 뜬 경우
     alert('댓글 좋아요에서 오류가 발생했습니다.');
@@ -210,7 +210,7 @@ async function clickDislikeComment(commentId) {
   try {
     // 0-1. 댓글 싫어요 클릭 API 호출
     const response = await fetch(
-      `${API_BASE_URL}/comments/${commentId}/dislikes`,
+      `${API_BASE_URL}/posts/${postId}/comments/${commentId}/dislikes`,
       {
         method: 'PATCH',
         headers: {
@@ -220,11 +220,12 @@ async function clickDislikeComment(commentId) {
       }
     );
     // 0-2. API response 결과가 ok가 아니면
+    console.log(response);
     if (!response.ok) {
       alert('자신의 댓글에는 싫어요를 누를 수 없습니다.');
     }
-    // 0-3. 새로고침
-    window.location.reload();
+    // 0-3. 댓글목록 새로 불러오기
+    fetchComments();
   } catch (error) {
     // 0-4. 도중에 에러가 뜬 경우
     alert('댓글 싫어요에서 오류가 발생했습니다.');

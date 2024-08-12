@@ -11,6 +11,7 @@ import {
   UseInterceptors,
   Query,
   UploadedFiles,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dtos/create-post.dto';
@@ -35,7 +36,7 @@ import { FindAllPostsDto } from './dtos/find-all-posts.dto';
 @ApiTags('3. POST API')
 @Controller('posts')
 export class PostController {
-  constructor(private readonly postService: PostService) { }
+  constructor(private readonly postService: PostService) {}
 
   /** 게시글 생성 API **/
   @UseGuards(AuthGuard('jwt'))
@@ -206,6 +207,110 @@ export class PostController {
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.FORCE_DELETE.SUCCESS,
+    };
+  }
+
+  /** 게시글 좋아요 조회 API **/
+  @ApiTags('3. POST API')
+  @ApiOperation({ summary: '게시글 좋아요 조회 API' })
+  @Get(':postId/likes')
+  async getPostLikes(@Param('postId', ParseIntPipe) postId: number) {
+    const data = await this.postService.getPostLikes(postId);
+
+    return {
+      status: HttpStatus.OK,
+      message: POST_MESSAGE.LIKE.FIND.SUCCESS,
+      data,
+    };
+  }
+
+  /** 로그인한 사람의 게시글 좋아요 조회 API **/
+  @ApiTags('3. POST API')
+  @ApiOperation({ summary: '나의 게시글 좋아요 여부 조회 API' })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @Get(':postId/likes/me')
+  async getMyPostLike(
+    @LogIn() user: User,
+    @Param('postId', ParseIntPipe) postId: number
+  ) {
+    const userId = user.id;
+    const data = await this.postService.getMyPostLike(userId, postId);
+    return {
+      status: HttpStatus.OK,
+      messgae: '나의 게시글 좋아요 여부 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 게시글 좋아요 클릭 API **/
+  @ApiTags('3. POST API')
+  @ApiOperation({ summary: '게시글 좋아요 클릭 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch(':postId/likes')
+  async postLike(
+    @LogIn() user: User,
+    @Param('postId', ParseIntPipe) postId: number
+  ) {
+    const userId = user.id;
+    await this.postService.postLike(userId, postId);
+
+    return {
+      status: HttpStatus.OK,
+      message: POST_MESSAGE.LIKE.CREATE.SUCCESS,
+    };
+  }
+
+  /** 게시글 싫어요 조회 API **/
+  @ApiTags('3. POST API')
+  @ApiOperation({ summary: '게시글 싫어요 조회 API' })
+  @Get(':postId/dislikes')
+  async getPostDislikes(@Param('postId', ParseIntPipe) postId: number) {
+    const data = await this.postService.getPostDislikes(postId);
+
+    return {
+      status: HttpStatus.OK,
+      message: POST_MESSAGE.DISLIKE.FIND.SUCCESS,
+      data,
+    };
+  }
+
+  /** 로그인한 사람의 게시글 싫어요 조회 API **/
+  @ApiTags('3. POST API')
+  @ApiOperation({ summary: '나의 게시글 싫어요 여부 조회 API' })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @Get(':postId/dislikes/me')
+  async getMyPostDislike(
+    @LogIn() user: User,
+    @Param('postId', ParseIntPipe) postId: number
+  ) {
+    const userId = user.id;
+    const data = await this.postService.getMyPostDislike(userId, postId);
+    return {
+      status: HttpStatus.OK,
+      messgae: '나의 게시글 싫어요 여부 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 게시글 싫어요 클릭 API **/
+  @ApiTags('3. POST API')
+  @ApiOperation({ summary: '게시글 싫어요 클릭 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch(':postId/dislikes')
+  async clickPostDislike(
+    @LogIn() user: User,
+    @Param('postId', ParseIntPipe) postId: number
+  ) {
+    const userId = user.id;
+    await this.postService.clickPostDislike(userId, postId);
+
+    return {
+      status: HttpStatus.OK,
+      message: POST_MESSAGE.DISLIKE.CREATE.SUCCESS,
     };
   }
 }

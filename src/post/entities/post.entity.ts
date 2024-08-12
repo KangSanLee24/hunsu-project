@@ -11,8 +11,8 @@ import {
 import { User } from 'src/user/entities/user.entity';
 import { PostImage } from './post-image.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
-import { PostLike } from 'src/like/entities/post-like.entity';
-import { PostDislike } from 'src/dislike/entities/post-dislike.entity';
+import { PostLike } from 'src/post/entities/post-like.entity';
+import { PostDislike } from 'src/post/entities/post-dislike.entity';
 import { Category } from '../types/post-category.type';
 import { VirtualColumn } from 'src/decorators/count-like.decorator';
 
