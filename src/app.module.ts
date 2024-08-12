@@ -21,6 +21,7 @@ import { PointModule } from './point/point.module';
 import { HashtagModule } from './hashtag/hashtag.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ScheduleService } from './schedule/schedule.service';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ScheduleService } from './schedule/schedule.service';
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     ScheduleModule.forRoot(),
+    RedisModule,
     AuthModule,
     UserModule,
     PostModule,
@@ -50,6 +52,7 @@ import { ScheduleService } from './schedule/schedule.service';
     AlarmModule,
     PointModule,
     HashtagModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AwsService, ScheduleService],
