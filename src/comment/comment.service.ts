@@ -75,9 +75,9 @@ export class CommentService {
       userId,
       PointType.COMMENT
     );
-    if (isValidPoint) {
+    if (isValidPoint && post.userId !== userId) {
       console.log('postId 전달:', postId); // 디버깅용 로그
-      this.pointService.savePointLog(userId, PointType.COMMENT, true, postId);
+      this.pointService.savePointLog(userId, PointType.COMMENT, true);
     }
 
     // 알람을 줄 것인지 여부
