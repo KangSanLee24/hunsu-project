@@ -52,7 +52,7 @@ async function addCommentToList(comment) {
       <div class="comment-like-btn-count">
         <button class="comment-like-btn" data-comment-id="${comment.id}" onclick="clickLikeComment(${comment.id})">👍</button>
         <span class="comment-like-count"> ${comment.likes || 0} </span>
-       </div>
+      </div>
       <div class="comment-dislike-btn-count">
         <button class="comment-dislike-btn" data-comment-id="${comment.id}" onclick="clickDislikeComment(${comment.id})">👎</button>
         <span class="comment-dislike-count"> ${comment.dislikes || 0} </span>
@@ -75,12 +75,19 @@ async function addCommentToList(comment) {
     comment.recomments.forEach((recomment) => {
       const recommentItem = document.createElement('li');
       recommentItem.innerHTML = `
-                      <p>${recomment.nickname}
-                      | 작성일: ${elapsedTime(recomment.createdAt)}
-                      | 좋아요: ${recomment.likes}
-                      | 싫어요: ${recomment.dislikes}</p>
-                      <p>${recomment.content}</p>
-                  `;
+        <div class="recomment-header">
+          <span>${recomment.nickname} | 작성일: ${elapsedTime(recomment.createdAt)} | </span>
+          <div class="recomment-like-btn-count">
+            <button class="recomment-like-btn" data-recomment-id="${recomment.id}" onclick="clickLikeRecomment(${recomment.id})">👍</button>
+            <span class="recomment-like-count"> ${recomment.likes || 0} </span>
+          </div>
+          <div class="recomment-dislike-btn-count">
+            <button class="recomment-dislike-btn" data-recomment-id="${recomment.id}" onclick="clickDislikeRecomment(${recomment.id})">👎</button>
+            <span class="recomment-dislike-count"> ${recomment.dislikes || 0} </span>
+          </div>
+        </div>
+        <p>${recomment.content}</p>
+      `;
       recommentsList.appendChild(recommentItem);
     });
     commentItem.appendChild(recommentsList);
