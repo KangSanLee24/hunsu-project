@@ -165,8 +165,8 @@ function displayUserComments(comments) {
 
     comments.forEach(comment => {
         const listItem = document.createElement('li');
+        // <p>게시글: ${comment.postTitle}</p>
         listItem.innerHTML = `
-            <p>게시글: ${comment.postTitle}</p>
             <p>${comment.content}</p>
             <p>${new Date(comment.createdAt).toLocaleString()}</p>
         `;
@@ -207,3 +207,41 @@ window.clickupdateProfileBtn = async function () {
     // 내 정보 수정으로 이동
     window.location.href = './update-profile.html';
 };
+
+// 회원 탈퇴 함수
+window.clickdeleteProfileBtn = async function () {
+    let email = '';
+    let nickname = '';
+
+    // 내 정보 조회 API
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/me`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+        });
+
+        if (!response.ok) {
+            alert('현재 이메일을 가져오는데 실패했습니다.');
+            return;
+        }
+
+        // user로 저장
+        const user = await response.json();
+        // nickname 추출
+        nickname = user.data.nickname;
+        // email 추출
+        email = user.data.email;
+    } catch (error) {
+        console.error(error);
+        return;
+    }
+
+    // localstorage에 nickname, email 저장
+    localStorage.setItem('nickname', nickname);
+    localStorage.setItem('email', email);
+
+    // 내 정보 수정으로 이동
+    window.location.href = './delete-profile.html';
+}

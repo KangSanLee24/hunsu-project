@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('출석 체크 호출 결과:', attendanceResult);
 
         // 1-4-A-2. '로그인에 성공했습니다.' alert
-        alert(result.message);
+        // alert(result.message);
 
         // // 메인 페이지로 이동
         // window.location.href = './main.html';

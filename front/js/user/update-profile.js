@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const nickname = localStorage.getItem('nickname');
     if (nickname) {
         currentNicknameInput.value = nickname;
+    } else {
+        alert('닉네임을 불러올 수 없습니다.');
+        // window.location.href = document.referrer;
+        window.location.href = './main.html';
     }
 });
 
@@ -45,7 +49,6 @@ async function updateProfile() {
         // 성공적으로 업데이트된 경우 알림 표시
         if (result.status === 200) {
             alert('닉네임이 성공적으로 수정되었습니다.');
-            localStorage.removeItem('nickname');
             window.location.href = './my-page.html';
         }
     } catch (error) {
@@ -53,8 +56,13 @@ async function updateProfile() {
     }
 }
 
-// 버튼 클릭 이벤트 리스너 추가
+// 회원 변경 이벤트 리스너 추가
 submitUpdateProfileButton.addEventListener('click', (event) => {
     event.preventDefault();
     updateProfile();
+});
+
+// 페이지를 벗어날때 nickname을 localstorage에서 지운다.
+window.addEventListener('beforeunload', () => {
+    localStorage.removeItem('nickname');
 });
