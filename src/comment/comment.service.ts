@@ -306,23 +306,33 @@ export class CommentService {
     }
     // 1-2. 본인의 댓글에는 좋아요를 누를 수 없도록
     if (existingComment.userId === userId) {
+      throw new BadRequestException(COMMENT_MESSAGE.LIKE.CLICK.FAILURE.NO_SELF);
+    }
+
+    // 2. 내가 싫어요를 누른 상태인지 아닌지 확인
+    const alreadyDislike = await this.commentDislikeRepository.findOneBy({
+      userId: userId,
+      commentId: commentId,
+    });
+    // 2-1. 싫어요를 누른 상태라면 좋아요를 누를 수 없도록
+    if (alreadyDislike) {
       throw new BadRequestException(
-        COMMENT_MESSAGE.LIKE.CREATE.FAILURE.NO_SELF
+        COMMENT_MESSAGE.LIKE.CLICK.FAILURE.ALREADY_DISLIKE
       );
     }
 
-    // 2. 내가 좋아요를 누른 상태인지 아닌지 확인
+    // 3. 내가 좋아요를 누른 상태인지 아닌지 확인
     const commentLike = await this.commentLikeRepository.findOneBy({
       userId: userId,
       commentId: commentId,
     });
     if (!commentLike) {
-      // 2-1A. 댓글 좋아요 명단에 내가 없다면 => 댓글 좋아요 등록
+      // 3-1A. 댓글 좋아요 명단에 내가 없다면 => 댓글 좋아요 등록
       await this.commentLikeRepository.save({
         userId,
         commentId,
       });
-      // 2-1B. 댓글 좋아요에 따른 포인트 지급
+      // 3-1B. 댓글 좋아요에 따른 포인트 지급
       const isValidPoint = await this.pointService.validatePointLog(
         userId,
         PointType.COMMENT_LIKE
@@ -331,12 +341,12 @@ export class CommentService {
         this.pointService.savePointLog(userId, PointType.COMMENT_LIKE, true);
       }
     } else {
-      // 2-2A. 댓글 좋아요 명단에 내가 있다면 => 댓글 좋아요 취소
+      // 3-2A. 댓글 좋아요 명단에 내가 있다면 => 댓글 좋아요 취소
       await this.commentLikeRepository.delete({
         userId,
         commentId,
       });
-      // 2-2B. 댓글 좋아요 취소에 따른 포인트 차감
+      // 3-2B. 댓글 좋아요 취소에 따른 포인트 차감
       this.pointService.savePointLog(userId, PointType.COMMENT_LIKE, false);
     }
   }
@@ -390,23 +400,35 @@ export class CommentService {
     // 1-2. 본인의 댓글에는 싫어요를 누를 수 없도록
     if (existingComment.userId == userId) {
       throw new BadRequestException(
-        COMMENT_MESSAGE.DISLIKE.CREATE.FAILURE.NO_SELF
+        COMMENT_MESSAGE.DISLIKE.CLICK.FAILURE.NO_SELF
       );
     }
 
-    // 2. 내가 싫어요를 누른 상태인지 아닌지 확인
+    // 2. 내가 좋아요를 누른 상태인지 아닌지 확인
+    const alreadyLike = await this.commentLikeRepository.findOneBy({
+      userId: userId,
+      commentId: commentId,
+    });
+    // 2-1. 좋아요를 누른 상태라면 싫어요를 누를 수 없도록
+    if (alreadyLike) {
+      throw new BadRequestException(
+        COMMENT_MESSAGE.DISLIKE.CLICK.FAILURE.ALREADY_LIKE
+      );
+    }
+
+    // 3. 내가 싫어요를 누른 상태인지 아닌지 확인
     const commentDislike = await this.commentDislikeRepository.findOneBy({
       userId,
       commentId,
     });
     if (!commentDislike) {
-      // 2-1. 댓글 싫어요 명단에 내가 없다면 => 댓글 싫어요 등록
+      // 3-1. 댓글 싫어요 명단에 내가 없다면 => 댓글 싫어요 등록
       await this.commentDislikeRepository.save({
         userId,
         commentId,
       });
     } else {
-      // 2-2. 댓글 싫어요 명단에 내가 있다면 => 댓글 싫어요 취소
+      // 3-2. 댓글 싫어요 명단에 내가 있다면 => 댓글 싫어요 취소
       await this.commentDislikeRepository.delete({
         userId,
         commentId,
