@@ -20,4 +20,14 @@ export class HashtagController {
       data: data,
     };
   }
+
+  /**
+   * 레디스 테스트
+   * @returns
+   */
+  @Get('redis-test')
+  async redisTest() {
+    const data = await this.hashtagService.getHashtag();
+    return data;
+  }
 }

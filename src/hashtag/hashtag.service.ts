@@ -4,10 +4,12 @@ import { Like, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Hashtag } from './entities/hashtag.entity';
 import { HashtagFromType } from './types/hashtag-from.type';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class HashtagService {
   constructor(
+    private readonly redisService : RedisService,
     @InjectRepository(Hashtag)
     private readonly hashTagRepository: Repository<Hashtag>,
     @InjectRepository(ChatLog)
@@ -59,5 +61,12 @@ export class HashtagService {
         hashtagType: HashtagFromType.CHAT,
       });
     }
+  }
+
+  async getHashtag() {
+    const client = this.redisService.getClient();
+    const hashtag = await client.zrange('hashtag', 0, -1, 'WITHSCORES');
+
+    return hashtag;
   }
 }
