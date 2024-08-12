@@ -229,7 +229,8 @@ ul {
   cursor: pointer;
 }
 
-#updateProfileBtn {
+#updateProfileBtn,
+#deleteProfileBtn {
   background-color: #000000;
   color: white;
   border: none;

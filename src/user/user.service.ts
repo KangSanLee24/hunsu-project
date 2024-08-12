@@ -230,7 +230,7 @@ export class UserService {
     }
 
     // 유저 정보를 업데이트
-    user.nickname = `탈퇴한 회원입니다 : ${user.nickname}`;
+    user.nickname = '탈퇴한 회원입니다';
     user.deletedAt = new Date();
 
     return this.userRepository.save(user);
