@@ -1,4 +1,4 @@
-import { API_BASE_URL, API_LINK_URL } from '../../config/config.js';
+import { API_BASE_URL } from '../../config/config.js';
 import { elapsedTime } from '../common/elapsed-time.js';
 
 /** 1. 페이지에 필요한 변수 세팅 **/
