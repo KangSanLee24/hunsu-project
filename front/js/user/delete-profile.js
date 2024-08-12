@@ -47,7 +47,7 @@ async function deleteProfile() {
         // 성공적으로 업데이트된 경우 알림 표시
         if (result.status === 200) {
             alert('회원 탈퇴가 완료되었습니다.\n계정복구에 대한 건은 운영자에게 문의하여 주시기 바랍니다.');
-            window.location.href = './my-page.html';
+            window.location.href = './main.html';
         }
     } catch (error) {
         console.error('회원 탈퇴 중 오류 발생:', error);
