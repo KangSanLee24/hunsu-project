@@ -21,18 +21,22 @@ import { paginate } from 'nestjs-typeorm-paginate';
 import { PointService } from 'src/point/point.service';
 import { PointType } from 'src/point/types/point.type';
 import { v4 as uuidv4 } from 'uuid'; // ES Modules
+import { PostLike } from 'src/post/entities/post-like.entity';
+import { PostDislike } from 'src/post/entities/post-dislike.entity';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
-
     @InjectRepository(PostImage)
     private readonly postImageRepository: Repository<PostImage>,
-
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(PostLike)
+    private readonly postLikeRepository: Repository<PostLike>,
+    @InjectRepository(PostDislike)
+    private readonly postDislikeRepository: Repository<PostDislike>,
 
     private readonly awsService: AwsService,
     private readonly pointService: PointService
@@ -397,5 +401,158 @@ export class PostService {
     const uniqueOldUrls = oldUrls.filter((url) => !newUrlSet.has(url));
 
     return uniqueOldUrls;
+  }
+
+  /** 게시글 좋아요 조회 API **/
+  async getPostLikes(postId: number) {
+    // 1. 게시글이 존재하는지?
+    const existingPost = await this.postRepository.findOneBy({
+      id: postId,
+    });
+    // 1-1. 존재하지 않으면 에러처리
+    if (!existingPost) {
+      throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
+    }
+
+    // 2. 해당 게시글의 총 좋아요 수 계산
+    const count = await this.postLikeRepository.countBy({ postId });
+    return count;
+  }
+
+  /** 로그인한 사람의 게시글 좋아요 조회 API **/
+  async getMyPostLike(userId: number, postId: number) {
+    // 1. 게시글이 존재하는지?
+    const existingPost = await this.postRepository.findOneBy({
+      id: postId,
+    });
+    // 1-1. 존재하지 않으면 에러처리
+    if (!existingPost) {
+      throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
+    }
+
+    // 2. 해당 게시글 좋아요를 눌렀는지?
+    const like = await this.postLikeRepository.findOneBy({
+      userId,
+      postId,
+    });
+    return like ? true : false;
+  }
+
+  /** 게시글 좋아요 클릭 API **/
+  async postLike(userId: number, postId: number) {
+    // 1. 좋아요를 누를 게시글 정보
+    const existingPost = await this.postRepository.findOneBy({
+      id: postId,
+    });
+    // 1-1. 게시글이 존재하지 않으면 에러처리
+    if (!existingPost) {
+      throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
+    }
+    // 1-2. 본인의 게시글에는 좋아요를 누를 수 없도록
+    if (existingPost.userId == userId) {
+      throw new BadRequestException(POST_MESSAGE.LIKE.CREATE.FAILURE.NO_SELF);
+    }
+
+    // 3. 내가 좋아요를 누른 상태인지 아닌지를 확인
+    const postLike = await this.postLikeRepository.findOneBy({
+      userId,
+      postId,
+    });
+    if (!postLike) {
+      // 3-1-A. 게시글 좋아요 명단에 내가 없다면 => 게시글 좋아요 등록
+      await this.postLikeRepository.save({
+        userId,
+        postId,
+      });
+      // 3-1-B. 게시글 좋아요 생성 포인트 지급
+      const isValidPoint = await this.pointService.validatePointLog(
+        userId,
+        PointType.POST_LIKE
+      );
+      if (isValidPoint) {
+        this.pointService.savePointLog(userId, PointType.POST_LIKE, true);
+      }
+    } else {
+      // 3-2-A. 게시글 좋아요 명단에 내가 있다면 => 게시글 좋아요 취소
+      await this.postLikeRepository.delete({
+        userId,
+        postId,
+      });
+      // 3-2-B. 게시글 좋아요 취소 포인트 차감
+      this.pointService.savePointLog(userId, PointType.POST_LIKE, false);
+    }
+  }
+
+  /** 게시글 싫어요 조회 API **/
+  async getPostDislikes(postId: number) {
+    // 1. 게시글이 존재하는지?
+    const existingPost = await this.postRepository.findOneBy({
+      id: postId,
+    });
+    // 1-1. 존재하지 않으면 에러처리
+    if (!existingPost) {
+      throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
+    }
+
+    // 2. 해당 게시글의 총 싫어요 수 계산
+    const count = await this.postDislikeRepository.countBy({ postId });
+    return count;
+  }
+
+  /** 로그인한 사람의 게시글 싫어요 조회 API **/
+  async getMyPostDislike(userId: number, postId: number) {
+    // 1. 게시글이 존재하는지?
+    const existingPost = await this.postRepository.findOneBy({
+      id: postId,
+    });
+    // 1-1. 존재하지 않으면 에러처리
+    if (!existingPost) {
+      throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
+    }
+
+    // 2. 해당 게시글 싫어요를 눌렀는지?
+    const dislike = await this.postDislikeRepository.findOneBy({
+      userId,
+      postId,
+    });
+
+    return dislike ? true : false;
+  }
+
+  /** 게시글 싫어요 클릭 API **/
+  async clickPostDislike(userId: number, postId: number) {
+    // 1. 싫어요를 누를 게시글 정보
+    const existingPost = await this.postRepository.findOneBy({
+      id: postId,
+    });
+    // 1-1. 게시글이 존재하지 않으면 에러처리
+    if (!existingPost) {
+      throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
+    }
+    // 1-2. 본인의 게시글에는 싫어요를 누를 수 없도록
+    if (existingPost.userId == userId) {
+      throw new BadRequestException(
+        POST_MESSAGE.DISLIKE.CREATE.FAILURE.NO_SELF
+      );
+    }
+
+    // 2. 내가 싫어요를 누른 상태인지 아닌지를 확인
+    const postDislike = await this.postDislikeRepository.findOneBy({
+      userId,
+      postId,
+    });
+    if (!postDislike) {
+      // 2-1. 게시글 싫어요 명단에 내가 없다면 => 게시글 싫어요 등록
+      await this.postDislikeRepository.save({
+        userId,
+        postId,
+      });
+    } else {
+      // 2-2. 게시글 싫어요 명단에 내가 있다면 => 게시글 싫어요 취소
+      await this.postDislikeRepository.delete({
+        userId,
+        postId,
+      });
+    }
   }
 }

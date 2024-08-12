@@ -66,7 +66,7 @@ async function fetchPost(postId) {
 async function fetchLD(postId) {
   try {
     // 1. 게시글 좋아요 눌렀는지 조회
-    const postLike = await fetch(`${API_BASE_URL}/posts/${postId}/likes/me`, {
+    const postLike = await fetch(`../api/posts/${postId}/likes/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

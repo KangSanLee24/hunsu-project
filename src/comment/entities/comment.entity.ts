@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-import { CommentDislike } from 'src/dislike/entities/comment-dislike.entity';
-import { CommentLike } from 'src/like/entities/comment-like.entity';
+import { CommentDislike } from 'src/comment/entities/comment-dislike.entity';
+import { CommentLike } from 'src/comment/entities/comment-like.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
