@@ -56,14 +56,14 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutLink.className = 'logout-link';
     logoutLink.href = '#';
     logoutLink.addEventListener('click', async () => {
-      if (window.confirm('로그아웃 하시겠습니까?')) {
-        await logout();
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        alert('로그아웃 되었습니다.');
-        showLoginOptions();
-        window.location.href = localStorage.getItem('redirectUrl'); // 로그아웃 후 main.html로 이동
-      }
+      // if (window.confirm('로그아웃 하시겠습니까?')) {
+      await logout();
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      // alert('로그아웃 되었습니다.');
+      showLoginOptions();
+      window.location.href = localStorage.getItem('redirectUrl'); // 로그아웃 후 main.html로 이동
+      // }
     });
 
     // 닉네임과 로그아웃 버튼을 나란히 배치

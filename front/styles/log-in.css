@@ -45,11 +45,6 @@ input[type='text'] {
   border-radius: 4px;
 }
 
-.forgot-password {
-  font-size: 13px;
-  margin-top: 0px;
-}
-
 button {
   width: 100%;
   padding: 10px;
@@ -62,8 +57,9 @@ button {
   margin-bottom: 10px;
 }
 
+.sign-up,
 .forgot-password {
-  font-size: 13px;
+  font-size: 15px;
   margin-top: 0px;
 }
 

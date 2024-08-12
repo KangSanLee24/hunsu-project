@@ -450,7 +450,19 @@ export class PostService {
     }
     // 1-2. 본인의 게시글에는 좋아요를 누를 수 없도록
     if (existingPost.userId == userId) {
-      throw new BadRequestException(POST_MESSAGE.LIKE.CREATE.FAILURE.NO_SELF);
+      throw new BadRequestException(POST_MESSAGE.LIKE.CLICK.FAILURE.NO_SELF);
+    }
+
+    // 2. 내가 싫어요를 누른 상태인지 아닌지를 확인
+    const alreadyDislike = await this.postDislikeRepository.findOneBy({
+      userId,
+      postId,
+    });
+    // 2-1. 싫어요를 누른 상태라면 좋아요를 누를 수 없도록
+    if (alreadyDislike) {
+      throw new BadRequestException(
+        POST_MESSAGE.LIKE.CLICK.FAILURE.ALREADY_DISLIKE
+      );
     }
 
     // 3. 내가 좋아요를 누른 상태인지 아닌지를 확인
@@ -531,24 +543,34 @@ export class PostService {
     }
     // 1-2. 본인의 게시글에는 싫어요를 누를 수 없도록
     if (existingPost.userId == userId) {
+      throw new BadRequestException(POST_MESSAGE.DISLIKE.CLICK.FAILURE.NO_SELF);
+    }
+
+    // 2. 내가 좋아요를 누른 상태인지 아닌지를 확인
+    const alreadyLike = await this.postLikeRepository.findOneBy({
+      userId,
+      postId,
+    });
+    // 2-1. 좋아요를 누른 상태라면 싫어요를 누를 수 없도록
+    if (alreadyLike) {
       throw new BadRequestException(
-        POST_MESSAGE.DISLIKE.CREATE.FAILURE.NO_SELF
+        POST_MESSAGE.DISLIKE.CLICK.FAILURE.ALREADY_LIKE
       );
     }
 
-    // 2. 내가 싫어요를 누른 상태인지 아닌지를 확인
+    // 3. 내가 싫어요를 누른 상태인지 아닌지를 확인
     const postDislike = await this.postDislikeRepository.findOneBy({
       userId,
       postId,
     });
     if (!postDislike) {
-      // 2-1. 게시글 싫어요 명단에 내가 없다면 => 게시글 싫어요 등록
+      // 3-1. 게시글 싫어요 명단에 내가 없다면 => 게시글 싫어요 등록
       await this.postDislikeRepository.save({
         userId,
         postId,
       });
     } else {
-      // 2-2. 게시글 싫어요 명단에 내가 있다면 => 게시글 싫어요 취소
+      // 3-2. 게시글 싫어요 명단에 내가 있다면 => 게시글 싫어요 취소
       await this.postDislikeRepository.delete({
         userId,
         postId,
