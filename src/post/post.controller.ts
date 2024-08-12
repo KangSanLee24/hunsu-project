@@ -258,7 +258,7 @@ export class PostController {
 
     return {
       status: HttpStatus.OK,
-      message: POST_MESSAGE.LIKE.CREATE.SUCCESS,
+      message: POST_MESSAGE.LIKE.CLICK.SUCCESS,
     };
   }
 
@@ -310,7 +310,7 @@ export class PostController {
 
     return {
       status: HttpStatus.OK,
-      message: POST_MESSAGE.DISLIKE.CREATE.SUCCESS,
+      message: POST_MESSAGE.DISLIKE.CLICK.SUCCESS,
     };
   }
 }

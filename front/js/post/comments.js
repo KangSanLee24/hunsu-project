@@ -192,14 +192,16 @@ async function clickLikeComment(commentId) {
         },
       }
     );
-    // 0-2. API response 결과가 ok가 아니면
+    // 0-2. fetch 받아온 result를 json으로
+    const result = await response.json();
+    // 0-3. API response 결과가 ok가 아니면
     if (!response.ok) {
-      alert('자신의 댓글에는 좋아요를 누를 수 없습니다.');
+      alert(result.message);
     }
-    // 0-3. 댓글목록 새로 불러오기
+    // 0-4. 댓글목록 새로 불러오기
     fetchComments();
   } catch (error) {
-    // 0-4. 도중에 에러가 뜬 경우
+    // 0-5. 도중에 에러가 뜬 경우
     alert('댓글 좋아요에서 오류가 발생했습니다.');
     console.error(error);
   }
@@ -219,15 +221,16 @@ async function clickDislikeComment(commentId) {
         },
       }
     );
-    // 0-2. API response 결과가 ok가 아니면
-    console.log(response);
+    // 0-2. fetch 받아온 result를 json으로
+    const result = await response.json();
+    // 0-3. API response 결과가 ok가 아니면
     if (!response.ok) {
-      alert('자신의 댓글에는 싫어요를 누를 수 없습니다.');
+      alert(result.message);
     }
-    // 0-3. 댓글목록 새로 불러오기
+    // 0-4. 댓글목록 새로 불러오기
     fetchComments();
   } catch (error) {
-    // 0-4. 도중에 에러가 뜬 경우
+    // 0-5. 도중에 에러가 뜬 경우
     alert('댓글 싫어요에서 오류가 발생했습니다.');
     console.error(error);
   }
