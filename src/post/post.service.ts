@@ -299,7 +299,7 @@ export class PostService {
     }
 
     // 게시글 삭제로 포인트 차감
-    // await this.pointService.savePointLog(userId, PointType.POST, false);
+    await this.pointService.savePointLog(userId, PointType.POST, false);
 
     // DB에서 게시글 삭제
     await this.postRepository.remove(post);
