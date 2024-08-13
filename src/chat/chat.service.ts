@@ -256,9 +256,9 @@ export class ChatService {
         // ZINCRBY가 멤버가 없을 때는 추가, 있을 때는 증가시킴
         client.zincrby('hashtag', 1, tag);
 
-        const uiqueTag = `${tag}:${currentTime}`;
+        const uniqueTag = `${tag}:${currentTime}`;
         //만료기간을 따로 저장
-        client.hset('hashtag_expire', uiqueTag, expireTime);
+        client.hset('hashtag_expire', uniqueTag, expireTime);
         console.log(`redis - hashtag ${tag}`);
       }
     }
@@ -357,12 +357,14 @@ export class ChatService {
     //트랜잭션
     //로그, 이미지, 멤버, 방 삭제
     //격리수준 -READ UNCOMMITED -> 트랜잭션 중 다른 데이터 삽입 가능
+    //2024-08-13 채팅 내역 테이블 삭제 (레디스로 이동)
+
     await this.entityManager.transaction(
       "READ UNCOMMITTED",
       async (manager) => {
       try {
         for (const room of findDeleteChat) {
-          await manager.delete(ChatLog, { roomId: room.id });
+          //await manager.delete(ChatLog, { roomId: room.id });
           await manager.delete(ChatImage, { roomId: room.id });
           await manager.delete(ChatMember, { roomId: room.id });
           await manager.delete(ChatRoom, { id: room.id });
