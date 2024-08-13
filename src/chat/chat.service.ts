@@ -253,10 +253,11 @@ export class ChatService {
 
     if(hashtagitem) {
       for (const tag of hashtagitem) {
-        // ZINCRBY가 멤버가 없을 때는 추가, 있을 때는 증가시킴
-        client.zincrby('hashtag', 1, tag);
-
         const uniqueTag = `${tag}:${currentTime}`;
+
+        // ZINCRBY가 멤버가 없을 때는 추가, 있을 때는 증가시킴
+        client.zincrby('hashtag', 1, uniqueTag);
+
         //만료기간을 따로 저장
         client.hset('hashtag_expire', uniqueTag, expireTime);
         console.log(`redis - hashtag ${tag}`);

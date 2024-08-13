@@ -64,7 +64,7 @@ export class HashtagService {
 
     const data = [];
     for (let i=0; i < hashtagData.length; i+=2) {
-      const item = hashtagData[i];
+      const item = hashtagData[i].split[':'][0];
       const count = hashtagData[i+1];
 
       data.push({
@@ -87,11 +87,10 @@ export class HashtagService {
 
     for ( const [uniqueTag, expireTime] of Object.entries(expireData)) {
       if(expireTime < currentDay) {
-        const hashitem = uniqueTag.split(':')[0];
-        await client.zrem('hashtag', hashitem);
+        await client.zrem('hashtag', uniqueTag);
         await client.hdel('hashtag_expire', uniqueTag);
 
-        console.log(`delete expire hashtag: ${hashitem}`);
+        console.log(`delete expire hashtag: ${uniqueTag}`);
       }
     }
   }
