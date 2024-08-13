@@ -40,7 +40,7 @@ export class PostService {
 
     private readonly awsService: AwsService,
     private readonly pointService: PointService
-  ) {}
+  ) { }
 
   /* 게시글 생성 API*/
   async create(createPostDto: CreatePostDto, userId: number) {
@@ -343,6 +343,7 @@ export class PostService {
 
   /** 이미지 업로드 API **/
   async uploadPostImages(files: Express.Multer.File[]) {
+    // const uuid = uuidv4();
     const uuid = uuidv4();
     // 업로드된 이미지 URL을 저장할 배열을 초기화한다
     const uploadedImageUrls: string[] = [];
