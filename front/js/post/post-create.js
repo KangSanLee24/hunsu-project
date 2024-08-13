@@ -10,6 +10,7 @@ let postId = new URLSearchParams(window.location.search).get('id'); // URL에서
 async function createPost() {
   const title = document.getElementById('post-title').value;
   const category = document.getElementById('post-category').value;
+  const hashtags = document.getElementById('post-hashtags').value;
   const content = editor.getMarkdown();
 
   // const accessToken = localStorage.getItem('accessToken');
@@ -25,6 +26,7 @@ async function createPost() {
       content: content,
       category: category,
       urlsArray: window.imageUrls, // 이미지 URL 배열 추가
+      hashtagsArray: hashtags
     }),
   });
 
