@@ -243,11 +243,11 @@ export class ChatService {
         const uniqueTag = `${tag}:${currentTime}`;
 
         // ZINCRBY가 멤버가 없을 때는 추가, 있을 때는 증가시킴
-        client.zincrby('hashtag', 1, uniqueTag);
+        client.zincrby('hashtag', 1, tag);
 
         //만료기간을 따로 저장
         client.hset('hashtag_expire', uniqueTag, expireTime);
-        console.log(`redis - hashtag ${tag}`);
+        console.log(`redis : chat-hashtag ${tag}`);
       }
     }
   }

@@ -23,10 +23,13 @@ import { PointType } from 'src/point/types/point.type';
 import { v4 as uuidv4 } from 'uuid'; // ES Modules
 import { PostLike } from 'src/post/entities/post-like.entity';
 import { PostDislike } from 'src/post/entities/post-dislike.entity';
+import { RedisService } from 'src/redis/redis.service';
+import { format } from 'date-fns';
 
 @Injectable()
 export class PostService {
   constructor(
+    private readonly redisService : RedisService,
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     @InjectRepository(PostImage)
@@ -93,6 +96,20 @@ export class PostService {
     if (isValidPoint)
       this.pointService.savePointLog(userId, PointType.POST, true);
 
+    //4. 해시태그 레디스에 저장
+    const client = this.redisService.getClient();
+    const currentTime = Date.now();
+    const sevenDaysInMilliseconds = 7 * 24 * 60 * 60 * 1000; // 7일을 밀리초로 변환
+    const expireTime = format(currentTime + sevenDaysInMilliseconds, 'yyyy-MM-dd');
+
+    //hashtags = [#청바지, #모자]
+    const postHashtag = hashtags.map((item) => {
+      const uniqueTag = `${item}:${currentTime}`;
+      client.zincrby('hashtag', 1, item);
+      client.hset('hashtag_expire', uniqueTag, expireTime);
+      console.log(`redis : post-hashtag ${item}`);
+    })
+
     return {
       id: post.id,
       userId: post.userId,
@@ -100,6 +117,7 @@ export class PostService {
       title: post.title,
       category: post.category,
       content: post.content,
+      hashtags: post.hashtags,  // 해시태그 추가
       createdAt: post.createdAt,
       updatedAt: post.updatedAt, // 테스트를 위해 남겨둠 마무리에는 포스트아이디만 리턴할 예정
     };

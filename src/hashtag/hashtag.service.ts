@@ -80,15 +80,20 @@ export class HashtagService {
   async deleteHashtag() {
     const client = this.redisService.getClient();
 
-    const currentDay = format(Date.now(), 'yyyy-mm-dd');
+    const currentDay = format(Date.now(), 'yyyy-MM-dd');
 
     //만료기간 날짜가 오늘보다 작은 해시태그 삭제
     const expireData = await client.hgetall('hashtag_expire');
 
     for ( const [uniqueTag, expireTime] of Object.entries(expireData)) {
       if(expireTime < currentDay) {
-        await client.zrem('hashtag', uniqueTag);
+        const tag = uniqueTag.split(':')[0];
+        const score = await client.zincrby('hashtag', -1, tag);
         await client.hdel('hashtag_expire', uniqueTag);
+
+        if( parseFloat(score) <= 0 ) {
+          await client.zrem('hashtag', tag);
+        };
 
         console.log(`delete expire hashtag: ${uniqueTag}`);
       }
