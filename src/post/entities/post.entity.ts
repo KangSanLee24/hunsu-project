@@ -47,6 +47,10 @@ export class Post {
   @VirtualColumn()
   numDislikes: number;
 
+  // 게시글 해시태그 배열
+  @Column({ type: 'simple-array' })
+  hashtags: string[];
+
   // 생성일시 = createdAt, Date
   @CreateDateColumn()
   createdAt: Date;
