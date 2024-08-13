@@ -12,7 +12,6 @@ import { User } from 'src/user/entities/user.entity';
 import { ChatMember } from './entities/chat-member.entity';
 import moment from 'moment';
 import { format, isSameDay } from 'date-fns';
-import { ChatLog } from './entities/chat-log.entity';
 import { AwsService } from 'src/aws/aws.service';
 import { ChatImage } from './entities/chat-image.entity';
 import { Order } from 'src/post/types/post-order.type';
@@ -27,8 +26,6 @@ export class ChatService {
     private readonly chatRoomRepository: Repository<ChatRoom>,
     @InjectRepository(ChatMember)
     private readonly chatMemberRepository: Repository<ChatMember>,
-    @InjectRepository(ChatLog)
-    private readonly chatLogRepository: Repository<ChatLog>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(Point)
@@ -161,10 +158,10 @@ export class ChatService {
   //채팅방 마지막 채팅 시간
 
   async chatLastTime(chatRoomId: number) {
-    const chatLastTime = await this.chatLogRepository.findOne({
-      where: { roomId: chatRoomId },
-      select: { createdAt: true },
-      order: { createdAt: 'DESC' },
+    const chatLastTime = await this.chatRoomRepository.findOne({
+      where: { id: chatRoomId },
+      select: { updatedAt: true },
+      order: { updatedAt: 'DESC' },
     });
 
     const chatImageLastTime = await this.chatImageRepository.findOne({
@@ -173,31 +170,21 @@ export class ChatService {
       order: { createdAt: 'DESC' },
     });
 
-    //아무 채팅 없음
-    if (!chatLastTime && !chatImageLastTime) {
-      return { message: ' ' };
-    }
-
     let formatTime: any;
 
     if (chatLastTime && !chatImageLastTime) {
-      formatTime = format(new Date(chatLastTime.createdAt), 'yyyy-MM-dd HH:mm');
-    } else if (!chatLastTime && chatImageLastTime) {
-      formatTime = format(
-        new Date(chatImageLastTime.createdAt),
-        'yyyy-MM-dd HH:mm'
-      );
+      formatTime = format(new Date(chatLastTime.updatedAt), 'yyyy-MM-dd HH:mm');
     } else if (chatLastTime && chatImageLastTime) {
       const diffTime =
-        chatLastTime.createdAt < chatImageLastTime.createdAt
+        chatLastTime.updatedAt < chatImageLastTime.createdAt
           ? chatImageLastTime.createdAt
-          : chatLastTime.createdAt;
+          : chatLastTime.updatedAt;
       formatTime = format(new Date(diffTime), 'yyyy-MM-dd HH:mm');
     }
 
     //오늘인지 확인
 
-    const result = await this.chatLogRepository.query(
+    const result = await this.chatRoomRepository.query(
       'SELECT NOW() as currentTime'
     );
     const dbTime = new Date(result[0].currentTime);
@@ -365,7 +352,6 @@ export class ChatService {
       async (manager) => {
       try {
         for (const room of findDeleteChat) {
-          //await manager.delete(ChatLog, { roomId: room.id });
           await manager.delete(ChatImage, { roomId: room.id });
           await manager.delete(ChatMember, { roomId: room.id });
           await manager.delete(ChatRoom, { id: room.id });

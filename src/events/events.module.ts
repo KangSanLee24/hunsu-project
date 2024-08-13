@@ -3,7 +3,6 @@ import { ChatGateway } from './events.gateway';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatRoom } from 'src/chat/entities/chat-room.entity';
 import { ChatMember } from 'src/chat/entities/chat-member.entity';
-import { ChatLog } from 'src/chat/entities/chat-log.entity';
 import { User } from 'src/user/entities/user.entity';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
@@ -18,7 +17,6 @@ import { RedisModule } from 'src/redis/redis.module';
     TypeOrmModule.forFeature([
       ChatRoom,
       ChatMember,
-      ChatLog,
       ChatImage,
       User,
       Point,
