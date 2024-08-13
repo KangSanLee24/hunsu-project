@@ -44,7 +44,7 @@ export class PostService {
 
   /* 게시글 생성 API*/
   async create(createPostDto: CreatePostDto, userId: number) {
-    const { title, content, category, urlsArray } = createPostDto;
+    const { title, content, category, urlsArray , hashtagsArray} = createPostDto;
     const user = await this.userRepository.findOne({
       where: { id: userId },
       withDeleted: true,
@@ -71,12 +71,16 @@ export class PostService {
         notUsedUrls.map((fileUrl) => this.awsService.deleteFileFromS3(fileUrl))
       );
     }
+    //해시태그 formatting
+    const hashtags = hashtagsArray.split(' ').filter(tag => tag.trim().length > 0);
+    
     // 2. 게시글 저장
     const createdPost = this.postRepository.create({
       title,
       content,
       category,
       userId,
+      hashtags: hashtags
     });
 
     const post = await this.postRepository.save(createdPost);
