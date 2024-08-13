@@ -25,8 +25,8 @@ export class HashtagController {
    * 레디스 테스트
    * @returns
    */
-  @Get('redis-test')
-  async redisTest() {
+  @Get('ranks-weekly')
+  async hashtagWeeklyLank() {
     const data = await this.hashtagService.hashtagWeeklyLank();
     return data;
   }
