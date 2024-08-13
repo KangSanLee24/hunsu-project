@@ -8,8 +8,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { PointLog } from './entities/point-log.entity';
 import { User } from 'src/user/entities/user.entity';
-import { Post } from 'src/post/entities/post.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
 import { MaxPointScore, PointScore, PointType } from './types/point.type';
 
 @Injectable()
@@ -21,10 +19,6 @@ export class PointService {
     private readonly pointRepository: Repository<Point>,
     @InjectRepository(PointLog)
     private readonly pointLogRepository: Repository<PointLog>,
-    @InjectRepository(Post)
-    private readonly postRepository: Repository<Post>,
-    @InjectRepository(Comment)
-    private readonly commentRepository: Repository<Comment>
   ) {}
 
   // 출석 체크 메소드
@@ -113,29 +107,8 @@ export class PointService {
     userId: number,
     pointType: PointType,
     sign: boolean,
-    postId?: number
   ) {
-    let point = await this.pointRepository.findOne({ where: { userId } });
-
-    // 댓글 작성 시, 작성자와 포스트 작성자가 동일한지 확인
-    if (pointType === PointType.COMMENT) {
-      const post = await this.postRepository.findOne({ where: { id: postId } });
-
-      if (post.userId === userId) {
-        // 작성자가 포스트 작성자와 동일하면 포인트 추가하지 않음
-        console.log(
-          '작성자가 포스트 작성자와 동일하여 포인트 추가하지 않습니다.'
-        );
-        return;
-      }
-    }
-
-    const isValidPoint = await this.validatePointLog(userId, pointType);
-    if (!isValidPoint) {
-      throw new ForbiddenException(
-        '오늘 해당 유형의 포인트를 더 이상 얻을 수 없습니다.'
-      );
-    }
+    const point = await this.pointRepository.findOne({ where: { userId } });
 
     const pointScore = PointScore[pointType];
     const newPoint = sign
@@ -207,43 +180,28 @@ export class PointService {
       limit ${num};
       `
     );
-
-    const data = pointRank.map((point) => ({
-      accPoint: point.acc_point,
-      nickname: point.nickname,
-    }));
-
-    return data;
+ 
+    return pointRank;
   }
 
   //주간 포인트 랭킹 조회 (매주 일요일~토요일))
   async pointWeeklyRank(num: number) {
     const pointRank = await this.pointLogRepository.query(
       `
-      SELECT b.id, b.nickname, SUM(a.point) AS point
+      select c.id AS userId, c.nickname, c.point, d.acc_point AS accPoint
+      from (SELECT b.id as id, b.nickname as nickname, SUM(a.point) AS point
       FROM point_logs a
       JOIN users b ON a.user_id = b.id
-      WHERE a.created_at >=  DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 8) DAY)  
-        AND a.created_at < DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 1) DAY)
-      GROUP BY b.nickname 
-      ORDER BY point DESC
+      WHERE a.created_at >=  DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 8) DAY)
+      AND a.created_at < DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 1) DAY)
+      GROUP BY b.nickname
+      ORDER BY point DESC) c left join points d
+      on c.id = d.user_id
       limit ${num};
       `
     );
 
-    const data = await Promise.all(
-      pointRank.map(async (point: any) => {
-        const accPoint = await this.pointRepository.findOneBy({
-          userId: point.id,
-        });
-        return {
-          accPoint: accPoint.accPoint,
-          point: point.point,
-          nickname: point.nickname,
-        };
-      })
-    );
-    return data;
+    return pointRank
   }
 
   // 오늘 포인트 타입 횟수 검색하는 메소드
