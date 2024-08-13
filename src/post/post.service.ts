@@ -231,7 +231,8 @@ export class PostService {
 
   /*게시글 수정 API*/
   async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
-    const { title, content, urlsArray, category } = updatePostDto;
+    const { title, content, urlsArray, category, hashtagsArray} = updatePostDto;
+
     const post = await this.postRepository.findOne({
       where: { id },
       withDeleted: true,
@@ -266,9 +267,14 @@ export class PostService {
       notUsedUrls.map((fileUrl) => this.awsService.deleteFileFromS3(fileUrl))
     );
 
+    //해시태그 수정 시
+    const hashtags = hashtagsArray.split(' ').filter(tag => tag.trim().length > 0);
+
     const updatedPost = await this.postRepository.update(
       { id },
-      { title, content, category }
+      { title, content, category, 
+        hashtags: hashtagsArray.length > 0 ? hashtags : post.hashtags
+       }
     );
     return await this.postRepository.findOneBy({ id });
   }

@@ -46,6 +46,7 @@ async function updatePost() {
   const title = document.getElementById('post-title').value;
   const category = document.getElementById('post-category').value;
   const content = editor.getMarkdown();
+  const hashtags = document.getElementById('post-hashtags').value;
 
   const postResponse = await fetch(`${API_BASE_URL}/posts/${postId}`, {
     method: 'PATCH',
@@ -58,6 +59,7 @@ async function updatePost() {
       content: content,
       category: category,
       urlsArray: window.imageUrls, // 이미지 URL 배열 추가
+      hashtagsArray: hashtags
     }),
   });
 
