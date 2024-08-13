@@ -64,7 +64,7 @@ export class HashtagService {
 
     const data = [];
     for (let i=0; i < hashtagData.length; i+=2) {
-      const item = hashtagData[i].split[':'][0];
+      const item = hashtagData[i];
       const count = hashtagData[i+1];
 
       data.push({
