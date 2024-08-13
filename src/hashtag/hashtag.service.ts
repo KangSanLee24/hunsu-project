@@ -65,7 +65,7 @@ export class HashtagService {
 
   async getHashtag() {
     const client = this.redisService.getClient();
-    const hashtag = await client.zrange('hashtag', 0, -1, 'WITHSCORES');
+    const hashtag = await client.zrevrange('hashtag', 0, -1, 'WITHSCORES');
 
     return hashtag;
   }

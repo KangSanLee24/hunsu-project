@@ -11,6 +11,7 @@ import { ChatService } from 'src/chat/chat.service';
 import { ChatImage } from 'src/chat/entities/chat-image.entity';
 import { AwsModule } from 'src/aws/aws.module';
 import { Point } from 'src/point/entities/point.entity';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { Point } from 'src/point/entities/point.entity';
     UserModule,
     AuthModule,
     AwsModule,
+    RedisModule
   ],
   providers: [ChatGateway, ChatService],
 })

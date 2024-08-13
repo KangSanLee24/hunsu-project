@@ -17,10 +17,12 @@ import { AwsService } from 'src/aws/aws.service';
 import { ChatImage } from './entities/chat-image.entity';
 import { Order } from 'src/post/types/post-order.type';
 import { Point } from 'src/point/entities/point.entity';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class ChatService {
   constructor(
+    private readonly redisService : RedisService,
     @InjectRepository(ChatRoom)
     private readonly chatRoomRepository: Repository<ChatRoom>,
     @InjectRepository(ChatMember)
@@ -221,21 +223,45 @@ export class ChatService {
   }
 
   //채팅방 채팅 내역 저장
-  async sendChatRoom(chatRoomId: number, author: string, message: string) {
-    const findUser = await this.userRepository.findOne({
-      where: { nickname: author },
-      select: { id: true },
-    });
+  // async sendChatRoom(chatRoomId: number, author: string, message: string) {
+  //   const findUser = await this.userRepository.findOne({
+  //     where: { nickname: author },
+  //     select: { id: true },
+  //   });
 
-    const chatLog = await this.chatLogRepository.save({
-      roomId: chatRoomId,
-      content: message,
-      memberId: findUser.id,
-    });
+  //   const chatLog = await this.chatLogRepository.save({
+  //     roomId: chatRoomId,
+  //     content: message,
+  //     memberId: findUser.id,
+  //   });
 
-    const chatTime = format(new Date(chatLog.createdAt), 'HH:mm');
+  //   const chatTime = format(new Date(chatLog.createdAt), 'HH:mm');
 
-    return chatTime;
+  //   return chatTime;
+  // }
+
+  //채팅 내역 중 해시태그 레디스 저장
+  async chatHashtag(chat: string) {
+    const client = this.redisService.getClient();
+
+    const hashtagPattern = /#\S+/g;
+    const hashtagitem = chat.match(hashtagPattern);
+
+    const currentTime = Date.now();
+    const sevenDaysInMilliseconds = 7 * 24 * 60 * 60 * 1000; // 7일을 밀리초로 변환
+    const expireTime = format(currentTime + sevenDaysInMilliseconds, 'yyyy-MM-dd');
+
+    if(hashtagitem) {
+      for (const tag of hashtagitem) {
+        // ZINCRBY가 멤버가 없을 때는 추가, 있을 때는 증가시킴
+        client.zincrby('hashtag', 1, tag);
+
+        const uiqueTag = `${tag}:${currentTime}`;
+        //만료기간을 따로 저장
+        client.hset('hashtag_expire', uiqueTag, expireTime);
+        console.log(`redis - hashtag ${tag}`);
+      }
+    }
   }
 
   //채팅방 이미지 저장

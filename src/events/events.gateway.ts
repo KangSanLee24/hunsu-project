@@ -10,6 +10,7 @@ import {
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from '../chat/chat.service';
+import { format } from 'date-fns';
 
 interface CustomFile {
   buffer: Buffer;
@@ -63,9 +64,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const isChatRoom = await this.chatService.isChatRoom(+payload.roomId);
 
     if(isChatRoom) {
-      const chatTime = await this.chatService.sendChatRoom(+payload.roomId, payload.author, payload.body);
-
+      const currentTime = Date.now();
+      const chatTime = format(currentTime, 'HH:mm');
+      
       this.server.to(payload.roomId).emit('chat', {author: payload.author, body: payload.body, chatTime});
+      this.chatService.chatHashtag(payload.body);
       return payload;
     } else {
       this.server.to(payload.roomId).emit('outRoom', {});
