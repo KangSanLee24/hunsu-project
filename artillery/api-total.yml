@@ -1,0 +1,40 @@
+config:
+  # base url 정의 (우리는 domain을 작성)
+  target: "http://localhost:3000"
+  phases:
+    # 부하테스트 시간 (초)
+    - duration: 60
+    # 부하테스트 동안의 사용자 수 (초당 요청 수)
+      arrivalRate: 150
+      # rampTo: 300
+      name: api-request-test
+  # payload:
+  #   path: "categorys.csv"
+  #   fields:
+  #     - "category"
+  #   skipHeader: true  # CSV 파일의 첫 줄이 헤더인 경우 true로 설정
+  #   loadAll: true
+  #   name: category
+# 부하 테스트 시나리오
+scenarios:
+  # 시나리오 정의
+  - name: "MAIN-GET-HOT-LiveChat"
+    flow:
+      - get:
+          url: "/api/chatrooms/hotlivechat"
+  - name: "MAIN-GET-HOT-Posts"
+    flow:
+      - get:
+          url: "/api/posts/hot?category={{category}}"
+  - name: "MAIN-GET-Weekly-Rank"
+    flow:
+      - get:
+          url: "/api/points/ranks-weekly?num=10"
+  - name: "MAIN-GET-Total-Rank"
+    flow:
+      - get:
+          url: "/api/points/ranks?num=10"
+  # - name: "POST-Detail-GET-Comments"
+  #   flow:
+  #     - get:
+  #         url: "/api/posts/6/comments"
