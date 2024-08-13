@@ -56,11 +56,13 @@ async function addCommentToList(comment) {
       <div class="comment-dislike-btn-count">
         <button class="comment-dislike-btn" data-comment-id="${comment.id}" onclick="clickDislikeComment(${comment.id})">👎</button>
         <span class="comment-dislike-count"> ${comment.dislikes || 0} </span>
-      </div>             
+      </div>
+      <div>
+        <button class="edit-comment-btn" onclick="editComment(${comment.id}, '${comment.content}')">수정</button>
+        <button class="delete-comment-btn" onclick="deleteComment(${comment.id})">삭제</button>
+      </div>       
     </div>
     <p class="comment-content">${comment.content}</p>
-    <button class="edit-comment-btn" onclick="editComment(${comment.id}, '${comment.content}')">수정</button>
-    <button class="delete-comment-btn" onclick="deleteComment(${comment.id})">삭제</button>
     <button class="recomment-btn" data-comment-id="${comment.id}">대댓글 작성</button>
     <div class="recomment-input" style="display: none;">
       <textarea placeholder="대댓글을 입력하세요..." rows="2"></textarea>
@@ -87,11 +89,13 @@ async function addCommentToList(comment) {
             <button class="recomment-dislike-btn" data-recomment-id="${recomment.id}" onclick="clickDislikeRecomment(${comment.id}, ${recomment.id})">👎</button>
             <span class="recomment-dislike-count"> ${recomment.dislikes || 0} </span>
           </div>
+          <div>
+            <button class="edit-recomment-btn" onclick="editRecomment(${recomment.id}, '${recomment.content}')">수정</button>
+            <button class="delete-recomment-btn" onclick="deleteRecomment(${recomment.id})">삭제</button>
+          </div>
         </div>
         <p class="recomment-content">${recomment.content}</p>
-        <button class="edit-recomment-btn" onclick="editRecomment(${recomment.id}, '${recomment.content}')">수정</button>
-        <button class="delete-recomment-btn" onclick="deleteRecomment(${recomment.id})">삭제</button>
-  
+        
       `;
       recommentsList.appendChild(recommentItem);
     });
