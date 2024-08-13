@@ -73,7 +73,7 @@ export class PostService {
     }
     //해시태그 formatting
     const hashtags = hashtagsArray.split(' ').filter(tag => tag.trim().length > 0);
-    
+
     // 2. 게시글 저장
     const createdPost = this.postRepository.create({
       title,
@@ -178,6 +178,7 @@ export class PostService {
       numDislikes: post.numDislikes, // 싫어요 수
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
+      hashtagsArray: post.hashtags
     };
   }
 
