@@ -18,23 +18,23 @@ config:
 # 부하 테스트 시나리오
 scenarios:
   # 시나리오 정의
-  - name: "MAIN-GET-HOT-LiveChat"
+  - name: "GET-hot-liveChat"
     flow:
       - get:
           url: "/api/chatrooms/hotlivechat"
-  - name: "MAIN-GET-HOT-Posts"
+  - name: "GET-hot-posts"
     flow:
       - get:
           url: "/api/posts/hot?category={{category}}"
-  - name: "MAIN-GET-Weekly-Rank"
+  - name: "GET-weekly-rank"
     flow:
       - get:
           url: "/api/points/ranks-weekly?num=10"
-  - name: "MAIN-GET-Total-Rank"
+  - name: "GET-total-rank"
     flow:
       - get:
           url: "/api/points/ranks?num=10"
-  # - name: "POST-Detail-GET-Comments"
-  #   flow:
-  #     - get:
-  #         url: "/api/posts/6/comments"
+  - name: "GET-hashtags-rank"
+    flow:
+      - get:
+          url: "/api/hashtags/ranks-weekly?num=10"
