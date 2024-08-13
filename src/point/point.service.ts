@@ -180,43 +180,28 @@ export class PointService {
       limit ${num};
       `
     );
-
-    const data = pointRank.map((point) => ({
-      accPoint: point.acc_point,
-      nickname: point.nickname,
-    }));
-
-    return data;
+ 
+    return pointRank;
   }
 
   //주간 포인트 랭킹 조회 (매주 일요일~토요일))
   async pointWeeklyRank(num: number) {
     const pointRank = await this.pointLogRepository.query(
       `
-      SELECT b.id, b.nickname, SUM(a.point) AS point
+      select c.id AS userId, c.nickname, c.point, d.acc_point AS accPoint
+      from (SELECT b.id as id, b.nickname as nickname, SUM(a.point) AS point
       FROM point_logs a
       JOIN users b ON a.user_id = b.id
-      WHERE a.created_at >=  DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 8) DAY)  
-        AND a.created_at < DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 1) DAY)
-      GROUP BY b.nickname 
-      ORDER BY point DESC
+      WHERE a.created_at >=  DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 8) DAY)
+      AND a.created_at < DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 1) DAY)
+      GROUP BY b.nickname
+      ORDER BY point DESC) c left join points d
+      on c.id = d.user_id
       limit ${num};
       `
     );
 
-    const data = await Promise.all(
-      pointRank.map(async (point: any) => {
-        const accPoint = await this.pointRepository.findOneBy({
-          userId: point.id,
-        });
-        return {
-          accPoint: accPoint.accPoint,
-          point: point.point,
-          nickname: point.nickname,
-        };
-      })
-    );
-    return data;
+    return pointRank
   }
 
   // 오늘 포인트 타입 횟수 검색하는 메소드
