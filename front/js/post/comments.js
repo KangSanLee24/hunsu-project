@@ -23,11 +23,13 @@ async function fetchComments() {
     if (!response.ok) throw new Error('댓글을 불러오는 데 실패했습니다.');
 
     const result = await response.json();
+    console.log("🚀 ~ fetchComments ~ result.data:", result.data)
     renderComments(result.data);
   } catch (error) {
     console.error(error);
     alert('댓글을 불러오는 중 오류가 발생했습니다.');
   }
+    
 }
 
 /** 2. 댓글 랜더링 함수 **/
@@ -42,10 +44,9 @@ function renderComments(comments) {
   }
 }
 
-
-
 /** 3. 댓글 리스트에 추가하는 함수 **/
 async function addCommentToList(comment) {
+  console.log("🚀 ~ addCommentToList ~ comment:", comment)
   const commentItem = document.createElement('li');
   commentItem.innerHTML = `
     <div class="comment-header">
@@ -98,6 +99,7 @@ async function fetchRecomments(commentId) {
 function renderRecomments(commentId, recomments, recommentList) {
   console.log("🚀 ~ renderRecomments ~ recomments:", recomments)
   recommentList.innerHTML = ''; // 기존 대댓글 초기화
+  recommentList.style.paddingLeft = '20px'; // 들여쓰기
   if (recomments.length > 0) {
     recomments.forEach((recomment) => {
       const recommentItem = document.createElement('li');
@@ -296,8 +298,12 @@ submitCommentButton.addEventListener('click', () => {
 commentList.addEventListener('click', (event) => {
   if (event.target.classList.contains('recomment-btn')) {
     const recommentInput = event.target.nextElementSibling;
-    recommentInput.style.display =
-      recommentInput.style.display === 'none' ? 'block' : 'none';
+
+    // 대댓글 입력 UI가 있는지 확인
+    if (recommentInput && recommentInput.classList.contains('recomment-input')) {
+      recommentInput.style.display = 
+        recommentInput.style.display === 'none' || recommentInput.style.display === '' ? 'block' : 'none';
+    }
   }
 });
 
