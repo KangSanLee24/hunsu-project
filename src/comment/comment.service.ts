@@ -104,69 +104,7 @@ export class CommentService {
     };
   }
 
-  // 댓글 목록 조회 API ( 댓글 + 대댓글)
-  async findCommentsByPostId(postId: number) {
-    // comments
-    const comments = await this.commentRepository.find({
-      where: { postId, parentId: IsNull() },
-    });
 
-    // recomments, user nickname, likes, dislikes
-    const commentsWithDetails = await Promise.all(
-      comments.map(async (comment) => {
-        const recomments = await this.commentRepository.find({
-          where: { postId, parentId: comment.id },
-        });
-
-        const user = await this.userRepository.findOne({
-          where: { id: comment.userId },
-          select: ['nickname'],
-        });
-
-        const likes = await this.commentLikeRepository.count({
-          where: { commentId: comment.id },
-        });
-        const dislikes = await this.commentDislikeRepository.count({
-          where: { commentId: comment.id },
-        });
-
-        const recommentsWithDetails = await Promise.all(
-          recomments.map(async (recomment) => {
-            const recommentUser = await this.userRepository.findOne({
-              where: { id: recomment.userId },
-              select: ['nickname'],
-            });
-
-            const recommentLikes = await this.commentLikeRepository.count({
-              where: { commentId: recomment.id },
-            });
-            const recommentDislikes = await this.commentDislikeRepository.count(
-              {
-                where: { commentId: recomment.id },
-              }
-            );
-
-            return {
-              ...recomment,
-              nickname: recommentUser?.nickname,
-              likes: recommentLikes,
-              dislikes: recommentDislikes,
-            };
-          })
-        );
-
-        return {
-          ...comment,
-          nickname: user?.nickname,
-          likes,
-          dislikes,
-          recomments: recommentsWithDetails,
-        };
-      })
-    );
-
-    return commentsWithDetails;
-  }
   // 댓글 목록 조회 API ( 댓글만 )
   async findCommentsById(postId:number) {
     const comments = await this.commentRepository.find({

@@ -23,7 +23,6 @@ async function fetchComments() {
     if (!response.ok) throw new Error('댓글을 불러오는 데 실패했습니다.');
 
     const result = await response.json();
-    console.log("🚀 ~ fetchComments ~ result.data:", result.data)
     renderComments(result.data);
   } catch (error) {
     console.error(error);
@@ -46,7 +45,6 @@ function renderComments(comments) {
 
 /** 3. 댓글 리스트에 추가하는 함수 **/
 async function addCommentToList(comment) {
-  console.log("🚀 ~ addCommentToList ~ comment:", comment)
   const commentItem = document.createElement('li');
   commentItem.innerHTML = `
     <div class="comment-header">
@@ -58,7 +56,11 @@ async function addCommentToList(comment) {
       <div class="comment-dislike-btn-count">
         <button class="comment-dislike-btn" data-comment-id="${comment.id}" onclick="clickDislikeComment(${comment.id})">👎</button>
         <span class="comment-dislike-count"> ${comment.dislikes || 0} </span>
-      </div>             
+      </div>
+      <div>
+        <button class="edit-comment-btn" onclick="editComment(${comment.id}, '${comment.content}')">수정</button>
+        <button class="delete-comment-btn" onclick="deleteComment(${comment.id})">삭제</button>
+      </div>       
     </div>
     <p>${comment.content}</p>
     <button class="recomment-btn" data-comment-id="${comment.id}" onclick="fetchRecomments(${comment.id})">대댓글 (${comment.recommentsCount})</button>
@@ -82,7 +84,6 @@ async function fetchRecomments(commentId) {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
     });
-    console.log("🚀 ~ fetchRecomments ~ response:", response)
 
     if (!response.ok) throw new Error('대댓글을 불러오는 데 실패했습니다.');
 
@@ -97,7 +98,6 @@ async function fetchRecomments(commentId) {
 
 /** 5. 대댓글 랜더링 함수 **/
 function renderRecomments(commentId, recomments, recommentList) {
-  console.log("🚀 ~ renderRecomments ~ recomments:", recomments)
   recommentList.innerHTML = ''; // 기존 대댓글 초기화
   recommentList.style.paddingLeft = '20px'; // 들여쓰기
   if (recomments.length > 0) {

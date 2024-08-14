@@ -196,3 +196,25 @@
   border: 0px;
   background-color: white;
 }
+
+/*대댓글 좋아요, 싫어요 버튼*/
+.recomment-header {
+  display: flex;
+  flex-direction: row;
+}
+.recomment-like-btn-count {
+  display: flex;
+  flex-direction: row;
+}
+.recomment-dislike-btn-count {
+  display: flex;
+  flex-direction: row;
+}
+.recomment-like-btn {
+  border: 0px;
+  background-color: white;
+}
+.recomment-dislike-btn {
+  border: 0px;
+  background-color: white;
+}
