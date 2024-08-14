@@ -33,7 +33,7 @@ import { Token } from 'src/decorators/token.decorator';
 import { VerifyPasswordDto } from './dtos/verify-password.dto';
 import { LogInKakao } from 'src/decorators/log-in-kakao.decorator';
 
-@ApiTags('1. AUTH API')
+@ApiTags('01. AUTH API')
 @Controller('auth')
 export class AuthController {
   constructor(

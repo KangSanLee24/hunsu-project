@@ -19,11 +19,21 @@ async function getAuthor() {
     return { author, authorId };
   } catch {
     console.error('Error:', error);
-    throw error;
+    // throw error;
+    return;
   }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+
+  // 로그인 여부 확인
+  const accessToken = localStorage.getItem('accessToken');
+  if (!accessToken) {
+    alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+    window.location.href = '/html/log-in.html';
+    return; 
+  }
+  
   const socket = io('');
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -36,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const roomNameElement = document.getElementById('roomName');
   const fileInput = document.getElementById('fileInput');
   const imagePreview = document.getElementById('imagePreview');
-  
+
   let file = null; // 파일 변수 초기화
 
   let currentUser;
@@ -45,10 +55,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const authorData = await getAuthor();
     currentUser = authorData.author;
     currentUserId = authorData.authorId;
-    // currentUser = (await getAuthor()).author;
-    // currentUserId = (await getAuthor()).authorId;
   } catch (error) {
     console.error('Failed to get author:', error);
+    alert('로그인 정보가 올바르지 않습니다. 로그인 페이지로 이동합니다.');
+    window.location.href = '/html/log-in.html'; // 로그인 페이지 경로로 리다이렉트
+    return; // 이후 코드를 실행하지 않도록 중단
   }
 
   // 채팅 목록을 자동으로 스크롤 하단으로 이동
@@ -254,12 +265,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const closeImage = document.getElementById('closeImage');
 
         closeImage.addEventListener('click', () => {
-            // 파일 입력 필드 초기화
-            fileInput.value = '';
-            imagePreview.style.display = 'none'; 
-            imagePreview.style.backgroundImage = ''; // 이미지 배경 초기화
-            file = null; // 파일 변수 초기화
-          });
+          // 파일 입력 필드 초기화
+          fileInput.value = '';
+          imagePreview.style.display = 'none';
+          imagePreview.style.backgroundImage = ''; // 이미지 배경 초기화
+          file = null; // 파일 변수 초기화
+        });
       };
       reader.readAsDataURL(file);
     }

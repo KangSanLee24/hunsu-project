@@ -2,7 +2,7 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { HashtagService } from './hashtag.service';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('10. 해시태그 API')
+@ApiTags('09. HASHTAG API')
 @Controller('hashtags')
 export class HashtagController {
   constructor(private readonly hashtagService: HashtagService) {}

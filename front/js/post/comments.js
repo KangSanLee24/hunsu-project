@@ -11,7 +11,7 @@ const submitCommentButton = document.getElementById('submit-comment');
 const commentContentInput = document.getElementById('comment-content');
 const commentList = document.getElementById('comment-list');
 
-/** 1. 댓글을 불러오는 함수 **/
+/** 1. 댓글 목록 조회 API **/
 async function fetchComments() {
   try {
     const response = await fetch(`${API_BASE_URL}/posts/${postId}/comments`, {
@@ -28,6 +28,7 @@ async function fetchComments() {
     console.error(error);
     alert('댓글을 불러오는 중 오류가 발생했습니다.');
   }
+    
 }
 
 /** 2. 댓글 랜더링 함수 **/
@@ -44,7 +45,6 @@ function renderComments(comments) {
 
 /** 3. 댓글 리스트에 추가하는 함수 **/
 async function addCommentToList(comment) {
-  // const data = await fetchLD(comment.id);
   const commentItem = document.createElement('li');
   commentItem.innerHTML = `
     <div class="comment-header">
@@ -52,42 +52,89 @@ async function addCommentToList(comment) {
       <div class="comment-like-btn-count">
         <button class="comment-like-btn" data-comment-id="${comment.id}" onclick="clickLikeComment(${comment.id})">👍</button>
         <span class="comment-like-count"> ${comment.likes || 0} </span>
-       </div>
+      </div>
       <div class="comment-dislike-btn-count">
         <button class="comment-dislike-btn" data-comment-id="${comment.id}" onclick="clickDislikeComment(${comment.id})">👎</button>
         <span class="comment-dislike-count"> ${comment.dislikes || 0} </span>
-      </div>             
+      </div>
+      <div>
+        <button class="edit-comment-btn" onclick="editComment(${comment.id}, '${comment.content}')">수정</button>
+        <button class="delete-comment-btn" onclick="deleteComment(${comment.id})">삭제</button>
+      </div>       
     </div>
     <p>${comment.content}</p>
-    <button class="recomment-btn" data-comment-id="${comment.id}">대댓글 작성</button>
-    <div class="recomment-input" style="display: none;">
-      <textarea placeholder="대댓글을 입력하세요..." rows="2"></textarea>
-      <button class="submit-recomment">작성</button>
-    </div>  
+    <button class="recomment-btn" data-comment-id="${comment.id}" onclick="fetchRecomments(${comment.id})">대댓글 (${comment.recommentsCount})</button>
+    <div class="recomment-list" id="recomment-list-${comment.id}" style="display: none;"></div>  
   `;
 
-  // 3-1. 대댓글이 있는 경우 랜더링
-  if (comment.recomments && comment.recomments.length > 0) {
-    const recommentsList = document.createElement('ul');
-    recommentsList.style.listStyleType = 'none'; // 기본 리스트 스타일 제거
-    recommentsList.style.paddingLeft = '20px'; // 들여쓰기
-
-    comment.recomments.forEach((recomment) => {
-      const recommentItem = document.createElement('li');
-      recommentItem.innerHTML = `
-                      <p>${recomment.nickname}
-                      | 작성일: ${elapsedTime(recomment.createdAt)}
-                      | 좋아요: ${recomment.likes}
-                      | 싫어요: ${recomment.dislikes}</p>
-                      <p>${recomment.content}</p>
-                  `;
-      recommentsList.appendChild(recommentItem);
-    });
-    commentItem.appendChild(recommentsList);
-  }
-  // 3-2. 이어서
   commentList.appendChild(commentItem);
 }
+
+/** 4. 대댓글을 불러오는 함수 **/
+async function fetchRecomments(commentId) {
+  const recommentList = document.getElementById(`recomment-list-${commentId}`);
+  if (recommentList.style.display === 'block') {
+    recommentList.style.display = 'none'; // 이미 보이는 경우 숨김
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/comments/${commentId}/recomments`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+
+    if (!response.ok) throw new Error('대댓글을 불러오는 데 실패했습니다.');
+
+    const result = await response.json();
+    renderRecomments(commentId, result.data, recommentList);
+    recommentList.style.display = 'block'; // 대댓글 목록 보이기
+  } catch (error) {
+    console.error(error);
+    alert('대댓글을 불러오는 중 오류가 발생했습니다.');
+  }
+}
+
+/** 5. 대댓글 랜더링 함수 **/
+function renderRecomments(commentId, recomments, recommentList) {
+  recommentList.innerHTML = ''; // 기존 대댓글 초기화
+  recommentList.style.paddingLeft = '20px'; // 들여쓰기
+  if (recomments.length > 0) {
+    recomments.forEach((recomment) => {
+      const recommentItem = document.createElement('li');
+      recommentItem.innerHTML = `
+      <div class="comment-header">
+        <span>${recomment.nickname} | 작성일: ${elapsedTime(recomment.createdAt)} </span> 
+        <div class="comment-like-btn-count">
+          <button class="comment-dislike-btn" data-comment-id="${recomment.id}" onclick="clickLikeComment(${recomment.id})">👍</button>
+          <span class="recomment-like-count">${recomment.likes || 0}</span>
+        </div>
+        <div class="comment-dislike-btn-count">
+          <button class="comment-dislike-btn" data-comment-id="${recomment.id}" onclick="clickDislikeComment(${recomment.id})">👎</button>
+          <span class="recomment-dislike-count">${recomment.dislikes || 0}</span>
+        </div>
+      </div>
+      <p>${recomment.content}</p>
+      `;
+      recommentList.appendChild(recommentItem);
+    });
+  } else {
+    recommentList.innerHTML = '<p>대댓글이 없습니다.</p>';
+  }
+
+  // 대댓글 작성 버튼과 입력 공간 추가
+  const recommentInputContainer = document.createElement('div');
+  recommentInputContainer.innerHTML = `
+    <button class="recomment-btn" onclick="toggleRecommentInput(${commentId})">대댓글 작성</button>
+    <div class="recomment-input" id="recomment-input-${commentId}" style="display: none;">
+      <textarea placeholder="대댓글을 입력하세요..." rows="2"></textarea>
+      <button class="submit-recomment" onclick="addRecomment(${commentId})">작성</button>
+    </div>
+  `;
+recommentList.appendChild(recommentInputContainer);
+}
+
 
 /** 4. 나의 댓글 좋아요/싫어요 여부 조회 **/
 async function fetchLD(commentId) {
@@ -246,14 +293,20 @@ submitCommentButton.addEventListener('click', () => {
     alert('댓글 내용을 입력하세요.');
   }
 });
+
 // 2. [대댓글] 버튼 클릭 시 대댓글 입력 UI 토글
 commentList.addEventListener('click', (event) => {
   if (event.target.classList.contains('recomment-btn')) {
     const recommentInput = event.target.nextElementSibling;
-    recommentInput.style.display =
-      recommentInput.style.display === 'none' ? 'block' : 'none';
+
+    // 대댓글 입력 UI가 있는지 확인
+    if (recommentInput && recommentInput.classList.contains('recomment-input')) {
+      recommentInput.style.display = 
+        recommentInput.style.display === 'none' || recommentInput.style.display === '' ? 'block' : 'none';
+    }
   }
 });
+
 // 3. [대댓글 작성] 버튼 클릭 시 API 호출
 commentList.addEventListener('click', async (event) => {
   if (event.target.classList.contains('submit-recomment')) {
@@ -280,3 +333,4 @@ if (postId) {
 /** 전역변수 선언 **/
 window.clickLikeComment = clickLikeComment;
 window.clickDislikeComment = clickDislikeComment;
+window.fetchRecomments = fetchRecomments;

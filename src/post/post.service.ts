@@ -43,9 +43,9 @@ export class PostService {
 
     private readonly awsService: AwsService,
     private readonly pointService: PointService
-  ) {}
+  ) { }
 
-  /* 게시글 생성 API*/
+  /* 게시글 생성 API */
   async create(createPostDto: CreatePostDto, userId: number) {
     const { title, content, category, urlsArray , hashtagsArray} = createPostDto;
     const user = await this.userRepository.findOne({
@@ -119,11 +119,11 @@ export class PostService {
       content: post.content,
       hashtags: post.hashtags,  // 해시태그 추가
       createdAt: post.createdAt,
-      updatedAt: post.updatedAt, // 테스트를 위해 남겨둠 마무리에는 포스트아이디만 리턴할 예정
+      updatedAt: post.updatedAt, 
     };
   }
 
-  /*게시글 목록 조회 API*/
+  /* 게시글 목록 조회 API */
   async findAll(
     page: number,
     limit: number,
@@ -133,8 +133,10 @@ export class PostService {
   ) {
     // 카테고리에 따른 정렬
     const sortCategory = category ? { category } : {};
+    // 검색어 조건 추가
     const keywordFilter = keyword ? { title: Like(`%${keyword}%`) } : {};
 
+    // paginate 적용. items는 내용, meta는 페이지 정보
     const { items, meta } = await paginate<Post>(
       this.postRepository,
       {
@@ -145,6 +147,20 @@ export class PostService {
         where: { ...sortCategory, ...keywordFilter },
         relations: ['user', 'comments'],
         order: { createdAt: sort ? sort : 'DESC' }, // 정렬조건
+        select: {
+          id: true,
+          userId: true,
+          title: true,
+          category: true,
+          createdAt: true,
+          updatedAt: true,
+          user: {
+            nickname: true,
+          },
+          comments: {
+            id: true, 
+          },
+        },
       }
     );
 
@@ -154,7 +170,7 @@ export class PostService {
         userId: post.userId,
         nickname: post.user.nickname,
         title: post.title,
-        numComments: post.comments.length, // 댓글 수 배열로 표현됨
+        numComments: post.comments.length, 
         category: post.category,
         createdAt: post.createdAt,
         updatedAt: post.updatedAt,
@@ -163,7 +179,7 @@ export class PostService {
     };
   }
 
-  /* 게시글 상세 조회 API*/
+  /* 게시글 상세 조회 API */
   async findOne(id: number) {
     const post = await this.postRepository.findOne({
       where: { id },
@@ -176,6 +192,7 @@ export class PostService {
       ],
     });
 
+    // 게시글이 존재하는지 확인
     if (!post) {
       throw new NotFoundException('게시글을 찾을 수 없습니다.');
     }
@@ -191,7 +208,6 @@ export class PostService {
       images: post.postImages.map((image) => image.imgUrl), // 게시글 이미지 : { 이미지 URL}
       category: post.category,
       content: post.content,
-      // comments: post.comments, // 댓글
       numLikes: post.numLikes, // 좋아요 수
       numDislikes: post.numDislikes, // 싫어요 수
       createdAt: post.createdAt,
@@ -200,7 +216,7 @@ export class PostService {
     };
   }
 
-  /*화제글 목록 조회 API*/
+  /* 화제글 목록 조회 API */
   async findHotPost(category: Category) {
     const now = new Date(); // 현재시간
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 현재시간으로부터 일주일전
@@ -247,7 +263,7 @@ export class PostService {
     }));
   }
 
-  /*게시글 수정 API*/
+  /* 게시글 수정 API */
   async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
     const { title, content, urlsArray, category, hashtagsArray} = updatePostDto;
 
@@ -294,7 +310,6 @@ export class PostService {
         hashtags: hashtagsArray.length > 0 ? hashtags : post.hashtags
        }
     );
-    return await this.postRepository.findOneBy({ id });
   }
 
   /*게시글 삭제 API*/
@@ -336,20 +351,19 @@ export class PostService {
 
   /*게시글 강제 삭제 API*/
   async forceRemove(id: number, userId: number) {
-    //
     const post = await this.postRepository.findOne({
       where: { id },
       withDeleted: true,
     });
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-    });
-
+    
     // 게시글이 존재하는지 확인
     if (!post) {
       throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
     }
 
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
     // user의 역할이 admin인지 확인
     if (user.role !== Role.ADMIN) {
       throw new ForbiddenException(
@@ -367,11 +381,12 @@ export class PostService {
       );
     }
 
-    return this.postRepository.remove(post);
+    await this.postRepository.remove(post);
   }
 
   /** 이미지 업로드 API **/
   async uploadPostImages(files: Express.Multer.File[]) {
+    // const uuid = uuidv4();
     const uuid = uuidv4();
     // 업로드된 이미지 URL을 저장할 배열을 초기화한다
     const uploadedImageUrls: string[] = [];

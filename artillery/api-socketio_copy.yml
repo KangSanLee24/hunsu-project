@@ -1,0 +1,50 @@
+config:
+  target: "http://localhost:3000"
+  socketio:
+      transports: ["websocket"]
+  phases:
+      - duration: 60
+        arrivalCount: 90
+        name: socket.io_test
+  payload:
+    path: "user.csv"
+    fields:
+      - "user"
+    # skipHeader: true  # CSV 파일의 첫 줄이 헤더인 경우 true로 설정
+    # loadAll: true # 한 번에 다 불러오기
+    # name: user # user라는 이름에 묶여 배열화됨.
+
+scenarios:
+  # - name: "Login and Get User Info and Chatting" # 시나리오 제목2
+  #   flow:
+  #     - post:
+  #         url: "/api/auth/log-in"
+  #         body: | # user 테이블에 있는 아이디 아무거나
+  #           { 
+  #             "email": "test01@test.com",
+  #             "password": "test01"
+  #           }
+  #         headers:
+  #           Content-Type: "application/json"
+  #         capture:
+  #         - json: "$.data.accessToken"  # 응답 본문에서 토큰 캡처
+  #           as: "accessToken"
+  - name: "Chat" # 시나리오 제목2
+    engine: "socketio" # socketio
+    flow:
+      - loop:
+          - emit:
+              channel: "chat" # evnets.gateway.ts @SubscribeMessage('chat')
+              data:
+                  roomId: "29" # 접속할 룸 id
+                  author: "{{ user }}" # 닉네임
+                  body: "안녕하세요 {{ user }}입니다." # 채팅 내용
+          - think: 1 # 대기시간 2초 / arrivalCount가 2초 간격으로 채팅을 침.
+          - emit:
+              channel: "chat" # evnets.gateway.ts @SubscribeMessage('chat')
+              data:
+                  roomId: "29" # 접속할 룸 id
+                  author: "{{ user }}" # 닉네임
+                  body: "안녕하세요 {{ user }}입니다." # 채팅 내용
+          - think: 1 # 대기시간 2초 / arrivalCount가 2초 간격으로 채팅을 침.
+        count: 50 # 루프 반복 횟수

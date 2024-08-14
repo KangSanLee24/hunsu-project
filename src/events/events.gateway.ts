@@ -6,8 +6,9 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   ConnectedSocket,
+  BaseWsExceptionFilter,
 } from '@nestjs/websockets';
-import { Logger } from '@nestjs/common';
+import { Logger, UseFilters } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from '../chat/chat.service';
 import { format } from 'date-fns';
@@ -21,7 +22,7 @@ interface CustomFile {
   mimetype: string;
   size: number;
 }
-
+// @UseFilters(new BaseWsExceptionFilter())
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -47,20 +48,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log(`Socket ${socket.id} joined room: ${payload.roomId}`);
 
     socket.data.roomId = payload.roomId; // socket.data에 roomId 설정
-    socket.data.author = payload.author;  
-    socket.data.authorId = payload.authorId; 
+    socket.data.author = payload.author;
+    socket.data.authorId = payload.authorId;
 
     await this.chatService.joinChatRoom(+payload.roomId, +payload.authorId);
     const resultImage = await this.chatService.findChatImage(+payload.roomId);
 
-    if(resultImage) {
+    if (resultImage) {
       const { findChatImage, findUser } = resultImage;
       //고정된 이미지 전송
-      this.server.to(payload.roomId).emit('lastImage', {author: findUser.nickname, fileUrl: findChatImage.imgUrl });
+      this.server.to(payload.roomId).emit('lastImage', { author: findUser.nickname, fileUrl: findChatImage.imgUrl });
     }
 
     //유저가 들어왔음을 알림
-    this.server.to(payload.roomId).emit('userJoined', {message: `${payload.author} 님이 입장하셨습니다`});
+    this.server.to(payload.roomId).emit('userJoined', { message: `${payload.author} 님이 입장하셨습니다` });
   }
 
   //채팅 전송
@@ -96,12 +97,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const isChatRoom = await this.chatService.isChatRoom(+payload.roomId);
 
-    if(isChatRoom) {
+    if (isChatRoom) {
       const imageTime = await this.chatService.imageTime(+payload.roomId, payload.author, payload.fileUrl);
 
-      this.server.to(payload.roomId).emit('chatImage', {author: payload.author, fileUrl: payload.fileUrl, imageTime });
+      this.server.to(payload.roomId).emit('chatImage', { author: payload.author, fileUrl: payload.fileUrl, imageTime });
       return payload;
-    }else {
+    } else {
       this.server.to(payload.roomId).emit('outRoom', {});
     }
   }
@@ -110,23 +111,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log(`Socket connected: ${socket.id}`);
   }
 
+  @UseFilters(new BaseWsExceptionFilter())
   //나가기
   async handleDisconnect(socket: Socket) {
-    this.logger.log(`Socket disconnected: ${socket.id}`);
+    try {
+      this.logger.log(`Socket disconnected: ${socket.id}`);
 
-    const { roomId, author, authorId } = socket.data;
-    console.log(socket.data);
+      const { roomId, author, authorId } = socket.data;
+      console.log(socket.data);
 
-    socket.leave(roomId);
+      socket.leave(roomId);
 
-    const checkChatOwner = await this.chatService.checkChatOwner(+roomId, +authorId);
+      const checkChatOwner = await this.chatService.checkChatOwner(+roomId, +authorId);
 
-    if(checkChatOwner == true) {
-      await this.chatService.outChatRoom(+roomId, +authorId);
-      this.server.to(roomId).emit('ownerLeft', {});
-    } else {
-      await this.chatService.outChatRoom(+roomId, +authorId);
-      this.server.to(roomId).emit('userLeft', { message: `${author} 님이 퇴장하셨습니다` });
+      if (checkChatOwner == true) {
+        await this.chatService.outChatRoom(+roomId, +authorId);
+        this.server.to(roomId).emit('ownerLeft', {});
+      } else {
+        await this.chatService.outChatRoom(+roomId, +authorId);
+        this.server.to(roomId).emit('userLeft', { message: `${author} 님이 퇴장하셨습니다` });
+      }
+    } catch (error) {
+      return;
     }
   }
 }
