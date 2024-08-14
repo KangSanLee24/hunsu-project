@@ -24,6 +24,7 @@ export class RedisService implements OnModuleInit {
     });
   }
 
+  //클라이언트 함수
   getClient(): Redis {
     return this.redisClient;
   }
