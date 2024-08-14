@@ -6,7 +6,7 @@ config:
     - duration: 60
     # 부하테스트 동안의 사용자 수 (초당 요청 수)
       arrivalRate: 150
-      # rampTo: 300
+      rampTo: 300
       name: api-request-test
   payload:
     path: "categorys.csv"

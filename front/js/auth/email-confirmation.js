@@ -1,6 +1,7 @@
 import { API_BASE_URL } from '../../config/config.js';
 
-if (!document.referrer.includes('sign-up.html') && !document.referrer.includes('change-password.html')) {
+if (!document.referrer.includes('sign-up.html') && !document.referrer.includes('change-password.html') && !document.referrer.includes('email-confirmation.html')) {
+  // alert(document.referrer);
   alert('잘못된 접근입니다.');
   window.location.href = "./main.html"
 }
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 폼 데이터 가져오기
     const email = document.getElementById('email').value;
     const token = document.getElementById('token').value;
+    alert('token 값은 : ' + token);
 
     // 회원가입 이메일 인증
     if (document.referrer.includes('sign-up.html')) {
@@ -55,17 +57,17 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           body: JSON.stringify({ email, certification: parseInt(token, 10) }),
         });
+        const result = await response.json();
 
-        if (response.ok && result.status === 200) {
+        if (response.ok) {
           // 성공적인 응답 시 로그인 페이지로 이동
-          location.setItem('email', email);
           alert('이메일 인증이 성공적으로 완료되었습니다.\n비밀번호를 변경해 주십시오.');
-          window.location.href = './log-in.html';
+          event.preventDefault();
+          window.location.href = './update-password.html';
         } else {
           // 오류 처리
           alert(result.message || '이메일 인증에 실패했습니다.');
         }
-        const result = await response.json();
       } catch (error) {
         console.error('이메일 인증 요청 중 오류 발생:', error);
         alert('이메일 인증 요청 중 오류가 발생했습니다.');
