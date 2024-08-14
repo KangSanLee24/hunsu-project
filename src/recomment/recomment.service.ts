@@ -80,6 +80,32 @@ export class RecommentService {
     return newRecomment;
   }
 
+  /** 대댓글 목록 조회 **/
+  async findRecommentsById(commentId:number) {
+    const recomments = await this.commentRepository.find({
+      where: { parentId: commentId},
+      relations: ['user', 'commentLikes', 'commentDislikes'],
+      select:{
+        user:{
+          nickname:true
+        }
+      }
+    }) 
+
+    return recomments.map(recomment => ({
+      id: recomment.id,
+      parentId: recomment.parentId,
+      content: recomment.content,
+      userId: recomment.userId,
+      nickname: recomment.user.nickname,
+      postId: recomment.postId,
+      createdAt: recomment.createdAt,
+      updateAt: recomment.updateAt,
+      likes: recomment.commentLikes.length,
+      dislikes: recomment.commentDislikes.length,
+    }));
+  }
+
   //대댓글 수정
   async updateRecomment(
     commentId: number,
