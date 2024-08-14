@@ -1,7 +1,30 @@
 import { API_BASE_URL } from '../../config/config.js';
 
-// 전역변수 선언
+// 페이지 로드 시 실행될 초기화 함수
+function initializeForm() {
+  const categoryElement = document.getElementById('post-category');
+  const hashtagsElement = document.getElementById('post-hashtags');
 
+  // 카테고리 변경 시 해시태그 입력란의 표시/숨김 상태를 제어하는 함수
+  function updateHashtagsVisibility() {
+    if (categoryElement.value === 'CHAT') {
+      hashtagsElement.style.display = 'none';
+    } else {
+      hashtagsElement.style.display = 'block';
+    }
+  }
+
+  // 초기 상태 설정
+  updateHashtagsVisibility();
+
+  // 카테고리 변경 이벤트 리스너 추가
+  categoryElement.addEventListener('change', updateHashtagsVisibility);
+}
+
+// 페이지 로드 시 초기화 함수 호출
+document.addEventListener('DOMContentLoaded', initializeForm);
+
+// 전역변수 선언
 const accessToken = localStorage.getItem('accessToken');
 
 let postId = new URLSearchParams(window.location.search).get('id'); // URL에서 postId 가져오기
@@ -12,8 +35,6 @@ async function createPost() {
   const category = document.getElementById('post-category').value;
   const hashtags = document.getElementById('post-hashtags').value;
   const content = editor.getMarkdown();
-
-  // const accessToken = localStorage.getItem('accessToken');
 
   const postResponse = await fetch(`${API_BASE_URL}/posts`, {
     method: 'POST',
