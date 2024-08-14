@@ -1,0 +1,31 @@
+config:
+    target: "http://localhost:3000"
+    socketio:
+        transports: ["websocket"]
+    phases:
+        - duration: 30
+          arrivalCount: 90
+    payload:
+    path: "user.csv"
+    fields:
+      - "roomId"
+      - "author"
+      - "body"
+    skipHeader: true  # CSV 파일의 첫 줄이 헤더인 경우 true로 설정
+    loadAll: true
+    name: user
+
+scenarios:
+    - name: "Join Group"
+      engine: "socketio"
+      flow:
+        - loop:
+            - emit:
+                channel: "chat"
+                data:
+                    roomId: "22" # 접속할 룸 id
+                    author: "박근균" # 닉네임
+                    body: "안녕하세요 1트" # 채팅 내용
+            - think: 2 # 대기시간 2초 / arrivalCount가 2초 간격으로 채팅을 침.
+          count: 10 # 루프 반복 횟수
+          

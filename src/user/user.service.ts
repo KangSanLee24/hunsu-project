@@ -232,7 +232,7 @@ export class UserService {
     }
 
     // 유저 정보를 업데이트
-    user.nickname = `del${uuid.v1().substring(0, 8)}`;
+    user.nickname = `del-${uuid.v1().substring(0, 8)}`;
     user.deletedAt = new Date();
 
     return this.userRepository.save(user);

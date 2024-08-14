@@ -3,7 +3,10 @@ import { API_BASE_URL } from '../../config/config.js';
 async function getAuthor() {
   try {
     const accessToken = localStorage.getItem('accessToken');
-
+    // if (!accessToken) {
+    //   alert("조까");
+    //   window.location.href = document.referrer;
+    // }
     const response = await fetch(`${API_BASE_URL}/users/me`, {
       method: 'GET',
       headers: {
@@ -19,7 +22,8 @@ async function getAuthor() {
     return { author, authorId };
   } catch {
     console.error('Error:', error);
-    throw error;
+    // throw error;
+    return;
   }
 }
 
@@ -36,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const roomNameElement = document.getElementById('roomName');
   const fileInput = document.getElementById('fileInput');
   const imagePreview = document.getElementById('imagePreview');
-  
+
   let file = null; // 파일 변수 초기화
 
   let currentUser;
@@ -254,12 +258,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const closeImage = document.getElementById('closeImage');
 
         closeImage.addEventListener('click', () => {
-            // 파일 입력 필드 초기화
-            fileInput.value = '';
-            imagePreview.style.display = 'none'; 
-            imagePreview.style.backgroundImage = ''; // 이미지 배경 초기화
-            file = null; // 파일 변수 초기화
-          });
+          // 파일 입력 필드 초기화
+          fileInput.value = '';
+          imagePreview.style.display = 'none';
+          imagePreview.style.backgroundImage = ''; // 이미지 배경 초기화
+          file = null; // 파일 변수 초기화
+        });
       };
       reader.readAsDataURL(file);
     }
