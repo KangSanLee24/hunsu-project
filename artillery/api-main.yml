@@ -26,6 +26,7 @@ scenarios:
     flow:
       - get:
           url: "/api/posts/hot?category={{category}}"
+      - log: "{{ category }}"  # 전체 응답을 로그로 출력
   - name: "GET-weekly-rank"
     flow:
       - get:
