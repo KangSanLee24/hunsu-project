@@ -23,13 +23,13 @@ export class PointService {
 
   // 출석 체크 메소드
   async checkAttendance(userId: number): Promise<void> {
-    // 1. 유효한 사용자인지 체크
+    // 1. 유효한 사용자인지 확인
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('유효한 사용자를 찾을 수 없습니다.');
     }
 
-    // 2. 오늘 출석을 했는지 체크
+    // 2. 오늘 출석을 했는지 확인
     const todayPoint = await this.findTodayPointById(
       userId,
       PointType.ATTENTION

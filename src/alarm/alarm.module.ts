@@ -9,14 +9,10 @@ import { Comment } from 'src/comment/entities/comment.entity';
 import { AlarmController } from './alarm.controller';
 import { AlarmService } from './alarm.service';
 import { UserModule } from 'src/user/user.module';
-import { PostModule } from 'src/post/post.module';
-import { CommentModule } from 'src/comment/comment.module';
-import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Alarm, User, Post, Comment]),
-    ConfigModule,
     UserModule,
   ],
   controllers: [AlarmController],

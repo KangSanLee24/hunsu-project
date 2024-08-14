@@ -20,7 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Order } from 'src/post/types/post-order.type';
 import { AuthGuard } from '@nestjs/passport';
 
-@ApiTags('9. CHAT API')
+@ApiTags('08. CHAT API')
 @Controller('chatrooms')
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}

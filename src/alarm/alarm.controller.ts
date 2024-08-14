@@ -26,7 +26,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { FindAllAlarmsDto } from './dto/find-all-alarms.dto';
 
-@ApiTags('7. ALARM API')
+@ApiTags('06. ALARM API')
 @Controller('alarms')
 export class AlarmController {
   constructor(private readonly alarmService: AlarmService) {}
