@@ -23,7 +23,7 @@ import { User } from 'src/user/entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
 
-@ApiTags('5. RECOMMENT API')
+@ApiTags('05. RECOMMENT API')
 @Controller('comments')
 export class RecommentController {
   constructor(private readonly recommentService: RecommentService) {}
@@ -70,6 +70,7 @@ export class RecommentController {
     @LogIn() user: User,
     @Body() createRecommentDto: CreateRecommentDto
   ) {
+    // 1. 대댓글 존재하는지 확인 + 사용자가 작성자인지 확인
     const recomment = await this.recommentService.findRecomment(recommentId);
 
     if (recomment.userId != user.id) {
@@ -93,6 +94,7 @@ export class RecommentController {
     @Param('recommentId') recommentId: number,
     @LogIn() user: User
   ) {
+    // 1. 대댓글 존재하는지 확인 + 사용자가 작성자인지 확인
     const recomment = await this.recommentService.findRecomment(recommentId);
 
     if (recomment.userId != user.id) {

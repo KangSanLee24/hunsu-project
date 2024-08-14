@@ -24,12 +24,12 @@ export class RecommentService {
     private readonly pointService: PointService
   ) {}
 
-  //대댓글 찾기
+  /** 대댓글 찾기 **/
   async findRecomment(recommentId: number) {
+    // 1. 대댓글이 존재하는지 확인
     const findRecomment = await this.commentRepository.findOne({
       where: { id: recommentId },
     });
-
     if (!findRecomment) {
       throw new NotFoundException('해당 대댓글이 없습니다.');
     }
@@ -37,13 +37,13 @@ export class RecommentService {
     return findRecomment;
   }
 
-  //대댓글 생성
+  /** 대댓글 생성 **/
   async createRecomment(
     commentId: number,
     user: User,
     createRecommentDto: CreateRecommentDto
   ) {
-    // 댓글에 대댓글에 대댓글이 가능해서 수정.
+    // 1. 해당 댓글이 존재하는지 확인 ( parentId = NULL 이여야 댓글 )
     const findComment = await this.commentRepository.findOne({
       where: { id: commentId, parentId: IsNull() },
     });
@@ -52,6 +52,7 @@ export class RecommentService {
       throw new BadRequestException('댓글이 존재하지 않습니다.');
     }
 
+    // 2. 대댓글 저장
     const newRecomment = await this.commentRepository.save({
       parentId: commentId, // 부모댓글 id
       postId: findComment.postId, // 부모댓글이 달려있는 게시글 id
@@ -59,7 +60,7 @@ export class RecommentService {
       content: createRecommentDto.content, // 대댓글 내용
     });
 
-    // 댓글 생성 포인트 지급
+    // 3. 댓글 작성 포인트 지급
     const isValidPoint = await this.pointService.validatePointLog(
       user.id,
       PointType.COMMENT
@@ -67,8 +68,8 @@ export class RecommentService {
     if (isValidPoint)
       this.pointService.savePointLog(user.id, PointType.COMMENT, true);
 
-    // 알람을 줄 것인가 여부
-    // 부모댓글을 쓴 사람이 나인가?
+    // 4. 알람을 줄 것인가 여부
+    // 부모댓글을 쓴 사람이 사용자인지 확인
     if (user.id !== findComment.userId) {
       await this.alarmService.createAlarm(
         findComment.userId, // 부모댓글을 쓴 사용자 id
@@ -82,6 +83,7 @@ export class RecommentService {
 
   /** 대댓글 목록 조회 **/
   async findRecommentsById(commentId:number) {
+    // 1. commentId로 대댓글을 확인
     const recomments = await this.commentRepository.find({
       where: { parentId: commentId},
       relations: ['user', 'commentLikes', 'commentDislikes'],
@@ -92,6 +94,7 @@ export class RecommentService {
       }
     }) 
 
+    // 2. 응답 형태 수정
     return recomments.map(recomment => ({
       id: recomment.id,
       parentId: recomment.parentId,
@@ -106,7 +109,7 @@ export class RecommentService {
     }));
   }
 
-  //대댓글 수정
+  /** 대댓글 수정 **/
   async updateRecomment(
     commentId: number,
     recommentId: number,
@@ -120,7 +123,7 @@ export class RecommentService {
     return updateRecomment;
   }
 
-  //대댓글 삭제
+  /**대댓글 삭제**/
   async removeRecomment(userId, commentId: number, recommentId: number) {
     const removeRecomment = await this.commentRepository.delete({
       id: recommentId,

@@ -24,7 +24,7 @@ import { LogIn } from 'src/decorators/log-in.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
 
-@ApiTags('4. COMMENT API')
+@ApiTags('04. COMMENT API')
 @Controller('/posts/:postId/comments')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
@@ -132,7 +132,6 @@ export class CommentController {
   }
 
   /** 댓글 좋아요 조회 API **/
-  @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '댓글 좋아요 조회 API' })
   @Get(':commentId/likes')
   async getCommentLikes(@Param('commentId', ParseIntPipe) commentId: number) {
@@ -145,7 +144,6 @@ export class CommentController {
   }
 
   /** 로그인한 사람의 댓글 좋아요 여부 조회 API **/
-  @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '나의 댓글 좋아요 여부 조회 API' })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
@@ -164,7 +162,6 @@ export class CommentController {
   }
 
   /** 댓글 좋아요 클릭 API **/
-  @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '댓글 좋아요 클릭 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -183,7 +180,6 @@ export class CommentController {
   }
 
   /** 댓글 싫어요 조회 API **/
-  @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '댓글 싫어요 조회 API' })
   @Get(':commentId/dislikes')
   async getCommentDislikes(
@@ -198,7 +194,6 @@ export class CommentController {
   }
 
   /** 로그인한 사람의 댓글 싫어요 여부 조회 API **/
-  @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '나의 댓글 싫어요 여부 조회 API' })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
@@ -220,7 +215,6 @@ export class CommentController {
   }
 
   /** 댓글 싫어요 클릭 API **/
-  @ApiTags('4. COMMENT API')
   @ApiOperation({ summary: '댓글 싫어요 클릭 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))

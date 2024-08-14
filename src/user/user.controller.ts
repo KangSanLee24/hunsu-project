@@ -22,7 +22,7 @@ import { SoftdeleteUserDto } from './dtos/softdelete-user.dto';
 import { COMMENT_MESSAGE } from 'src/constants/comment-message.constant';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
 
-@ApiTags('2. USER API')
+@ApiTags('02. USER API')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) { }
