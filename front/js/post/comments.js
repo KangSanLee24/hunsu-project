@@ -52,13 +52,17 @@ async function addCommentToList(comment) {
       <div class="comment-like-btn-count">
         <button class="comment-like-btn" data-comment-id="${comment.id}" onclick="clickLikeComment(${comment.id})">👍</button>
         <span class="comment-like-count"> ${comment.likes || 0} </span>
-       </div>
+      </div>
       <div class="comment-dislike-btn-count">
         <button class="comment-dislike-btn" data-comment-id="${comment.id}" onclick="clickDislikeComment(${comment.id})">👎</button>
         <span class="comment-dislike-count"> ${comment.dislikes || 0} </span>
-      </div>             
+      </div>
+      <div>
+        <button class="edit-comment-btn" onclick="editComment(${comment.id}, '${comment.content}')">수정</button>
+        <button class="delete-comment-btn" onclick="deleteComment(${comment.id})">삭제</button>
+      </div>       
     </div>
-    <p>${comment.content}</p>
+    <p class="comment-content">${comment.content}</p>
     <button class="recomment-btn" data-comment-id="${comment.id}">대댓글 작성</button>
     <div class="recomment-input" style="display: none;">
       <textarea placeholder="대댓글을 입력하세요..." rows="2"></textarea>
@@ -75,12 +79,24 @@ async function addCommentToList(comment) {
     comment.recomments.forEach((recomment) => {
       const recommentItem = document.createElement('li');
       recommentItem.innerHTML = `
-                      <p>${recomment.nickname}
-                      | 작성일: ${elapsedTime(recomment.createdAt)}
-                      | 좋아요: ${recomment.likes}
-                      | 싫어요: ${recomment.dislikes}</p>
-                      <p>${recomment.content}</p>
-                  `;
+        <div class="recomment-header">
+          <span>${recomment.nickname} | 작성일: ${elapsedTime(recomment.createdAt)} | </span>
+          <div class="recomment-like-btn-count">
+            <button class="recomment-like-btn" data-recomment-id="${recomment.id}" onclick="clickLikeRecomment(${comment.id}, ${recomment.id})">👍</button>
+            <span class="recomment-like-count"> ${recomment.likes || 0} </span>
+          </div>
+          <div class="recomment-dislike-btn-count">
+            <button class="recomment-dislike-btn" data-recomment-id="${recomment.id}" onclick="clickDislikeRecomment(${comment.id}, ${recomment.id})">👎</button>
+            <span class="recomment-dislike-count"> ${recomment.dislikes || 0} </span>
+          </div>
+          <div>
+            <button class="edit-recomment-btn" onclick="editRecomment(${recomment.id}, '${recomment.content}')">수정</button>
+            <button class="delete-recomment-btn" onclick="deleteRecomment(${recomment.id})">삭제</button>
+          </div>
+        </div>
+        <p class="recomment-content">${recomment.content}</p>
+        
+      `;
       recommentsList.appendChild(recommentItem);
     });
     commentItem.appendChild(recommentsList);

@@ -28,6 +28,15 @@ async function getAuthor() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+
+  // 로그인 여부 확인
+  const accessToken = localStorage.getItem('accessToken');
+  if (!accessToken) {
+    alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+    window.location.href = '/html/log-in.html';
+    return; 
+  }
+  
   const socket = io('');
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -49,10 +58,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const authorData = await getAuthor();
     currentUser = authorData.author;
     currentUserId = authorData.authorId;
-    // currentUser = (await getAuthor()).author;
-    // currentUserId = (await getAuthor()).authorId;
   } catch (error) {
     console.error('Failed to get author:', error);
+    alert('로그인 정보가 올바르지 않습니다. 로그인 페이지로 이동합니다.');
+    window.location.href = '/html/log-in.html'; // 로그인 페이지 경로로 리다이렉트
+    return; // 이후 코드를 실행하지 않도록 중단
   }
 
   // 채팅 목록을 자동으로 스크롤 하단으로 이동

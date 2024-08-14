@@ -123,6 +123,20 @@ export class PostService {
         where: { ...sortCategory, ...keywordFilter },
         relations: ['user', 'comments'],
         order: { createdAt: sort ? sort : 'DESC' }, // 정렬조건
+        select: {
+          id: true,
+          userId: true,
+          title: true,
+          category: true,
+          createdAt: true,
+          updatedAt: true,
+          user: {
+            nickname: true,
+          },
+          comments: {
+            id: true, 
+          },
+        },
       }
     );
 
