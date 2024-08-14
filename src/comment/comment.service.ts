@@ -194,6 +194,7 @@ export class CommentService {
         postId: comment.postId,
         createdAt: comment.createdAt,
         updateAt: comment.updateAt,
+        nickname: comment.user.nickname,
         likes: comment.commentLikes.length,
         dislikes: comment.commentDislikes.length,
         recommentsCount
