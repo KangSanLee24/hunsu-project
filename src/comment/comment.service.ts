@@ -39,50 +39,51 @@ export class CommentService {
     private readonly pointService: PointService
   ) {}
 
-  // 댓글 생성
+  /** 댓글 생성 **/ 
   async createComment(
     userId: number,
     postId: number,
     createCommentDto: CreateCommentDto
   ) {
-    const post = await this.postRepository.findOneBy({
-      id: postId,
-    });
-    const user = await this.userRepository.findOne({
+     // 1. 사용자 정보 확인
+     const user = await this.userRepository.findOne({
       where: { id: userId },
       withDeleted: true,
     });
-
-    // 권한 확인
     if (!user) {
       throw new UnauthorizedException(COMMENT_MESSAGE.COMMENT.UNAUTHORIZED);
     }
 
-    // 게시글 확인
+    // 2. 게시글 존재 확인
+    const post = await this.postRepository.findOneBy({
+      id: postId,
+    });
     if (!post) {
       throw new NotFoundException(COMMENT_MESSAGE.COMMENT.NO_POST);
-    }
+    } 
+    // 닉네임 저장 
+    const nickname = user.nickname;
 
+    // 3. 댓글 저장
     const data = await this.commentRepository.save({
       userId,
       postId,
       ...createCommentDto,
     });
-    const nickname = user.nickname;
-
-    // 댓글 생성 포인트 지급
+    
+    // 4. 댓글 생성 포인트 확인
     const isValidPoint = await this.pointService.validatePointLog(
       userId,
       PointType.COMMENT
     );
+    // 4-1. 포인트 획득 가능하고 게시글 작성자가 아닐 때, 댓글 생성 포인트 지급
     if (isValidPoint && post.userId !== userId) {
       console.log('postId 전달:', postId); // 디버깅용 로그
       this.pointService.savePointLog(userId, PointType.COMMENT, true);
     }
 
-    // 알람을 줄 것인지 여부
+    // 5. 알람(SSE) 전송
     // 댓글을 다는 사람(로그인한 사람)이 게시글을 쓴 사람이 아닌 경우에만 알람
-
     if (userId !== post.userId) {
       await this.alarmService.createAlarm(
         post.userId, // 게시글 글쓴이(알람을 받을 사용자)에게
@@ -104,9 +105,9 @@ export class CommentService {
     };
   }
 
-
-  // 댓글 목록 조회 API ( 댓글만 )
+  /** 댓글 목록 조회 API ( 댓글만 ) **/ 
   async findCommentsById(postId:number) {
+    // 1. 댓글 목록 조회
     const comments = await this.commentRepository.find({
       where: { postId, parentId: IsNull() },
       relations: ['user', 'commentLikes', 'commentDislikes'],
@@ -117,7 +118,7 @@ export class CommentService {
       }
     })
 
-  // 각 댓글에 대한 대댓글 개수 추가
+  // 2. 각 댓글에 대한 대댓글 갯수 추가
   const commentsWithRecommentsCount = await Promise.all(
     comments.map(async (comment) => {
       const recommentsCount = await this.commentRepository.count({
@@ -143,10 +144,6 @@ export class CommentService {
   return commentsWithRecommentsCount;
   }
 
-  async findOneBy(id: number) {
-    return await this.commentRepository.findOneBy({ id });
-  }
-
   /** 댓글 수정**/
   async update(
     userId: number,
@@ -154,26 +151,23 @@ export class CommentService {
     commentId: number,
     updateCommentDto: UpdateCommentDto
   ) {
+    // 1. 게시글이 존재하는지 확인
     const post = await this.postRepository.findOneBy({ id: postId });
-    const comment = await this.commentRepository.findOneBy({ id: commentId });
-
-    // 게시글이 존재하는지 확인
     if (!post) {
       throw new NotFoundException(COMMENT_MESSAGE.COMMENT.NO_POST);
     }
 
-    // 댓글이 존재하는지 확인
+    // 2. 댓글이 존재하는지 확인 + 작성자 본인인지 확인
+    const comment = await this.commentRepository.findOneBy({ id: commentId });
     if (!comment) {
       throw new NotFoundException(COMMENT_MESSAGE.COMMENT.NOT_FOUND);
-    }
-
-    // 작성자 본인인지 확인
-    else if (comment.userId !== userId) {
+    } else if (comment.userId !== userId) {
       throw new ForbiddenException(
         COMMENT_MESSAGE.COMMENT.UPDATE.FAILURE.FORBIDDEN
       );
     }
 
+    // 3. 수정 내용 저장
     const updatedComment = await this.commentRepository.save({
       id: commentId,
       ...updateCommentDto,
@@ -183,25 +177,22 @@ export class CommentService {
 
   /** 댓글 삭제 **/
   async remove(userId: number, commentId: number) {
+    // 1. 댓글이 존재하는지 확인, 작성자 본인인지 확인
     const comment = await this.commentRepository.findOneBy({
       id: commentId,
     });
-
-    // 댓글이 존재하는지 확인
     if (!comment) {
       throw new NotFoundException(COMMENT_MESSAGE.COMMENT.NOT_FOUND);
-    }
-
-    // 작성자 본인인지 확인
-    else if (comment.userId !== userId) {
+    } else if (comment.userId !== userId) {
       throw new ForbiddenException(
         COMMENT_MESSAGE.COMMENT.DELETE.FAILURE.FORBIDDEN
       );
     }
 
-    // 댓글 삭제로 포인트 차감
+    // 2. 댓글 삭제로 포인트 차감
     this.pointService.savePointLog(userId, PointType.COMMENT, false);
 
+    // 3. 댓글 삭제 : 사실 내용만 바꿈.
     await this.commentRepository.save({
       id: commentId,
       content: '삭제된 댓글입니다.',
@@ -210,23 +201,23 @@ export class CommentService {
 
   /** 댓글 강제 삭제 **/
   async forceRemove(userId: number, commentId: number) {
+    // 1. 댓글이 존재하는지 확인
     const comment = await this.commentRepository.findOneBy({ id: commentId });
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-    });
-
-    // 댓글이 존재하는지 확인
     if (!comment) {
       throw new NotFoundException(COMMENT_MESSAGE.COMMENT.NOT_FOUND);
     }
 
-    // user의 역할이 admin인지 확인
+    // 2. user의 역할이 admin인지 확인
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
     if (user.role !== Role.ADMIN) {
       throw new ForbiddenException(
         COMMENT_MESSAGE.COMMENT.FORCE_DELETE.FAILURE.FORBIDDEN
       );
     }
 
+    // 3. 댓글 삭제 : 사실 내용만 바꿈.
     await this.commentRepository.save({
       id: commentId,
       content: '삭제된 댓글입니다.',
@@ -235,11 +226,10 @@ export class CommentService {
 
   /** 댓글 좋아요 조회 API **/
   async getCommentLikes(commentId: number) {
-    // 1. 댓글이 존재하니?
+    // 1. 댓글이 존재하는지 확인
     const existingComment = await this.commentRepository.findOneBy({
       id: commentId,
     });
-    // 1-1. 존재하지 않으면 에러처리
     if (!existingComment) {
       throw new NotFoundException(COMMENT_MESSAGE.COMMENT.NOT_FOUND);
     }
@@ -251,21 +241,19 @@ export class CommentService {
 
   /** 로그인한 사람의 댓글 좋아요 조회 API **/
   async getMyCommentLike(userId: number, commentId: number) {
-    // 1. 댓글이 존재하는지?
+    // 1. 댓글이 존재하는지 확인
     const existingComment = await this.commentRepository.findOneBy({
       id: commentId,
     });
-    // 1-1. 존재하지 않으면 에러처리
     if (!existingComment) {
       throw new NotFoundException(COMMENT_MESSAGE.COMMENT.NOT_FOUND);
     }
 
-    // 2. 해당 댓글에 좋아요를 눌렀는지?
+    // 2. 해당 댓글에 좋아요를 눌렀는지 확인
     const like = await this.commentLikeRepository.findOneBy({
       userId,
       commentId,
     });
-
     return like ? true : false;
   }
 
@@ -409,5 +397,10 @@ export class CommentService {
         commentId,
       });
     }
+  }
+
+  /** 댓글 조회 **/
+  async findOneBy(id: number) {
+    return await this.commentRepository.findOneBy({ id });
   }
 }

@@ -15,7 +15,6 @@ import { Comment } from 'src/comment/entities/comment.entity';
 
 import { AlarmFromType } from './types/alarm-from.type';
 import { ALARM_MESSAGES } from 'src/constants/alarm-message.constant';
-import { ConfigService } from '@nestjs/config';
 import { Observable, Subject, filter, map } from 'rxjs';
 import { paginate } from 'nestjs-typeorm-paginate';
 
@@ -28,8 +27,6 @@ export class AlarmService {
   private observer = this.users$.asObservable();
 
   constructor(
-    private readonly configService: ConfigService,
-
     @InjectRepository(Alarm)
     private readonly alarmRepository: Repository<Alarm>,
 
