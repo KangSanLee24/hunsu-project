@@ -104,7 +104,7 @@ export class CommentService {
     };
   }
 
-  // 댓글 목록 조회 API
+  // 댓글 목록 조회 API ( 댓글 + 대댓글)
   async findCommentsByPostId(postId: number) {
     // comments
     const comments = await this.commentRepository.find({
@@ -166,6 +166,42 @@ export class CommentService {
     );
 
     return commentsWithDetails;
+  }
+  // 댓글 목록 조회 API ( 댓글만 )
+  async findCommentsById(postId:number) {
+    const comments = await this.commentRepository.find({
+      where: { postId, parentId: IsNull() },
+      relations: ['user', 'commentLikes', 'commentDislikes'],
+      select:{
+        user:{
+          nickname:true
+        }
+      }
+    })
+
+  // 각 댓글에 대한 대댓글 개수 추가
+  const commentsWithRecommentsCount = await Promise.all(
+    comments.map(async (comment) => {
+      const recommentsCount = await this.commentRepository.count({
+        where: { parentId: comment.id }
+      });
+
+      return {
+        id: comment.id,
+        parentId: comment.parentId,
+        content: comment.content,
+        userId: comment.userId,
+        postId: comment.postId,
+        createdAt: comment.createdAt,
+        updateAt: comment.updateAt,
+        likes: comment.commentLikes.length,
+        dislikes: comment.commentDislikes.length,
+        recommentsCount
+      };
+    })
+  );
+
+  return commentsWithRecommentsCount;
   }
 
   async findOneBy(id: number) {

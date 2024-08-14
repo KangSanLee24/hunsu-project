@@ -59,7 +59,7 @@ export class CommentController {
   @ApiOperation({ summary: '2. 댓글 목록 조회 API' })
   @Get()
   async findAll(@Param('postId', ParseIntPipe) postId: number) {
-    const data = await this.commentService.findCommentsByPostId(postId);
+    const data = await this.commentService.findCommentsById(postId);
 
     return {
       status: HttpStatus.OK,
@@ -158,7 +158,7 @@ export class CommentController {
     const data = await this.commentService.getMyCommentLike(userId, commentId);
     return {
       status: HttpStatus.OK,
-      messgae: '나의 댓글 좋아요 여부 조회에 성공했습니다.',
+      message: '나의 댓글 좋아요 여부 조회에 성공했습니다.',
       data: data,
     };
   }
@@ -214,7 +214,7 @@ export class CommentController {
     );
     return {
       status: HttpStatus.OK,
-      messgae: '나의 댓글 싫어요 여부 조회에 성공했습니다.',
+      message: '나의 댓글 싫어요 여부 조회에 성공했습니다.',
       data: data,
     };
   }
