@@ -215,16 +215,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /** 7. HASHTAG RANK FETCH **/
-  async function fetchHashtagRank(num) {
+  async function fetchHashtagRank() {
     try {
       // 1. 쿼리스트링 구성
-      const queryParams = new URLSearchParams({
-        num: num,
-      });
+      // 레디스로 이동 . 더이상 api에 쿼리스트링 없음
 
       // 2. fetch 받아오기 (HASHTAG RANK)
       const response = await fetch(
-        `${API_BASE_URL}/hashtags/ranks-weekly?${queryParams.toString()}`,
+        `${API_BASE_URL}/hashtags/ranks-weekly`,
         {
           method: 'GET',
           headers: {
@@ -238,18 +236,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await response.json();
 
       // 4. 데이터 처리
-      if (result.status === 200) {
-        // 4-1. data가 배열인지 확인해서 맞으면
-        if (Array.isArray(result.data)) {
-          // 4-1-1. 렌더링 함수에 데이터 전달
-          renderHashtagRank(result.data);
-        } else {
-          // 4-1-2. data가 배열인지 확인해서 아니면
-          console.error(
-            '해시태그 랭킹 데이터 형식이 잘못되었습니다:',
-            result.data
-          );
-        }
+      if (response.status === 200) {
+        // 4-1. 렌더링 함수에 결과 전달
+        renderHashtagRank(result);
       } else {
         // 4-2. data를 애초에 조회하지 못한 경우 에러메시지
         console.error('해시태그 랭킹 조회 실패:', result.message);
@@ -396,10 +385,10 @@ document.addEventListener('DOMContentLoaded', () => {
       <span class="hashtag-rank-ranking-var">${rankMark(i)}</span>
       </div>                  
       <div class="hashtag-rank-hashtag">
-      <span>${data[i - 1].hashtag}</span>
+      <span>${data[i-1].hashtag}</span>
       </div>                  
       <div class="hashtag-rank-count">
-      <span>${data[i - 1].count}</span>
+      <span>${data[i-1].count}</span>
       </div>
       </div>
       `;

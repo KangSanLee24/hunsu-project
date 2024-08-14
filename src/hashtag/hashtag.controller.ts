@@ -12,12 +12,8 @@ export class HashtagController {
    * @returns
    */
   @Get('ranks-weekly')
-  async hashtagWeeklyLank(@Query('num') num: number) {
-    const data = await this.hashtagService.hashtagWeeklyLank(+num);
-    return {
-      status: 200,
-      message: '해시태그 랭킹이 조회되었습니다.',
-      data: data,
-    };
+  async hashtagWeeklyLank() {
+    const data = await this.hashtagService.hashtagWeeklyLank();
+    return data;
   }
 }

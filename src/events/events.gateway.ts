@@ -11,6 +11,10 @@ import {
 import { Logger, UseFilters } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from '../chat/chat.service';
+import { format } from 'date-fns';
+import { ChatRoom } from 'src/chat/entities/chat-room.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 interface CustomFile {
   buffer: Buffer;
@@ -31,7 +35,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private logger = new Logger('ChatGateway');
 
-  constructor(private readonly chatService: ChatService) { }
+  constructor(
+    private readonly chatService: ChatService,
+    @InjectRepository(ChatRoom)
+    private readonly chatRoomRepository: Repository<ChatRoom>
+  ) {}
 
   //입장
   @SubscribeMessage('joinRoom')
@@ -63,13 +71,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const isChatRoom = await this.chatService.isChatRoom(+payload.roomId);
 
-    const chatRoomId = payload.roomId;
-    const nickname = payload.author;
+    if(isChatRoom) {
+      const currentTime = Date.now();
+      const chatTime = format(currentTime, 'HH:mm');
+      
+      this.server.to(payload.roomId).emit('chat', {author: payload.author, body: payload.body, chatTime});
+      this.chatService.chatHashtag(payload.body);
 
-    if (isChatRoom) {
-      const chatTime = await this.chatService.sendChatRoom(+payload.roomId, payload.author, payload.body);
+      //채팅방 update
+      await this.chatRoomRepository.update(
+        {id: +payload.roomId},
+        {updatedAt: new Date()}
+      );
 
-      this.server.to(payload.roomId).emit('chat', { author: payload.author, body: payload.body, chatTime });
       return payload;
     } else {
       this.server.to(payload.roomId).emit('outRoom', {});

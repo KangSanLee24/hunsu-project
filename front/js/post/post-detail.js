@@ -39,6 +39,14 @@ async function renderPostDetail(postId) {
     // marked 라이브러리로 마크다운 형식으로 표시
     document.getElementById('post-content').innerHTML =
       marked.parse(post.data.content) || '내용 없음';
+    //해시태그 렌더링
+    const hashtagsContainer = document.getElementById('post-hashtags');
+    const hashtagsArray = post.data.hashtagsArray;
+    if (hashtagsArray && hashtagsArray.length > 0) {
+      hashtagsContainer.innerHTML = hashtagsArray.map(tag => `<span class="hashtag">${tag}</span>`).join(' ');
+    } else {
+      hashtagsContainer.style.display = 'none'; // 해시태그가 없을 때는 숨기기
+    }
 
     try {
       // accessToken으로 사용자 정보 체크

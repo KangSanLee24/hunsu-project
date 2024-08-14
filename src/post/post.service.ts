@@ -23,10 +23,13 @@ import { PointType } from 'src/point/types/point.type';
 import { v4 as uuidv4 } from 'uuid'; // ES Modules
 import { PostLike } from 'src/post/entities/post-like.entity';
 import { PostDislike } from 'src/post/entities/post-dislike.entity';
+import { RedisService } from 'src/redis/redis.service';
+import { format } from 'date-fns';
 
 @Injectable()
 export class PostService {
   constructor(
+    private readonly redisService : RedisService,
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     @InjectRepository(PostImage)
@@ -44,7 +47,7 @@ export class PostService {
 
   /* 게시글 생성 API */
   async create(createPostDto: CreatePostDto, userId: number) {
-    const { title, content, category, urlsArray } = createPostDto;
+    const { title, content, category, urlsArray , hashtagsArray} = createPostDto;
     const user = await this.userRepository.findOne({
       where: { id: userId },
       withDeleted: true,
@@ -71,12 +74,16 @@ export class PostService {
         notUsedUrls.map((fileUrl) => this.awsService.deleteFileFromS3(fileUrl))
       );
     }
+    //해시태그 formatting
+    const hashtags = hashtagsArray.split(' ').filter(tag => tag.trim().length > 0);
+
     // 2. 게시글 저장
     const createdPost = this.postRepository.create({
       title,
       content,
       category,
       userId,
+      hashtags: hashtags
     });
 
     const post = await this.postRepository.save(createdPost);
@@ -89,6 +96,20 @@ export class PostService {
     if (isValidPoint)
       this.pointService.savePointLog(userId, PointType.POST, true);
 
+    //4. 해시태그 레디스에 저장
+    const client = this.redisService.getClient();
+    const currentTime = Date.now();
+    const sevenDaysInMilliseconds = 7 * 24 * 60 * 60 * 1000; // 7일을 밀리초로 변환
+    const expireTime = format(currentTime + sevenDaysInMilliseconds, 'yyyy-MM-dd');
+
+    //hashtags = [#청바지, #모자]
+    const postHashtag = hashtags.map((item) => {
+      const uniqueTag = `${item}:${currentTime}`;
+      client.zincrby('hashtag', 1, item);
+      client.hset('hashtag_expire', uniqueTag, expireTime);
+      console.log(`redis : post-hashtag ${item}`);
+    })
+
     return {
       id: post.id,
       userId: post.userId,
@@ -96,6 +117,7 @@ export class PostService {
       title: post.title,
       category: post.category,
       content: post.content,
+      hashtags: post.hashtags,  // 해시태그 추가
       createdAt: post.createdAt,
       updatedAt: post.updatedAt, 
     };
@@ -190,6 +212,7 @@ export class PostService {
       numDislikes: post.numDislikes, // 싫어요 수
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
+      hashtagsArray: post.hashtags
     };
   }
 
@@ -242,7 +265,8 @@ export class PostService {
 
   /* 게시글 수정 API */
   async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
-    const { title, content, urlsArray, category } = updatePostDto;
+    const { title, content, urlsArray, category, hashtagsArray} = updatePostDto;
+
     const post = await this.postRepository.findOne({
       where: { id },
       withDeleted: true,
@@ -277,9 +301,14 @@ export class PostService {
       notUsedUrls.map((fileUrl) => this.awsService.deleteFileFromS3(fileUrl))
     );
 
-    await this.postRepository.update(
+    //해시태그 수정 시
+    const hashtags = hashtagsArray.split(' ').filter(tag => tag.trim().length > 0);
+
+    const updatedPost = await this.postRepository.update(
       { id },
-      { title, content, category }
+      { title, content, category, 
+        hashtags: hashtagsArray.length > 0 ? hashtags : post.hashtags
+       }
     );
   }
 

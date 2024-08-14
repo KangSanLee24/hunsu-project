@@ -11,6 +11,7 @@ import { Point } from 'src/point/entities/point.entity';
 import { PointLog } from 'src/point/entities/point-log.entity';
 import { PostLike } from './entities/post-like.entity';
 import { PostDislike } from './entities/post-dislike.entity';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { PostDislike } from './entities/post-dislike.entity';
     ]),
     AwsModule,
     PointModule,
+    RedisModule
   ],
   controllers: [PostController],
   providers: [PostService],

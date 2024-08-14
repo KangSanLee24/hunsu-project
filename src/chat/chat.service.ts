@@ -12,21 +12,20 @@ import { User } from 'src/user/entities/user.entity';
 import { ChatMember } from './entities/chat-member.entity';
 import moment from 'moment';
 import { format, isSameDay } from 'date-fns';
-import { ChatLog } from './entities/chat-log.entity';
 import { AwsService } from 'src/aws/aws.service';
 import { ChatImage } from './entities/chat-image.entity';
 import { Order } from 'src/post/types/post-order.type';
 import { Point } from 'src/point/entities/point.entity';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class ChatService {
   constructor(
+    private readonly redisService : RedisService,
     @InjectRepository(ChatRoom)
     private readonly chatRoomRepository: Repository<ChatRoom>,
     @InjectRepository(ChatMember)
     private readonly chatMemberRepository: Repository<ChatMember>,
-    @InjectRepository(ChatLog)
-    private readonly chatLogRepository: Repository<ChatLog>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(Point)
@@ -159,10 +158,10 @@ export class ChatService {
   //채팅방 마지막 채팅 시간
 
   async chatLastTime(chatRoomId: number) {
-    const chatLastTime = await this.chatLogRepository.findOne({
-      where: { roomId: chatRoomId },
-      select: { createdAt: true },
-      order: { createdAt: 'DESC' },
+    const chatLastTime = await this.chatRoomRepository.findOne({
+      where: { id: chatRoomId },
+      select: { updatedAt: true },
+      order: { updatedAt: 'DESC' },
     });
 
     const chatImageLastTime = await this.chatImageRepository.findOne({
@@ -171,31 +170,21 @@ export class ChatService {
       order: { createdAt: 'DESC' },
     });
 
-    //아무 채팅 없음
-    if (!chatLastTime && !chatImageLastTime) {
-      return { message: ' ' };
-    }
-
     let formatTime: any;
 
     if (chatLastTime && !chatImageLastTime) {
-      formatTime = format(new Date(chatLastTime.createdAt), 'yyyy-MM-dd HH:mm');
-    } else if (!chatLastTime && chatImageLastTime) {
-      formatTime = format(
-        new Date(chatImageLastTime.createdAt),
-        'yyyy-MM-dd HH:mm'
-      );
+      formatTime = format(new Date(chatLastTime.updatedAt), 'yyyy-MM-dd HH:mm');
     } else if (chatLastTime && chatImageLastTime) {
       const diffTime =
-        chatLastTime.createdAt < chatImageLastTime.createdAt
+        chatLastTime.updatedAt < chatImageLastTime.createdAt
           ? chatImageLastTime.createdAt
-          : chatLastTime.createdAt;
+          : chatLastTime.updatedAt;
       formatTime = format(new Date(diffTime), 'yyyy-MM-dd HH:mm');
     }
 
     //오늘인지 확인
 
-    const result = await this.chatLogRepository.query(
+    const result = await this.chatRoomRepository.query(
       'SELECT NOW() as currentTime'
     );
     const dbTime = new Date(result[0].currentTime);
@@ -221,21 +210,46 @@ export class ChatService {
   }
 
   //채팅방 채팅 내역 저장
-  async sendChatRoom(chatRoomId: number, author: string, message: string) {
-    const findUser = await this.userRepository.findOne({
-      where: { nickname: author },
-      select: { id: true },
-    });
+  // async sendChatRoom(chatRoomId: number, author: string, message: string) {
+  //   const findUser = await this.userRepository.findOne({
+  //     where: { nickname: author },
+  //     select: { id: true },
+  //   });
 
-    const chatLog = await this.chatLogRepository.save({
-      roomId: chatRoomId,
-      content: message,
-      memberId: findUser.id,
-    });
+  //   const chatLog = await this.chatLogRepository.save({
+  //     roomId: chatRoomId,
+  //     content: message,
+  //     memberId: findUser.id,
+  //   });
 
-    const chatTime = format(new Date(chatLog.createdAt), 'HH:mm');
+  //   const chatTime = format(new Date(chatLog.createdAt), 'HH:mm');
 
-    return chatTime;
+  //   return chatTime;
+  // }
+
+  //채팅 내역 중 해시태그 레디스 저장
+  async chatHashtag(chat: string) {
+    const client = this.redisService.getClient();
+
+    const hashtagPattern = /#\S+/g;
+    const hashtagitem = chat.match(hashtagPattern);
+
+    const currentTime = Date.now();
+    const sevenDaysInMilliseconds = 7 * 24 * 60 * 60 * 1000; // 7일을 밀리초로 변환
+    const expireTime = format(currentTime + sevenDaysInMilliseconds, 'yyyy-MM-dd');
+
+    if(hashtagitem) {
+      for (const tag of hashtagitem) {
+        const uniqueTag = `${tag}:${currentTime}`;
+
+        // ZINCRBY가 멤버가 없을 때는 추가, 있을 때는 증가시킴
+        client.zincrby('hashtag', 1, tag);
+
+        //만료기간을 따로 저장
+        client.hset('hashtag_expire', uniqueTag, expireTime);
+        console.log(`redis : chat-hashtag ${tag}`);
+      }
+    }
   }
 
   //채팅방 이미지 저장
@@ -331,12 +345,13 @@ export class ChatService {
     //트랜잭션
     //로그, 이미지, 멤버, 방 삭제
     //격리수준 -READ UNCOMMITED -> 트랜잭션 중 다른 데이터 삽입 가능
+    //2024-08-13 채팅 내역 테이블 삭제 (레디스로 이동)
+
     await this.entityManager.transaction(
       "READ UNCOMMITTED",
       async (manager) => {
       try {
         for (const room of findDeleteChat) {
-          await manager.delete(ChatLog, { roomId: room.id });
           await manager.delete(ChatImage, { roomId: room.id });
           await manager.delete(ChatMember, { roomId: room.id });
           await manager.delete(ChatRoom, { id: room.id });

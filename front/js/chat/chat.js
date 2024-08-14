@@ -3,10 +3,7 @@ import { API_BASE_URL } from '../../config/config.js';
 async function getAuthor() {
   try {
     const accessToken = localStorage.getItem('accessToken');
-    // if (!accessToken) {
-    //   alert("조까");
-    //   window.location.href = document.referrer;
-    // }
+
     const response = await fetch(`${API_BASE_URL}/users/me`, {
       method: 'GET',
       headers: {
@@ -276,6 +273,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       };
       reader.readAsDataURL(file);
+    }
+  });
+
+  // 접기/펼치기 버튼 클릭 이벤트 핸들러 추가
+  const toggleIcon = document.getElementById('toggleIcon');
+  toggleIcon.addEventListener('click', () => {
+    const img = document.getElementById('fixedImageContent');
+    const isHidden = img.style.display === 'none';
+    
+    if (isHidden) {
+      img.style.display = 'block';
+      toggleIcon.textContent = '🔼'; // 펼쳐진 상태일 때 아이콘 변경
+    } else {
+      img.style.display = 'none';
+      toggleIcon.textContent = '🔽'; // 접힌 상태일 때 아이콘 변경
     }
   });
 
