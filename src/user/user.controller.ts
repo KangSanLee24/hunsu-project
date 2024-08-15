@@ -25,7 +25,7 @@ import { POST_MESSAGE } from 'src/constants/post-message.constant';
 @ApiTags('02. USER API')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   /** 내 정보 조회(R) API **/
   @UseGuards(AuthGuard('jwt'))
@@ -51,7 +51,7 @@ export class UserController {
     const userPosts = await this.userService.findAllPostByUser(userId);
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.READ_ALL.SUCCESS,
       data: userPosts,
     };
@@ -67,7 +67,7 @@ export class UserController {
     const userComments = await this.userService.findAllCommentByUser(userId);
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: COMMENT_MESSAGE.COMMENT.READ.SUCCESS,
       data: userComments,
     };
@@ -102,7 +102,6 @@ export class UserController {
     };
   }
 
-
   /** 회원탈퇴(softdelete) API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
@@ -116,7 +115,7 @@ export class UserController {
     return {
       status: HttpStatus.OK,
       message: USER_MESSAGES.DELETE_ME.SUCCESS,
-      data: data
+      data: data,
     };
   }
 }

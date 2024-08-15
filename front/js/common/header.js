@@ -1,8 +1,8 @@
-import { API_BASE_URL } from '../../config/config.js';
 import { levelMark } from './level-rank.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 0. 현재 페이지 위치 URL을 localStorage에 저장
+  /** 헤더에 필요한 변수들 선언 **/
+  // 현재 페이지 위치 URL을 localStorage에 저장
   const redirectUrl = window.location.href;
   const preUrl = localStorage.setItem('redirectUrl', redirectUrl);
 
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showLoginOptions();
   }
 
-  /** 1. 로그인 X상태 - 로그인 회원가입 버튼 보이고, 닉네임 숨기기 */
+  /** 로그인 X상태 - 로그인 회원가입 버튼 보이고, 닉네임 숨기기 */
   function showLoginOptions() {
     if (loginLink) loginLink.style.display = 'inline-block';
     if (signUpLink) signUpLink.style.display = 'inline-block';
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 2. 로그인 O상태 - 로그인 회원가입 버튼 숨기고, 닉네임과 로그아웃 버튼을 표시 */
+  /** 로그인 O상태 - 로그인 회원가입 버튼 숨기고, 닉네임과 로그아웃 버튼을 표시 */
   function displayUserInfo(id, point, nickname) {
     if (loginLink) loginLink.style.display = 'none';
     if (signUpLink) signUpLink.style.display = 'none';
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function logout() {
     const accessToken = localStorage.getItem('accessToken');
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/log-out`, {
+      const response = await fetch(`/api/auth/log-out`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /** accessToken으로 내 정보 조회 API */
   async function fetchAccessToken(accessToken) {
-    const response = await fetch(`${API_BASE_URL}/users/me`, {
+    const response = await fetch(`/api/users/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /** refreshToken으로 accessToken 재발급 API */
   async function fetchRefreshToken(refreshToken) {
-    const response = await fetch(`${API_BASE_URL}/auth/re-token`, {
+    const response = await fetch(`/api/auth/re-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /** SSE 알람 **/
 function alarmSSE(userId) {
-  const eventSource = new EventSource(`${API_BASE_URL}/alarms/sse/${userId}`);
+  const eventSource = new EventSource(`/api/alarms/sse/${userId}`);
 
   // 1. SSE - 메시지 받기
   eventSource.onmessage = (event) => {

@@ -29,7 +29,7 @@ export class PointController {
   async create(@LogIn() user: User) {
     await this.pointService.checkAttendance(user);
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: `출석 체크!`,
     };
   }
@@ -47,7 +47,7 @@ export class PointController {
     const data = await this.pointService.getPointSummary(user.id);
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: `포인트 조회에 성공했습니다.`,
       data,
     };
@@ -61,7 +61,7 @@ export class PointController {
   async pointRank(@Query('num') num: number) {
     const data = await this.pointService.pointRank(+num);
     return {
-      status: 200,
+      status: HttpStatus.OK,
       message: '종합 랭킹 조회에 성공했습니다.',
       data: data,
     };
@@ -75,7 +75,7 @@ export class PointController {
   async pointWeeklyRank(@Query('num') num: number) {
     const data = await this.pointService.pointWeeklyRank(+num);
     return {
-      status: 200,
+      status: HttpStatus.OK,
       message: '주간 랭킹 조회에 성공했습니다.',
       data: data,
     };
@@ -86,7 +86,7 @@ export class PointController {
   async getLastWeekPointRank() {
     const data = await this.pointService.getLastWeekPointRank();
     return {
-      status: 200,
+      status: HttpStatus.OK,
       message: '주간 랭킹 조회에 성공했습니다.',
       data: data,
     };
@@ -97,7 +97,7 @@ export class PointController {
   async getTotalPointRank() {
     const data = await this.pointService.getTotalPointRank();
     return {
-      status: 200,
+      status: HttpStatus.OK,
       message: '종합 랭킹 조회에 성공했습니다.',
       data: data,
     };

@@ -1,9 +1,11 @@
-import { API_BASE_URL } from '../../config/config.js';
-
-if (!document.referrer.includes('sign-up.html') && !document.referrer.includes('change-password.html') && !document.referrer.includes('email-confirmation.html')) {
+if (
+  !document.referrer.includes('sign-up.html') &&
+  !document.referrer.includes('change-password.html') &&
+  !document.referrer.includes('email-confirmation.html')
+) {
   // alert(document.referrer);
   alert('잘못된 접근입니다.');
-  window.location.href = "./main.html"
+  window.location.href = './main.html';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 회원가입 이메일 인증
     if (document.referrer.includes('sign-up.html')) {
       try {
-        const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
+        const response = await fetch(`/api/auth/verify-email`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -50,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 비밀번호 변경
     } else if (document.referrer.includes('change-password.html')) {
       try {
-        const response = await fetch(`${API_BASE_URL}/auth/verify-password`, {
+        const response = await fetch(`/api/auth/verify-password`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -61,7 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (response.ok) {
           // 성공적인 응답 시 로그인 페이지로 이동
-          alert('이메일 인증이 성공적으로 완료되었습니다.\n비밀번호를 변경해 주십시오.');
+          alert(
+            '이메일 인증이 성공적으로 완료되었습니다.\n비밀번호를 변경해 주십시오.'
+          );
           event.preventDefault();
           window.location.href = './update-password.html';
         } else {

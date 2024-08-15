@@ -39,24 +39,28 @@ export class RecommentController {
     @LogIn() user: User,
     @Body() createRecommentDto: CreateRecommentDto
   ) {
-    return await this.recommentService.createRecomment(
+    const data = await this.recommentService.createRecomment(
       +commentId,
       user,
       createRecommentDto
     );
+    return {
+      status: HttpStatus.OK,
+      message: '대댓글이 생성되었습니다.',
+      data: data,
+    };
   }
 
   /** 대댓글 목록 조회 **/
   @ApiOperation({ summary: '2. 대댓글 목록 조회 API' })
   @Get(':commentId/recomments')
   async findAll(@Param('commentId') commentId: number) {
-    const data = await this.recommentService.findRecommentsById(commentId)
-
+    const data = await this.recommentService.findRecommentsById(commentId);
     return {
       status: HttpStatus.OK,
       message: COMMENT_MESSAGE.COMMENT.READ.SUCCESS,
-      data
-    }
+      data: data,
+    };
   }
 
   /** 대댓글 수정 **/
@@ -77,11 +81,17 @@ export class RecommentController {
       throw new ForbiddenException('작성자가 아닙니다.');
     }
 
-    return await this.recommentService.updateRecomment(
+    const data = await this.recommentService.updateRecomment(
       +commentId,
       +recommentId,
       createRecommentDto
     );
+
+    return {
+      status: HttpStatus.OK,
+      message: '대댓글이 수정되었습니다.',
+      data: data,
+    };
   }
 
   /** 대댓글 삭제 **/
@@ -101,10 +111,15 @@ export class RecommentController {
       throw new ForbiddenException('작성자가 아닙니다.');
     }
 
-    return await this.recommentService.removeRecomment(
+    const data = await this.recommentService.removeRecomment(
       user.id,
       +commentId,
       +recommentId
     );
+    return {
+      status: HttpStatus.OK,
+      message: '대댓글이 삭제되었습니다.',
+      data: data,
+    };
   }
 }

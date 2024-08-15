@@ -93,7 +93,7 @@ export class PostController {
     );
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.READ_ALL.SUCCESS,
       data: findAllPost,
     };
@@ -110,7 +110,7 @@ export class PostController {
   async findHotPost(@Query('category') category: Category) {
     const hotPosts = await this.postService.findHotPost(category);
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.READ_HOT.SUCCESS,
       data: hotPosts,
     };
@@ -137,7 +137,7 @@ export class PostController {
   async uploadFiles(@UploadedFiles() files: Express.Multer.File[]) {
     const uploadedImageUrls = await this.postService.uploadPostImages(files);
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.IMAGE.UPLOAD.SUCCESS,
       data: uploadedImageUrls,
     };
@@ -150,7 +150,7 @@ export class PostController {
     const findOnePost = await this.postService.findOne(postId);
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.READ_DETAIL.SUCCESS,
       data: findOnePost,
     };
@@ -170,7 +170,7 @@ export class PostController {
     await this.postService.update(postId, updatePostDto, userId);
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.UPDATE.SUCCESS,
     };
   }
@@ -185,7 +185,7 @@ export class PostController {
     await this.postService.remove(postId, userId);
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.DELETE.SUCCESS,
     };
   }
@@ -200,7 +200,7 @@ export class PostController {
     await this.postService.forceRemove(id, userId);
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.FORCE_DELETE.SUCCESS,
     };
   }

@@ -1,5 +1,3 @@
-import { API_BASE_URL } from '../../config/config.js';
-
 // 페이지 로드 시 실행될 초기화 함수
 function initializeForm() {
   const categoryElement = document.getElementById('post-category');
@@ -36,7 +34,7 @@ async function createPost() {
   const hashtags = document.getElementById('post-hashtags').value;
   const content = editor.getMarkdown();
 
-  const postResponse = await fetch(`${API_BASE_URL}/posts`, {
+  const postResponse = await fetch(`/api/posts`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -47,7 +45,7 @@ async function createPost() {
       content: content,
       category: category,
       urlsArray: window.imageUrls, // 이미지 URL 배열 추가
-      hashtagsArray: hashtags
+      hashtagsArray: hashtags,
     }),
   });
 
@@ -69,7 +67,7 @@ async function updatePost() {
   const content = editor.getMarkdown();
   const hashtags = document.getElementById('post-hashtags').value;
 
-  const postResponse = await fetch(`${API_BASE_URL}/posts/${postId}`, {
+  const postResponse = await fetch(`/api/posts/${postId}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -80,7 +78,7 @@ async function updatePost() {
       content: content,
       category: category,
       urlsArray: window.imageUrls, // 이미지 URL 배열 추가
-      hashtagsArray: hashtags
+      hashtagsArray: hashtags,
     }),
   });
 
