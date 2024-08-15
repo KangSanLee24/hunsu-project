@@ -19,8 +19,8 @@ export class PointController {
 
   /**
    * 출석 체크
-   * @param user 
-   * @returns 
+   * @param user
+   * @returns
    */
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
@@ -36,9 +36,9 @@ export class PointController {
 
   /**
    * 오늘 포인트 획득 포인트와 누적포인트 조회
-   * @param user 
-   * @returns 
-   */ 
+   * @param user
+   * @returns
+   */
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '포인트 조회' })

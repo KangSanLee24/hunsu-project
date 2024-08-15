@@ -10,16 +10,19 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   /** Redis 모듈 시작 **/
   async onModuleInit() {
-    const redisHost = this.configService.get<string>('POINT_REDIS_HOST');
-    const redisPort = this.configService.get<number>('POINT_REDIS_PORT');
-    const redisPassword = this.configService.get<string>(
-      'POINT_REDIS_PASSWORD'
-    );
+    const redisHost = this.configService.get<string>('MAIN_REDIS_HOST');
+    const redisPort = this.configService.get<number>('MAIN_REDIS_PORT');
+    const redisUser = this.configService.get<string>('MAIN_REDIS_USER');
+    const redisPassword = this.configService.get<string>('MAIN_REDIS_PASSWORD');
+    const redisTls =
+      this.configService.get<string>('MAIN_REDIS_TLS') === 'true';
 
     this.redisClient = new Redis({
       host: redisHost,
-      port: redisPort || 6379,
+      port: redisPort || 18349,
+      username: redisUser,
       password: redisPassword,
+      tls: redisTls ? {} : undefined,
     });
 
     this.redisClient.on('connect', () => {
@@ -93,31 +96,3 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   /** Redis SortedSet GET score by value **/
 }
-
-// @Injectable()
-// export class RedisService implements OnModuleInit {
-//   private redisClient: Redis;
-
-//   constructor(private configService: ConfigService) {}
-
-//   onModuleInit() {
-//     this.redisClient = new Redis({
-//       host: this.configService.get<string>('REDIS_HOST'),
-//       port: 17640, // Redis 서버 포트
-//       password: this.configService.get<string>('REDIS_PASSWORD'),
-//     });
-
-//     this.redisClient.on('connect', () => {
-//       console.log('Connected to MAIN-Redis');
-//     });
-
-//     this.redisClient.on('error', (err) => {
-//       console.error('Redis error: ', err);
-//     });
-//   }
-
-//   //클라이언트 함수
-//   getClient(): Redis {
-//     return this.redisClient;
-//   }
-// }
