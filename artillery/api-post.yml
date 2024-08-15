@@ -1,55 +1,55 @@
 config:
   # base url 정의
-  target: "http://localhost:3000"
+  target: 'http://localhost:3000'
   phases:
     # 부하테스트 시간 (초)
     - duration: 60
-    # 부하테스트 동안의 사용자 수 (초당 요청 수)
+      # 부하테스트 동안의 사용자 수 (초당 요청 수)
       arrivalRate: 100
       # rampTo: 300
       name: api-request-test
   payload:
-    path: "categorys.csv"
+    path: 'categorys.csv'
     fields:
-      - "category"
-    skipHeader: true  # CSV 파일의 첫 줄이 헤더인 경우 true로 설정
+      - 'category'
+    skipHeader: true # CSV 파일의 첫 줄이 헤더인 경우 true로 설정
     loadAll: true
     name: category
   variables:
     # accessToken
-    bearerToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiQUMiLCJlbWFpbCI6InRlc3RAbmF2ZXIuY29tIiwic3ViIjoxLCJpYXQiOjE3MjM1NDk3NTksImV4cCI6MTcyMzU3NDk1OX0.FKywDbWHcqP2q_Fg8pWsaYUWo7hAep8XgXAhtHtnyxU"  # Bearer 토큰을 변수로 선언
+    bearerToken: '' # Bearer 토큰을 변수로 선언
 # 부하 테스트 시나리오
 scenarios:
   # 시나리오 정의
-  - name: "GET-posts"
+  - name: 'GET-posts'
     flow:
       - get:
-          url: "/api/posts?page=1"
-  - name: "GET-post-detail"
+          url: '/api/posts?page=1'
+  - name: 'GET-post-detail'
     flow:
       - get:
-          url: "/api/posts/82"
-  - name: "GET-post-likes"
+          url: '/api/posts/82'
+  - name: 'GET-post-likes'
     flow:
       - get:
-          url: "/api/posts/82/likes"
-  - name: "GET-post-my-like"
+          url: '/api/posts/82/likes'
+  - name: 'GET-post-my-like'
     flow:
       - get:
-          url: "/api/posts/82/likes/me"
+          url: '/api/posts/82/likes/me'
           headers:
-            Authorization: "Bearer {{ bearerToken }}" 
-  - name: "GET-post-dislikes"
+            Authorization: 'Bearer {{ bearerToken }}'
+  - name: 'GET-post-dislikes'
     flow:
       - get:
-          url: "/api/posts/82/dislikes"
-  - name: "GET-post-my-dislike"
+          url: '/api/posts/82/dislikes'
+  - name: 'GET-post-my-dislike'
     flow:
       - get:
-          url: "/api/posts/82/dislikes/me"
+          url: '/api/posts/82/dislikes/me'
           headers:
-            Authorization: "Bearer {{ bearerToken }}" 
-  - name: "GET-comments"
+            Authorization: 'Bearer {{ bearerToken }}'
+  - name: 'GET-comments'
     flow:
       - get:
-          url: "/api/posts/82/comments"
+          url: '/api/posts/82/comments'
