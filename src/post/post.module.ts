@@ -3,7 +3,6 @@ import { PostService } from './post.service';
 import { PostController } from './post.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
-import { PostImage } from './entities/post-image.entity';
 import { User } from 'src/user/entities/user.entity';
 import { AwsModule } from 'src/aws/aws.module';
 import { PointModule } from 'src/point/point.module';
@@ -17,7 +16,6 @@ import { RedisModule } from 'src/redis/redis.module';
   imports: [
     TypeOrmModule.forFeature([
       Post,
-      PostImage,
       User,
       Point,
       PointLog,
@@ -26,7 +24,7 @@ import { RedisModule } from 'src/redis/redis.module';
     ]),
     AwsModule,
     PointModule,
-    RedisModule
+    RedisModule,
   ],
   controllers: [PostController],
   providers: [PostService],
