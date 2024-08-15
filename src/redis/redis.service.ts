@@ -4,59 +4,60 @@ import Redis from 'ioredis';
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
-  private client: Redis;
+  private redisClient: Redis;
+
   constructor(private configService: ConfigService) {}
 
   /** Redis 모듈 시작 **/
   async onModuleInit() {
     const redisHost = this.configService.get<string>('POINT_REDIS_HOST');
     const redisPort = this.configService.get<number>('POINT_REDIS_PORT');
-    const redisUser = this.configService.get<string>('POINT_REDIS_USER');
     const redisPassword = this.configService.get<string>(
       'POINT_REDIS_PASSWORD'
     );
-    const redisTls =
-      this.configService.get<string>('POINT_REDIS_TLS') === 'true';
 
-    this.client = new Redis({
+    this.redisClient = new Redis({
       host: redisHost,
       port: redisPort || 6379,
-      username: redisUser,
       password: redisPassword,
-      tls: redisTls ? {} : undefined,
     });
 
-    this.client.on('connect', () => {
-      console.log('Connected to Redis');
+    this.redisClient.on('connect', () => {
+      console.log('Connected to MAIN-Redis');
     });
 
-    this.client.on('error', (err) => {
-      console.error('Redis error', err);
+    this.redisClient.on('error', (err) => {
+      console.error('MAIN-Redis error', err);
     });
+  }
+
+  /** 클라이언트 함수 **/
+  getClient(): Redis {
+    return this.redisClient;
   }
 
   /** Redis 모듈 종료 **/
   async onModuleDestroy() {
-    await this.client.quit();
+    await this.redisClient.quit();
   }
 
   /** Redis GET **/
   async getValue(key: string): Promise<string | null> {
-    const data = await this.client.get(key);
+    const data = await this.redisClient.get(key);
     return data;
   }
 
   /** Redis SET **/
   async setValue(key: string, value: string, ttl?: number): Promise<void> {
-    await this.client.set(key, value);
+    await this.redisClient.set(key, value);
     if (ttl) {
-      await this.client.expire(key, ttl);
+      await this.redisClient.expire(key, ttl);
     }
   }
 
   /** Redis DEL **/
   async delValue(key: string): Promise<number> {
-    const data = await this.client.del(key);
+    const data = await this.redisClient.del(key);
     return data;
   }
 
@@ -64,7 +65,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async zgetRank(key: string, range?: any) {
     // range 수만큼 RANK불러오고, range 지정하지 않으면 전체RANK 불러옴
     const end = range ? range - 1 : -1;
-    const data = await this.client.zrevrange(key, 0, end, 'WITHSCORES');
+    const data = await this.redisClient.zrevrange(key, 0, end, 'WITHSCORES');
     return data;
   }
 
@@ -72,7 +73,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async zaddValue(key: string, data: any, needReturn: boolean): Promise<any[]> {
     let dataArray = [];
     for (let i = 0; i < data.length; i++) {
-      await this.client.zadd(key, data[i].point, data[i].nickname);
+      await this.redisClient.zadd(key, data[i].point, data[i].nickname);
       if (needReturn) {
         dataArray.push(data[i].nickname);
         dataArray.push(data[i].point);
@@ -87,7 +88,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     point: number,
     nickname: string
   ): Promise<void> {
-    await this.client.zincrby(key, point, `${nickname}`);
+    await this.redisClient.zincrby(key, point, `${nickname}`);
   }
 
   /** Redis SortedSet GET score by value **/

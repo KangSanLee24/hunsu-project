@@ -15,9 +15,4 @@ export const configValidationSchema = Joi.object({
 
   NODE_MAILER_ID: Joi.string().required(),
   NODE_MAILER_PASSWORD: Joi.string().required(),
-
-  POINT_REDIS_HOST: Joi.string().required(),
-  POINT_REDIS_PORT: Joi.number().required(),
-  POINT_REDIS_USER: Joi.string().required(),
-  POINT_REDIS_PASSWORD: Joi.string().required(),
 });

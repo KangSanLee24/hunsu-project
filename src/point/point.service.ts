@@ -178,7 +178,7 @@ export class PointService {
     return pointLogs.reduce((acc, log) => acc + log.point, 0);
   }
 
-  //누적 포인트 조회
+  //누적 포인트 조회 (전체)
   async totalPoint(): Promise<any[]> {
     const totalPoint = await this.pointRepository.query(
       `
@@ -190,7 +190,7 @@ export class PointService {
     return totalPoint;
   }
 
-  //누적 포인트 랭킹 조회
+  //누적 포인트 랭킹 조회 (TOP N명)
   async pointRank(num: number): Promise<any[]> {
     const pointRank = await this.pointRepository.query(
       `
@@ -372,8 +372,8 @@ export class PointService {
     if (!weeklyData || weeklyData !== 'done') {
       // A-3-1. This Week Point ALL Redis 데이터 최신화(복원) 실행
       await this.updateThisWeekPointRedisDate();
-      // A-3-2. 최신화(복원) 확인증 생성 (4시간에 1회만 실행되도록)
-      const ttlWeekly = 60 * 60 * 4;
+      // A-3-2. 최신화(복원) 확인증 생성 (1일에 1회만 실행되도록)
+      const ttlWeekly = 60 * 60 * 24;
       await this.redisService.setValue(weeklyKey, 'done', ttlWeekly);
     }
 
