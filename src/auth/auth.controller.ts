@@ -41,7 +41,7 @@ export class AuthController {
     private configService: ConfigService
   ) {}
 
-  /** 1. 회원 가입(sign-up) API **/
+  /** 회원 가입(sign-up) API **/
   @ApiOperation({ summary: '1. 회원 가입(sign-up) API' })
   @Post('sign-up')
   async signUp(@Body() signUpDto: SignUpDto) {
@@ -53,7 +53,7 @@ export class AuthController {
     };
   }
 
-  /** 2. 로그인(log-in) API **/
+  /** 로그인(log-in) API **/
   @ApiOperation({ summary: '2. 로그인(log-in) API' })
   @Post('log-in')
   async logIn(@Body() logInDto: LogInDto) {
@@ -65,7 +65,7 @@ export class AuthController {
     };
   }
 
-  /** 3. 로그아웃(log-out) API **/
+  /** 로그아웃(log-out) API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '3. 로그아웃(log-out) API' })
@@ -79,7 +79,7 @@ export class AuthController {
     };
   }
 
-  /** 4. 토큰 재발급 API **/
+  /** 토큰 재발급 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '4. 토큰 재발급 API' })
@@ -93,7 +93,7 @@ export class AuthController {
     };
   }
 
-  /** 5. 이메일 인증 API **/
+  /** 이메일 인증 API **/
   @ApiOperation({ summary: '5. 이메일 인증 API' })
   @Patch('verify-email')
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
@@ -105,15 +105,15 @@ export class AuthController {
     };
   }
 
-  /** 6. 소셜로그인 **/
-  /** 6-1-1. 소셜로그인 - 네이버 **/
+  /** 소셜로그인 **/
+  /** 1. 소셜로그인 - 네이버 **/
   @ApiOperation({ summary: '6-1A. 로그인(log-in) Naver API' })
   @UseGuards(AuthGuard('naver'))
   @Get('log-in/naver')
   async logInNaver() {
     // 네이버 로그인 페이지 접속
   }
-  /** 6-1-2. 소셜로그인 - 네이버 콜백 **/
+  /** 1-1. 소셜로그인 - 네이버 콜백 **/
   @ApiOperation({ summary: '6-1B. 로그인(log-in) Naver 콜백 API' })
   @UseGuards(AuthGuard('naver'))
   @Get('log-in/naver/cb')
@@ -124,7 +124,7 @@ export class AuthController {
     const url = this.configService.get<string>('NAVER_REDIRECT_URL');
     res.redirect(`${url}?id=${id}&certification=${certification}`);
   }
-  /** 6-1-3. 소셜로그인 - 네이버 리콜 **/
+  /** 1-2. 소셜로그인 - 네이버 리콜 **/
   @Get('log-in/naver/rc')
   async logInNaverRC(
     @Query('userId') userId: number,
@@ -138,16 +138,16 @@ export class AuthController {
     };
   }
 
-  /** 6-2-1. 소셜로그인 - 구글 **/
+  /** 2. 소셜로그인 - 구글 **/
   @ApiOperation({ summary: '6-2A. 로그인(log-in) Google API' })
   @Get('log-in/google')
   async logInGoogle() {}
-  /** 6-2-2. 소셜로그인 - 구글 콜백 **/
+  /** 2-1. 소셜로그인 - 구글 콜백 **/
   @ApiOperation({ summary: '6-2B. 로그인(log-in) Google 콜백 API' })
   @Get('log-in/google/cb')
   async logInGoogleCB() {}
 
-  /** 6-2. 소셜로그인 - 카카오 **/
+  /** 3. 소셜로그인 - 카카오 **/
   // @UseGuards(AuthGuard('kakao'))
   // @Get('log-in/kakao')
   // async logInKakao(@LogInKakao() kakaoData) {
@@ -161,7 +161,7 @@ export class AuthController {
   //   return tokens.redirect(this.configService.get('KAKAO_CLIENT_URL'));
   // }
 
-  /** 7. 비밀번호 변경 요청 API **/
+  /** 비밀번호 변경 요청 API **/
   @ApiOperation({ summary: '6. 비밀번호 변경 요청 API' })
   @Post('re-password')
   async rePassword(@Body() rePasswordDto: RePasswordDto) {
@@ -172,7 +172,7 @@ export class AuthController {
     };
   }
 
-  /** 8. 비밀번호 변경 인증 API **/
+  /** 비밀번호 변경 인증 API **/
   @ApiOperation({ summary: '7. 비밀번호 변경 인증 API' })
   @Patch('verify-password')
   async verifyPassword(@Body() verifyPasswordDto: VerifyPasswordDto) {
@@ -184,7 +184,7 @@ export class AuthController {
     };
   }
 
-  /** 9. 비밀번호 변경 API **/
+  /** 비밀번호 변경 API **/
   @ApiOperation({ summary: '8. 비밀번호 변경 API' })
   @Post('update-password')
   async updatePassword(@Body() updatePasswordDto: UpdatePasswordDto) {
@@ -196,7 +196,7 @@ export class AuthController {
     };
   }
 
-  /** 10. 아이디 찾기 API **/
+  /** 아이디 찾기 API **/
   @ApiOperation({ summary: '9. 아이디 찾기 API' })
   @Get('find-id')
   async findId(@Query() findIdDto: FindIdDto) {

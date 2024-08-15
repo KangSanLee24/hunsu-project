@@ -1,11 +1,9 @@
-import { API_BASE_URL } from '../../config/config.js';
-
-/** 0. 게시글 상세 페이지에 필요한 변수 선언 **/
-// 0-1. URL에서 게시글 ID를 가져와서 상세 내용 로드
+/** 게시글 상세 페이지에 필요한 변수 선언 **/
+// 1. URL에서 게시글 ID를 가져와서 상세 내용 로드
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get('id');
 
-// 0-2. 버튼 선언
+// 2. 버튼 선언
 const postUpdateButton = document.getElementById('post-update-btn');
 const postDeleteButton = document.getElementById('post-delete-btn');
 
@@ -14,7 +12,7 @@ const submitDislikeButton = document.getElementById('dislike-btn');
 
 const accessToken = localStorage.getItem('accessToken');
 
-/** 1. 게시글 상세 페이지 랜더링 **/
+/** 게시글 상세 페이지 랜더링 **/
 async function renderPostDetail(postId) {
   const post = await fetchPost(postId);
   marked.setOptions({
@@ -23,7 +21,7 @@ async function renderPostDetail(postId) {
     breaks: true, // 줄바꿈을 <br>로 변환하도록 설정
   });
 
-  // 1-1. 게시글 내용 랜더링
+  // 1. 게시글 내용 랜더링
   if (post) {
     document.getElementById('post-category').innerText =
       post.data.category || 'N/A';
@@ -43,7 +41,9 @@ async function renderPostDetail(postId) {
     const hashtagsContainer = document.getElementById('post-hashtags');
     const hashtagsArray = post.data.hashtagsArray;
     if (hashtagsArray && hashtagsArray.length > 0) {
-      hashtagsContainer.innerHTML = hashtagsArray.map(tag => `<span class="hashtag">${tag}</span>`).join(' ');
+      hashtagsContainer.innerHTML = hashtagsArray
+        .map((tag) => `<span class="hashtag">${tag}</span>`)
+        .join(' ');
     } else {
       hashtagsContainer.style.display = 'none'; // 해시태그가 없을 때는 숨기기
     }
@@ -59,10 +59,10 @@ async function renderPostDetail(postId) {
   }
 }
 
-/** 2. 게시글 상세 조회 API 호출 **/
+/** 게시글 상세 조회 API 호출 **/
 async function fetchPost(postId) {
   try {
-    const response = await fetch(`${API_BASE_URL}/posts/${postId}`);
+    const response = await fetch(`/api/posts/${postId}`);
     if (!response.ok) throw new Error('게시글을 불러오는 데 실패했습니다.');
     return await response.json();
   } catch (error) {
@@ -70,11 +70,11 @@ async function fetchPost(postId) {
   }
 }
 
-/** 3. 나의 게시글 좋아요/싫어요 여부 조회 **/
+/** 나의 게시글 좋아요/싫어요 여부 조회 **/
 async function fetchLD(postId) {
   try {
     // 1. 게시글 좋아요 눌렀는지 조회
-    const postLike = await fetch(`../api/posts/${postId}/likes/me`, {
+    const postLike = await fetch(`/api/posts/${postId}/likes/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -91,16 +91,13 @@ async function fetchLD(postId) {
     }
 
     // 2. 게시글 싫어요 눌렀는지 조회
-    const postDislike = await fetch(
-      `${API_BASE_URL}/posts/${postId}/dislikes/me`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      }
-    );
+    const postDislike = await fetch(`/api/posts/${postId}/dislikes/me`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
     const resultPostDislike = await postDislike.json();
     // 2-1. 눌렀다면
     if (resultPostDislike.data == true) {
@@ -113,54 +110,54 @@ async function fetchLD(postId) {
   }
 }
 
-/** 4. 게시글 좋아요 클릭 **/
+/** 게시글 좋아요 클릭 **/
 async function clickLikes(postId) {
   try {
-    // 4-1. 게시글 좋아요 클릭 API 호출
-    const response = await fetch(`${API_BASE_URL}/posts/${postId}/likes`, {
+    // 1. 게시글 좋아요 클릭 API 호출
+    const response = await fetch(`/api/posts/${postId}/likes`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
     });
-    // 4-2. fetch 받아온 result를 json으로
+    // 2. fetch 받아온 result를 json으로
     const result = await response.json();
-    // 4-3. API response 결과가 ok가 아니면
+    // 3. API response 결과가 ok가 아니면
     if (!response.ok) {
       alert(result.message);
       return false;
     }
     return true;
   } catch (error) {
-    // 4-4. 도중에 에러가 뜬 경우
+    // 4. 도중에 에러가 뜬 경우
     alert('게시글 좋아요에서 오류가 발생했습니다.');
     console.error(error);
     return false;
   }
 }
 
-/** 5. 게시글 싫어요 클릭 **/
+/** 게시글 싫어요 클릭 **/
 async function clickDislikes(postId) {
   try {
-    // 5-1. 게시글 싫어요 클릭 API 호출
-    const response = await fetch(`${API_BASE_URL}/posts/${postId}/dislikes`, {
+    // 1. 게시글 싫어요 클릭 API 호출
+    const response = await fetch(`/api/posts/${postId}/dislikes`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
     });
-    // 5-2. fetch 받아온 result를 json으로
+    // 2. fetch 받아온 result를 json으로
     const result = await response.json();
-    // 5-3. API response 결과가 ok가 아니면
+    // 3. API response 결과가 ok가 아니면
     if (!response.ok) {
       alert(result.message);
       return false;
     }
     return true;
   } catch (error) {
-    // 5-4. 도중에 에러가 뜬 경우
+    // 4. 도중에 에러가 뜬 경우
     alert('게시글 싫어요에서 오류가 발생했습니다.');
     console.error(error);
     return false;
@@ -169,7 +166,7 @@ async function clickDislikes(postId) {
 
 // 내 정보 조회 API
 async function fetchAccessToken(accessToken) {
-  const response = await fetch(`${API_BASE_URL}/users/me`, {
+  const response = await fetch(`/api/users/me`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -183,7 +180,7 @@ async function fetchAccessToken(accessToken) {
 async function deletePost() {
   const confirmDelete = confirm('게시글을 삭제하시겠습니까?');
   if (confirmDelete) {
-    const response = await fetch(`${API_BASE_URL}/posts/${postId}`, {
+    const response = await fetch(`/api/posts/${postId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -250,7 +247,7 @@ postUpdateButton.addEventListener('click', () => {
 });
 postDeleteButton.addEventListener('click', deletePost);
 
-/** 페이지 시작!! 0. 페이지 로드 시 게시글 fetch 및 render **/
+/** 페이지 시작!! 페이지 로드 시 게시글 fetch 및 render **/
 if (postId) {
   renderPostDetail(postId);
   fetchLD(postId);

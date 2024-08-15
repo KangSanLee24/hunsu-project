@@ -1,5 +1,3 @@
-import { API_BASE_URL } from '../../config/config.js';
-
 document.addEventListener('DOMContentLoaded', () => {
   // 1. 쿼리스트링 주소로 받아온 데이터 가져오기
   const urlParams = new URLSearchParams(location.search);
@@ -24,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2-3. id(userId)와 certification으로 ATK, RTK 받아오기
     const response = await fetch(
-      `${API_BASE_URL}/auth/log-in/naver/rc?${queryParams.toString()}`,
+      `/api/auth/log-in/naver/rc?${queryParams.toString()}`,
       {
         method: 'GET',
         headers: {
@@ -61,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 출석 체크 함수
   async function checkAttendance(accessToken) {
     try {
-      const response = await fetch(`${API_BASE_URL}/points/today`, {
+      const response = await fetch(`/api/points/today`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

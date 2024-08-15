@@ -1,5 +1,3 @@
-import { API_BASE_URL } from '../../config/config.js';
-
 /** 로그인 페이지에 필요한 변수 선언 **/
 const naverLogInBtn = document.getElementById('naver_login');
 
@@ -19,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('password').value;
 
       // 1-2. 로그인API request 요청 => response로 받아오기
-      const response = await fetch(`${API_BASE_URL}/auth/log-in`, {
+      const response = await fetch(`/api/auth/log-in`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,7 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // window.location.href = './main.html';
 
         // localstorage에서 redirectUrl 가져오기
-        const redirectUrl = localStorage.getItem('redirectUrl') || './main.html';
+        const redirectUrl =
+          localStorage.getItem('redirectUrl') || './main.html';
 
         // 리다이렉트 URL로 이동
         window.location.href = redirectUrl;
@@ -77,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 1. 기존 동작 방지
       event.preventDefault();
       // 2. 네이버 로그인 API 실행
-      window.location.href = `${API_BASE_URL}/auth/log-in/naver`;
+      window.location.href = `/api/auth/log-in/naver`;
     });
   }
 });
@@ -85,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // 출석 체크 함수
 async function checkAttendance(accessToken) {
   try {
-    const response = await fetch(`${API_BASE_URL}/points/today`, {
+    const response = await fetch(`/api/points/today`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

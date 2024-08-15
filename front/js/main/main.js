@@ -1,26 +1,25 @@
-import { API_BASE_URL } from '../../config/config.js';
 import { rankMark, levelMark } from '../common/level-rank.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  /** 1. 페이지에 필요한 변수 세팅 **/
-  // 1-1. 로그인 관련 변수 선언
+  /** 페이지에 필요한 변수 세팅 **/
+  // 1. 로그인 관련 변수 선언
   const accessToken = localStorage.getItem('accessToken');
   const isLoggedIn = !!accessToken;
   const loginLink = document.querySelector('a[href="./log-in.html"]');
   const signUpLink = document.querySelector('a[href="./sign-up.html"]');
-  // 1-2. 인기채팅(HOT LIVECHAT) 관련 변수 선언
+  // 2. 인기채팅(HOT LIVECHAT) 관련 변수 선언
   const hotLiveChatList = document.getElementById('hot-live-chat-list');
-  // 1-3. 화제글(HOT POST) 관련 변수 선언
+  // 3. 화제글(HOT POST) 관련 변수 선언
   const hotPostListChat = document.getElementById('tab-chat');
   const hotPostListFashion = document.getElementById('tab-fashion');
   const hotPostListCooking = document.getElementById('tab-cooking');
-  // 1-4. 포인트 랭킹(POINT RANK) 관련 변수 선언
+  // 4. 포인트 랭킹(POINT RANK) 관련 변수 선언
   const weeklyPointRank = document.getElementById('tab-weekly-rank');
   const totalPointRank = document.getElementById('tab-total-rank');
-  // 1-5. 해시태그 랭킹(HASHTAG RANK) 관련 변수 선언
+  // 5. 해시태그 랭킹(HASHTAG RANK) 관련 변수 선언
   const hashtagRank = document.getElementById('tab-hashtag-rank');
 
-  /** 2. 로그인 상태에 따른 분기 세팅 **/
+  /** 로그인 상태에 따른 분기 세팅 **/
   // 1. 만약 로그인이 되어있다면
   if (isLoggedIn) {
     // 1-1. 로그인O => 로그인 및 회원가입 버튼 [숨기기]
@@ -33,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (signUpLink) signUpLink.style.display = 'block';
   }
 
-  /** 3. HOT LIVECHAT 랭킹 FETCH **/
+  /** HOT LIVECHAT 랭킹 FETCH **/
   async function fetchHotLiveChats(num) {
     try {
       // 1. 쿼리스트링 구성
@@ -43,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 2. fetch 받아오기 (HOT LIVECHAT)
       const response = await fetch(
-        `${API_BASE_URL}/chatrooms/hotlivechat?${queryParams.toString()}`,
+        `/api/chatrooms/hotlivechat?${queryParams.toString()}`,
         {
           method: 'GET',
           headers: {
@@ -78,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 4. HOT POST TYPE(CHAT, FASHION, COOKING) 랭킹 FETCH **/
+  /** FETCH - HOT POST TYPE(CHAT, FASHION, COOKING) **/
   async function fetchHotPosts(category) {
     try {
       // 1. 쿼리스트링 구성
@@ -87,22 +86,19 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       // 2. fetch 받아오기 (HOT POSTS [TYPE] LIST)
-      const response = await fetch(
-        `${API_BASE_URL}/posts/hot?${queryParams.toString()}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-        }
-      );
+      const response = await fetch(`/api/posts/hot?${queryParams.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
 
       // 3. fetch 받아온 result를 json으로
       const result = await response.json();
 
       // 4. 데이터 처리
-      if (result.statusCode === 200) {
+      if (result.status === 200) {
         // 4-1. data가 배열인지 확인해서 맞으면
         if (Array.isArray(result.data)) {
           // 4-1-1. 렌더링 함수에 데이터 전달
@@ -124,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 5. WEEKLY POINT RANK FETCH **/
+  /** FETCH - WEEKLY POINT RANK **/
   async function fetchWeeklyPointRank(num) {
     try {
       // 1. 쿼리스트링 구성
@@ -132,28 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
         num: num,
       });
 
-      // // 2. fetch 받아오기 (WEEKLY POINT RANK)
-      // const weeklyResponse = await fetch(
-      //   `${API_BASE_URL}/points/ranks-weekly?${queryParams.toString()}`,
-      //   {
-      //     method: 'GET',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //       Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      //     },
-      //   }
-      // );
-
       // 2. fetch 받아오기 (WEEKLY POINT RANK - Redis)
-      const weeklyResponse = await fetch(
-        `${API_BASE_URL}/points/ranks-lastweek-redis`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const weeklyResponse = await fetch(`/api/points/ranks-lastweek-redis`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       // 3. fetch 받아온 result를 json으로
       const weeklyResult = await weeklyResponse.json();
@@ -180,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 6. TOTAL POINT RANK FETCH **/
+  /** FETCH - TOTAL POINT RANK **/
   async function fetchTotalPointRank(num) {
     try {
       // 1. 쿼리스트링 구성
@@ -188,28 +169,13 @@ document.addEventListener('DOMContentLoaded', () => {
         num: num,
       });
 
-      // // 2. fetch 받아오기 (TOTAL POINT RANK)
-      // const totalResponse = await fetch(
-      //   `${API_BASE_URL}/points/ranks?${queryParams.toString()}`,
-      //   {
-      //     method: 'GET',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //       Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      //     },
-      //   }
-      // );
-
       // 2. fetch 받아오기 (TOTAL POINT RANK - Redis)
-      const totalResponse = await fetch(
-        `${API_BASE_URL}/points/ranks-total-redis`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const totalResponse = await fetch(`/api/points/ranks-total-redis`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       // 3. fetch 받아온 result를 json으로
       const totalResult = await totalResponse.json();
@@ -236,23 +202,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 7. HASHTAG RANK FETCH **/
+  /** FETCH - HASHTAG RANK **/
   async function fetchHashtagRank() {
     try {
       // 1. 쿼리스트링 구성
       // 레디스로 이동 . 더이상 api에 쿼리스트링 없음
 
       // 2. fetch 받아오기 (HASHTAG RANK)
-      const response = await fetch(
-        `${API_BASE_URL}/hashtags/ranks-weekly`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-        }
-      );
+      const response = await fetch(`/api/hashtags/ranks-weekly`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
 
       // 3. fetch 받아온 result를 json으로
       const result = await response.json();
@@ -270,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 0. HOT LIVECHAT 랜더링 **/
+  /** 랜더링 - HOT LIVECHAT**/
   function renderHotLivechatList(data) {
     // 1. 들어온 데이터를 하나하나 HTML화
     for (let i = 0; i < data.length; i++) {
@@ -310,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 0. HOT POST 랜더링 **/
+  /** 랜더링 - HOT POST **/
   function renderHotPostList(category, data) {
     // 1. 들어온 데이터를 하나하나 HTML화
     for (let i = 0; i < data.length; i++) {
@@ -347,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 0. WEEKLY POINT RANK 랜더링 **/
+  /** 랜더링 - WEEKLY POINT RANK **/
   function renderWeeklyPointRank(data) {
     // 1. 들어온 데이터를 하나하나 HTML화
     for (let i = 0; i < data.length / 2; i++) {
@@ -371,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 0. TOTAL POINT RANK 랜더링 **/
+  /** 랜더링 - TOTAL POINT RANK **/
   function renderTotalPointRank(data) {
     // 1. 들어온 데이터를 하나하나 HTML화
     for (let i = 0; i < data.length / 2; i++) {
@@ -395,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 0. HASHTAG RANK 랜더링 **/
+  /** 랜더링 - HASHTAG RANK **/
   function renderHashtagRank(data) {
     // 1. 들어온 데이터를 하나하나 HTML화
     for (let i = 1; i <= data.length; i++) {
@@ -407,10 +370,10 @@ document.addEventListener('DOMContentLoaded', () => {
       <span class="hashtag-rank-ranking-var">${rankMark(i)}</span>
       </div>                  
       <div class="hashtag-rank-hashtag">
-      <span>${data[i-1].hashtag}</span>
+      <span>${data[i - 1].hashtag}</span>
       </div>                  
       <div class="hashtag-rank-count">
-      <span>${data[i-1].count}</span>
+      <span>${data[i - 1].count}</span>
       </div>
       </div>
       `;

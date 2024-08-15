@@ -1,5 +1,3 @@
-import { API_BASE_URL } from '../../config/config.js';
-
 document.addEventListener('DOMContentLoaded', () => {
   const signUpForm = document.querySelector('form');
   if (!signUpForm) {
@@ -23,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/sign-up`, {
+      const response = await fetch(`/api/auth/sign-up`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
