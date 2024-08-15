@@ -14,11 +14,7 @@ import { CommentModule } from 'src/comment/comment.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Alarm, User, Post, Comment]),
-    ConfigModule,
-    UserModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Alarm, User, Post, Comment]), UserModule],
   controllers: [AlarmController],
   providers: [AlarmService],
   exports: [AlarmService],

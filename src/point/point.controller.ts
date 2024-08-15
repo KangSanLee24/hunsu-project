@@ -23,7 +23,7 @@ export class PointController {
   @ApiOperation({ summary: '출석 체크' })
   @Post('today')
   async create(@LogIn() user: User) {
-    await this.pointService.checkAttendance(user.id);
+    await this.pointService.checkAttendance(user);
     return {
       statusCode: HttpStatus.OK,
       message: `출석 체크!`,
@@ -69,6 +69,28 @@ export class PointController {
     return {
       status: 200,
       message: '주간 랭킹 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 주간 랭킹 조회 - 레디스 **/
+  @Get('ranks-lastweek-redis')
+  async getLastWeekPointRank() {
+    const data = await this.pointService.getLastWeekPointRank();
+    return {
+      status: 200,
+      message: '주간 랭킹 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 종합 랭킹 조회 - 레디스 **/
+  @Get('ranks-total-redis')
+  async getTotalPointRank() {
+    const data = await this.pointService.getTotalPointRank();
+    return {
+      status: 200,
+      message: '종합 랭킹 조회에 성공했습니다.',
       data: data,
     };
   }
