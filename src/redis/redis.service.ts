@@ -11,12 +11,12 @@ export class RedisService implements OnModuleInit {
   onModuleInit() {
     this.redisClient = new Redis({
       host: this.configService.get<string>('REDIS_HOST'),
-      port: 17640,        // Redis 서버 포트
+      port: 17640, // Redis 서버 포트
       password: this.configService.get<string>('REDIS_PASSWORD'),
     });
 
     this.redisClient.on('connect', () => {
-      console.log('Connected to Redis');
+      console.log('Connected to MAIN-Redis');
     });
 
     this.redisClient.on('error', (err) => {
