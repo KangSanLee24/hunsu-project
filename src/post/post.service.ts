@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   ForbiddenException,
-  HttpStatus,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -15,7 +14,6 @@ import { POST_MESSAGE } from 'src/constants/post-message.constant';
 import { User } from 'src/user/entities/user.entity';
 import { Role } from 'src/user/types/user-role.type';
 import { AwsService } from 'src/aws/aws.service';
-import { PostImage } from './entities/post-image.entity';
 import { Category } from './types/post-category.type';
 import { Order } from './types/post-order.type';
 import { paginate } from 'nestjs-typeorm-paginate';
@@ -36,8 +34,6 @@ export class PostService {
     private readonly subRedisService: SubRedisService,
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
-    @InjectRepository(PostImage)
-    private readonly postImageRepository: Repository<PostImage>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(PostLike)
@@ -216,13 +212,7 @@ export class PostService {
   async findOne(id: number) {
     const post = await this.postRepository.findOne({
       where: { id },
-      relations: [
-        'user',
-        'postImages',
-        'comments',
-        'postLikes',
-        'postDislikes',
-      ],
+      relations: ['user', 'comments', 'postLikes', 'postDislikes'],
     });
 
     // 게시글이 존재하는지 확인
@@ -238,7 +228,6 @@ export class PostService {
       userId: post.userId,
       nickname: post.user.nickname,
       title: post.title,
-      images: post.postImages.map((image) => image.imgUrl), // 게시글 이미지 : { 이미지 URL}
       category: post.category,
       content: post.content,
       numLikes: post.numLikes, // 좋아요 수

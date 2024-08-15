@@ -16,7 +16,7 @@ import {
 import { PostService } from './post.service';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
-import { AuthGuard, IAuthGuard, Type } from '@nestjs/passport';
+import { AuthGuard } from '@nestjs/passport';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
 import {
   ApiBearerAuth,
@@ -167,11 +167,7 @@ export class PostController {
     @Body() updatePostDto: UpdatePostDto
   ) {
     const userId = user.id;
-    await this.postService.update(
-      postId,
-      updatePostDto,
-      userId
-    );
+    await this.postService.update(postId, updatePostDto, userId);
 
     return {
       statusCode: HttpStatus.OK,
@@ -235,7 +231,7 @@ export class PostController {
     const data = await this.postService.getMyPostLike(userId, postId);
     return {
       status: HttpStatus.OK,
-      messgae: '나의 게시글 좋아요 여부 조회에 성공했습니다.',
+      message: '나의 게시글 좋아요 여부 조회에 성공했습니다.',
       data: data,
     };
   }
@@ -284,7 +280,7 @@ export class PostController {
     const data = await this.postService.getMyPostDislike(userId, postId);
     return {
       status: HttpStatus.OK,
-      messgae: '나의 게시글 싫어요 여부 조회에 성공했습니다.',
+      message: '나의 게시글 싫어요 여부 조회에 성공했습니다.',
       data: data,
     };
   }
