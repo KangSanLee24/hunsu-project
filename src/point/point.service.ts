@@ -38,7 +38,7 @@ export class PointService {
       throw new NotFoundException('유효한 사용자를 찾을 수 없습니다.');
     }
 
-    // 2. 오늘 출석을 했는지 체크
+    // 2. 오늘 출석을 했는지 확인
     const todayPoint = await this.findTodayPointById(
       userId,
       PointType.ATTENTION
@@ -208,13 +208,15 @@ export class PointService {
   async pointWeeklyRank(num: number): Promise<any[]> {
     const pointRank = await this.pointLogRepository.query(
       `
-      SELECT b.id, b.nickname, SUM(a.point) AS point
+      select c.id AS userId, c.nickname, c.point, d.acc_point AS accPoint
+      from (SELECT b.id as id, b.nickname as nickname, SUM(a.point) AS point
       FROM point_logs a
       JOIN users b ON a.user_id = b.id
-      WHERE a.created_at >=  DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 8) DAY)  
-        AND a.created_at < DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 1) DAY)
-      GROUP BY b.nickname 
-      ORDER BY point DESC
+      WHERE a.created_at >=  DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 8) DAY)
+      AND a.created_at < DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 1) DAY)
+      GROUP BY b.nickname
+      ORDER BY point DESC) c left join points d
+      on c.id = d.user_id
       limit ${num};
       `
     );

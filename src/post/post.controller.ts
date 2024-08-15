@@ -33,7 +33,7 @@ import { Category } from './types/post-category.type';
 import { Order } from './types/post-order.type';
 import { FindAllPostsDto } from './dtos/find-all-posts.dto';
 
-@ApiTags('3. POST API')
+@ApiTags('03. POST API')
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
@@ -100,7 +100,7 @@ export class PostController {
   }
 
   /** 화제글 목록 조회 API **/
-  @ApiOperation({ summary: '화제글 목록 조회 API' })
+  @ApiOperation({ summary: '8. 화제글 목록 조회 API' })
   @ApiQuery({
     name: 'category',
     required: false,
@@ -167,7 +167,7 @@ export class PostController {
     @Body() updatePostDto: UpdatePostDto
   ) {
     const userId = user.id;
-    const updatedPost = await this.postService.update(
+    await this.postService.update(
       postId,
       updatePostDto,
       userId
@@ -176,7 +176,6 @@ export class PostController {
     return {
       statusCode: HttpStatus.OK,
       message: POST_MESSAGE.POST.UPDATE.SUCCESS,
-      data: updatedPost,
     };
   }
 
@@ -198,7 +197,7 @@ export class PostController {
   /** 게시글 강제 삭제 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '게시글 강제 삭제 API' })
+  @ApiOperation({ summary: '7. 게시글 강제 삭제 API' })
   @Delete(':postId/admin')
   async forceRemove(@LogIn() user: User, @Param('id') id: number) {
     const userId = user.id;
@@ -211,8 +210,7 @@ export class PostController {
   }
 
   /** 게시글 좋아요 조회 API **/
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 좋아요 조회 API' })
+  @ApiOperation({ summary: '9. 게시글 좋아요 조회 API' })
   @Get(':postId/likes')
   async getPostLikes(@Param('postId', ParseIntPipe) postId: number) {
     const data = await this.postService.getPostLikes(postId);
@@ -225,8 +223,7 @@ export class PostController {
   }
 
   /** 로그인한 사람의 게시글 좋아요 조회 API **/
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '나의 게시글 좋아요 여부 조회 API' })
+  @ApiOperation({ summary: '10. 나의 게시글 좋아요 여부 조회 API' })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @Get(':postId/likes/me')
@@ -244,8 +241,7 @@ export class PostController {
   }
 
   /** 게시글 좋아요 클릭 API **/
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 좋아요 클릭 API' })
+  @ApiOperation({ summary: '11. 게시글 좋아요 클릭 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch(':postId/likes')
@@ -263,8 +259,7 @@ export class PostController {
   }
 
   /** 게시글 싫어요 조회 API **/
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 싫어요 조회 API' })
+  @ApiOperation({ summary: '12. 게시글 싫어요 조회 API' })
   @Get(':postId/dislikes')
   async getPostDislikes(@Param('postId', ParseIntPipe) postId: number) {
     const data = await this.postService.getPostDislikes(postId);
@@ -277,8 +272,7 @@ export class PostController {
   }
 
   /** 로그인한 사람의 게시글 싫어요 조회 API **/
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '나의 게시글 싫어요 여부 조회 API' })
+  @ApiOperation({ summary: '13. 나의 게시글 싫어요 여부 조회 API' })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @Get(':postId/dislikes/me')
@@ -296,8 +290,7 @@ export class PostController {
   }
 
   /** 게시글 싫어요 클릭 API **/
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 싫어요 클릭 API' })
+  @ApiOperation({ summary: '14. 게시글 싫어요 클릭 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch(':postId/dislikes')
