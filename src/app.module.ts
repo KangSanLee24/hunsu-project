@@ -39,6 +39,7 @@ import { RedisModule } from './redis/redis.module';
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     ScheduleModule.forRoot(),
+    RedisModule,
     AuthModule,
     UserModule,
     PostModule,

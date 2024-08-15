@@ -11,10 +11,7 @@ import { AlarmService } from './alarm.service';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Alarm, User, Post, Comment]),
-    UserModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Alarm, User, Post, Comment]), UserModule],
   controllers: [AlarmController],
   providers: [AlarmService],
   exports: [AlarmService],

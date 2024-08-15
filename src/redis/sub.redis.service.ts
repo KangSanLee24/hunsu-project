@@ -5,6 +5,7 @@ import Redis from 'ioredis';
 @Injectable()
 export class SubRedisService implements OnModuleInit, OnModuleDestroy {
   private subRedisClient: Redis;
+
   constructor(private configService: ConfigService) {}
 
   /** Redis 모듈 시작 **/
@@ -28,7 +29,7 @@ export class SubRedisService implements OnModuleInit, OnModuleDestroy {
     });
 
     this.subRedisClient.on('error', (err) => {
-      console.error('Redis error', err);
+      console.error('SUB-Redis error', err);
     });
   }
 

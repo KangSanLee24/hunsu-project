@@ -132,14 +132,25 @@ document.addEventListener('DOMContentLoaded', () => {
         num: num,
       });
 
-      // 2. fetch 받아오기 (WEEKLY POINT RANK)
+      // // 2. fetch 받아오기 (WEEKLY POINT RANK)
+      // const weeklyResponse = await fetch(
+      //   `${API_BASE_URL}/points/ranks-weekly?${queryParams.toString()}`,
+      //   {
+      //     method: 'GET',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //       Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      //     },
+      //   }
+      // );
+
+      // 2. fetch 받아오기 (WEEKLY POINT RANK - Redis)
       const weeklyResponse = await fetch(
-        `${API_BASE_URL}/points/ranks-weekly?${queryParams.toString()}`,
+        `${API_BASE_URL}/points/ranks-lastweek-redis`,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         }
       );
@@ -177,14 +188,25 @@ document.addEventListener('DOMContentLoaded', () => {
         num: num,
       });
 
-      // 2. fetch 받아오기 (TOTAL POINT RANK)
+      // // 2. fetch 받아오기 (TOTAL POINT RANK)
+      // const totalResponse = await fetch(
+      //   `${API_BASE_URL}/points/ranks?${queryParams.toString()}`,
+      //   {
+      //     method: 'GET',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //       Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      //     },
+      //   }
+      // );
+
+      // 2. fetch 받아오기 (TOTAL POINT RANK - Redis)
       const totalResponse = await fetch(
-        `${API_BASE_URL}/points/ranks?${queryParams.toString()}`,
+        `${API_BASE_URL}/points/ranks-total-redis`,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         }
       );
@@ -328,19 +350,19 @@ document.addEventListener('DOMContentLoaded', () => {
   /** 0. WEEKLY POINT RANK 랜더링 **/
   function renderWeeklyPointRank(data) {
     // 1. 들어온 데이터를 하나하나 HTML화
-    for (let i = 1; i <= data.length; i++) {
+    for (let i = 0; i < data.length / 2; i++) {
       // 1-1. 데이터로 row HTML 생성
       const row = document.createElement('div');
       row.innerHTML = `
                 <div class="point-rank-info">
                 <div class="point-rank-ranking">
-                <span class="point-rank-ranking-var">${rankMark(i)}</span>
+                <span class="point-rank-ranking-var">${rankMark(i + 1)}</span>
                 </div>                  
                 <div class="point-rank-nickname">
-                <span>${levelMark(data[i - 1].accPoint)}${data[i - 1].nickname}</span>
+                <span>${data[2 * i]}</span>
                 </div>                  
                   <div class="point-rank-point">
-                  <span>${data[i - 1].point}</span>
+                  <span>${data[2 * i + 1]}</span>
                   </div>
                   </div>
                   `;
@@ -352,19 +374,19 @@ document.addEventListener('DOMContentLoaded', () => {
   /** 0. TOTAL POINT RANK 랜더링 **/
   function renderTotalPointRank(data) {
     // 1. 들어온 데이터를 하나하나 HTML화
-    for (let i = 1; i <= data.length; i++) {
+    for (let i = 0; i < data.length / 2; i++) {
       // 1-1. 데이터로 row HTML 생성
       const row = document.createElement('div');
       row.innerHTML = `
       <div class="point-rank-info">
       <div class="point-rank-ranking">
-      <span class="point-rank-ranking-var">${rankMark(i)}</span>
+      <span class="point-rank-ranking-var">${rankMark(i + 1)}</span>
       </div>                  
       <div class="point-rank-nickname">
-      <span>${levelMark(data[i - 1].point)}${data[i - 1].nickname}</span>
+      <span>${levelMark(data[2 * i + 1])}${data[2 * i]}</span>
       </div>                  
       <div class="point-rank-point">
-      <span>${data[i - 1].accPoint}</span>
+      <span>${data[2 * i + 1]}</span>
       </div>
       </div>
       `;
