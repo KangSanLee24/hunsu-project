@@ -107,6 +107,10 @@ export class PostService {
       'yyyy-MM-dd'
     );
 
+    // 5. redis 비우는 작업 (게시글 목록 조회 캐시 삭제)
+    const postKey = `post:1:20:all:DESC:none`;
+    await this.subRedisService.deleteValue(postKey); // 해당 캐시 삭제
+
     //hashtags = [#청바지, #모자]
     const postHashtag = hashtags.map((item) => {
       const uniqueTag = `${item}:${currentTime}`;
