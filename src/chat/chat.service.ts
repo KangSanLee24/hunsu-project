@@ -252,7 +252,6 @@ export class ChatService {
 
         // 해시태그 카운트 증감에 따른 이벤트 등록
         const data = await client.zrevrange('hashtag', 0, 9, 'WITHSCORES');
-        console.log(data);
         const alarmData = {
           type: 'hashtag',
           message: `${tag}`,
