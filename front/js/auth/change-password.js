@@ -1,5 +1,3 @@
-import { API_BASE_URL } from '../../config/config.js';
-
 const sendEmailBtn = document.getElementById('send-email-btn');
 
 // 비밀번호 변경 요청
@@ -10,7 +8,7 @@ async function rePassword() {
   const email = document.getElementById('change-password-email').value;
   try {
     // 비밀번호 변경 요청 API
-    const response = await fetch(`${API_BASE_URL}/auth/re-password`, {
+    const response = await fetch(`/api/auth/re-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

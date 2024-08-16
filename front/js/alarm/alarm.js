@@ -1,7 +1,6 @@
-import { API_BASE_URL } from '../../config/config.js';
 import { elapsedTime } from '../common/elapsed-time.js';
 
-/** 1. 페이지에 필요한 변수 세팅 **/
+/** 페이지에 필요한 변수 세팅 **/
 // 1. 로그인 관련 변수 선언
 const accessToken = localStorage.getItem('accessToken');
 const isLoggedIn = !!accessToken;
@@ -21,7 +20,7 @@ let currentPage = 1; // 현재 페이지
 let totalPages = 0; // 총 페이지 수
 const alarmsPerPage = 10; // 페이지 당 게시글 수
 
-/** 2. 로그인 상태에 따른 분기 세팅 **/
+/** 로그인 상태에 따른 분기 세팅 **/
 // 1. 만약 로그인이 되어있다면
 if (isLoggedIn) {
   // 1-1. 로그인O => 로그인 및 회원가입 버튼 [숨기기]
@@ -37,7 +36,7 @@ if (isLoggedIn) {
   afterAlarmList.appendChild(noShow);
 }
 
-/** 3. 알람 목록 조회 API 호출 **/
+/** 알람 목록 조회 API 호출 **/
 async function fetchAlarmData(page) {
   try {
     // 1. API 호출 시 비어 있는 값을 포함하지 않도록 URL 구성
@@ -47,7 +46,7 @@ async function fetchAlarmData(page) {
     });
 
     // 2. fetch 받아오기 (알람 목록)
-    const response = await fetch(`${API_BASE_URL}/alarms`, {
+    const response = await fetch(`/api/alarms`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +80,7 @@ async function fetchAlarmData(page) {
   }
 }
 
-/** 5. 데이터 렌더링 함수 **/
+/** 데이터 렌더링 함수 **/
 function renderAlarmList(data) {
   // 1. 기본 세팅
   alarmListElement.innerHTML = '';
@@ -107,7 +106,7 @@ function renderAlarmList(data) {
   });
 }
 
-/** 6. 페이지네이션 업데이트 함수 **/
+/** 페이지네이션 업데이트 함수 **/
 function updatePagination() {
   // 1. 페이지네이션 붙일 세팅
   pageNumbersElement.innerHTML = '';
@@ -136,14 +135,14 @@ function updatePagination() {
   // 4. 현재 패이지가 끝번이면 <next> 버튼 비활성화
   nextButton.disabled = currentPage === totalPages;
 }
-/** 6-1. 페이지 이동 버튼 <prev> **/
+/** (+) 페이지 이동 버튼 <prev> **/
 prevButton.addEventListener('click', () => {
   if (currentPage > 1) {
     currentPage--;
     fetchAlarmData(currentPage);
   }
 });
-/** 6-2. 페이지 이동 버튼 <next> **/
+/** (+) 페이지 이동 버튼 <next> **/
 nextButton.addEventListener('click', () => {
   if (currentPage < totalPages) {
     currentPage++;
@@ -151,14 +150,14 @@ nextButton.addEventListener('click', () => {
   }
 });
 
-/** 7. 삭제 버튼 ❌ **/
+/** 삭제 버튼 ❌ **/
 // 알람 개별 삭제 API 호출
 async function deleteAlarm(alarmId) {
   try {
     // 0. 재확인
     if (window.confirm('해당 알람을 정말 삭제하시겠습니까?')) {
       // 1. 알람 개별 삭제 request => response 받기
-      const response = await fetch(`${API_BASE_URL}/alarms/${alarmId}`, {
+      const response = await fetch(`/api/alarms/${alarmId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -189,14 +188,14 @@ async function deleteAlarm(alarmId) {
   }
 }
 
-/** 8. 읽은 알람 모두 삭제 버튼 **/
+/** 읽은 알람 모두 삭제 버튼 **/
 // 읽은 알람 전체 삭제 API 호출
 async function deleteAllAlarm() {
   try {
     // 0. 재확인
     if (window.confirm('[읽음]상태의 알람을 모두 삭제하시겠습니까?')) {
       // 1. 읽은 알람 전체 삭제 request => response 받기
-      const response = await fetch(`${API_BASE_URL}/alarms`, {
+      const response = await fetch(`/api/alarms`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -227,14 +226,14 @@ async function deleteAllAlarm() {
   }
 }
 
-/** 9. 모두 읽음 처리 버튼 **/
+/** 모두 읽음 처리 버튼 **/
 // 모두 읽음 처리 API 호출
 async function readAllAlarm() {
   try {
     // 0. 재확인
     if (window.confirm('모든 알람을 [읽음]상태로 변경하시겠습니까?')) {
       // 1. 남은 알람 전부 읽음 처리 request => response 받기
-      const response = await fetch(`${API_BASE_URL}/alarms`, {
+      const response = await fetch(`/api/alarms`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -265,7 +264,7 @@ async function readAllAlarm() {
   }
 }
 
-/** 10. 읽음 처리 취소 **/
+/** 읽음 처리 취소 **/
 async function checkAlarm(alarmId) {
   try {
     // 0. 재확인
@@ -275,7 +274,7 @@ async function checkAlarm(alarmId) {
       )
     ) {
       // 1. 알람 [읽음]상태 취소 request => response 받기
-      const response = await fetch(`${API_BASE_URL}/alarms/${alarmId}`, {
+      const response = await fetch(`/api/alarms/${alarmId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -306,14 +305,14 @@ async function checkAlarm(alarmId) {
   }
 }
 
-/** 11. 해당 게시글로 이동 **/
+/** 해당 게시글로 이동 **/
 // 알람 메시지를 클릭하면 해당 게시글로 이동
 async function clickAlarm(alarmId) {
   try {
     // 0. 재확인
     if (window.confirm('해당 게시글로 이동하시겠습니까?')) {
       // 1. 알람 클릭 request => response 받기
-      const response = await fetch(`${API_BASE_URL}/alarms/${alarmId}`, {
+      const response = await fetch(`/api/alarms/${alarmId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -341,10 +340,10 @@ async function clickAlarm(alarmId) {
   }
 }
 
-/** 0. 페이지 시작되면 '3. 알람 목록 조회 API 호출' CALL **/
+/** 페이지 시작되면 '알람 목록 조회 API 호출' CALL **/
 fetchAlarmData(currentPage);
 
-/** 0. js함수를 전역으로 끄집어내서 html에서 사용 **/
+/** js함수를 전역으로 끄집어내서 html에서 사용 **/
 window.deleteAlarm = deleteAlarm;
 window.deleteAllAlarm = deleteAllAlarm;
 window.readAllAlarm = readAllAlarm;

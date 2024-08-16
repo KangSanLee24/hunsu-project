@@ -1,5 +1,3 @@
-import { API_BASE_URL } from '../../config/config.js';
-
 const updatePasswordBtn = document.getElementById('update-password-btn');
 
 // 비밀번호 변경 API 호출 함수
@@ -9,7 +7,7 @@ async function updatePassword() {
   const passwordConfirm = document.getElementById('password-confirm').value;
   try {
     // 비밀번호 변경 API
-    const response = await fetch(`${API_BASE_URL}/auth/update-password`, {
+    const response = await fetch(`/api/auth/update-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -17,8 +15,16 @@ async function updatePassword() {
       body: JSON.stringify({ email, password, passwordConfirm }),
     });
 
+
+    const result = await response.json();
+
+    // 409
+    if (result.status = 409) {
+      alert('새 비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+    }
+
     // 그 외
-    if (!response.ok) {
+    else if (!response.ok) {
       alert('비밀번호 변경에 실패했습니다.');
       return; // 더 이상 진행하지 않음
     }

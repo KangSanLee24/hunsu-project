@@ -12,8 +12,8 @@ export class HashtagController {
    * @returns
    */
   @Get('ranks-weekly')
-  async hashtagWeeklyLank() {
-    const data = await this.hashtagService.hashtagWeeklyLank();
+  async hashtagWeeklyRank() {
+    const data = await this.hashtagService.hashtagWeeklyRank();
     return data;
   }
 }

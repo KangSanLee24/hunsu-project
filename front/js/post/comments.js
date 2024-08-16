@@ -1,20 +1,19 @@
-import { API_BASE_URL } from '../../config/config.js';
 import { elapsedTime } from '../common/elapsed-time.js';
 
-/** 0. 댓글 목록 조회에 필요한 변수 선언 **/
-// 0-1. URL에서 게시글 ID를 가져와서 댓글 로드
+/** 댓글 목록 조회에 필요한 변수 선언 **/
+// 1. URL에서 게시글 ID를 가져와서 댓글 로드
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get('id');
 
-// 0-2. 기타 선언
+// 2. 기타 선언
 const submitCommentButton = document.getElementById('submit-comment');
 const commentContentInput = document.getElementById('comment-content');
 const commentList = document.getElementById('comment-list');
 
-/** 1. 댓글 목록 조회 API **/
+/** 댓글 목록 조회 API **/
 async function fetchComments() {
   try {
-    const response = await fetch(`${API_BASE_URL}/posts/${postId}/comments`, {
+    const response = await fetch(`/api/posts/${postId}/comments`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
@@ -28,10 +27,9 @@ async function fetchComments() {
     console.error(error);
     alert('댓글을 불러오는 중 오류가 발생했습니다.');
   }
-    
 }
 
-/** 2. 댓글 랜더링 함수 **/
+/** 댓글 랜더링 함수 **/
 function renderComments(comments) {
   commentList.innerHTML = ''; // 기존 댓글 초기화
   if (comments.length > 0) {
@@ -43,7 +41,7 @@ function renderComments(comments) {
   }
 }
 
-/** 3. 댓글 리스트에 추가하는 함수 **/
+/** 댓글 리스트에 추가하는 함수 **/
 async function addCommentToList(comment) {
   const commentItem = document.createElement('li');
   commentItem.innerHTML = `
@@ -70,7 +68,7 @@ async function addCommentToList(comment) {
   commentList.appendChild(commentItem);
 }
 
-/** 4. 대댓글을 불러오는 함수 **/
+/** 대댓글을 불러오는 함수 **/
 async function fetchRecomments(commentId) {
   const recommentList = document.getElementById(`recomment-list-${commentId}`);
   if (recommentList.style.display === 'block') {
@@ -79,7 +77,7 @@ async function fetchRecomments(commentId) {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/comments/${commentId}/recomments`, {
+    const response = await fetch(`/api/comments/${commentId}/recomments`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
@@ -96,7 +94,7 @@ async function fetchRecomments(commentId) {
   }
 }
 
-/** 5. 대댓글 랜더링 함수 **/
+/** 대댓글 랜더링 함수 **/
 function renderRecomments(commentId, recomments, recommentList) {
   recommentList.innerHTML = ''; // 기존 대댓글 초기화
   recommentList.style.paddingLeft = '20px'; // 들여쓰기
@@ -132,16 +130,15 @@ function renderRecomments(commentId, recomments, recommentList) {
       <button class="submit-recomment" onclick="addRecomment(${commentId})">작성</button>
     </div>
   `;
-recommentList.appendChild(recommentInputContainer);
+  recommentList.appendChild(recommentInputContainer);
 }
 
-
-/** 4. 나의 댓글 좋아요/싫어요 여부 조회 **/
+/** 나의 댓글 좋아요/싫어요 여부 조회 **/
 async function fetchLD(commentId) {
   try {
     // 1. 댓글 좋아요 눌렀는지 조회
     const commentLike = await fetch(
-      `${API_BASE_URL}/posts/${postId}/comments/${commentId}/likes/me`,
+      `/api/posts/${postId}/comments/${commentId}/likes/me`,
       {
         method: 'GET',
         headers: {
@@ -158,7 +155,7 @@ async function fetchLD(commentId) {
 
     // 2. 댓글 싫어요 눌렀는지 조회
     const commentDislike = await fetch(
-      `${API_BASE_URL}/comments/${commentId}/dislikes/me`,
+      `/api/comments/${commentId}/dislikes/me`,
       {
         method: 'GET',
         headers: {
@@ -177,10 +174,10 @@ async function fetchLD(commentId) {
   }
 }
 
-/** 0. 댓글 작성 **/
+/** 댓글 작성 **/
 async function createComment(content) {
   try {
-    const response = await fetch(`${API_BASE_URL}/posts/${postId}/comments`, {
+    const response = await fetch(`/api/posts/${postId}/comments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -204,20 +201,17 @@ async function createComment(content) {
   }
 }
 
-/** 0. 대댓글 작성 **/
+/** 대댓글 작성 **/
 async function submitRecomment(commentId, content) {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/comments/${commentId}/recomments`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-        body: JSON.stringify({ content }),
-      }
-    );
+    const response = await fetch(`/api/comments/${commentId}/recomments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+      body: JSON.stringify({ content }),
+    });
     if (!response.ok) throw new Error('대댓글 작성에 실패했습니다.');
     return await response.json();
   } catch (error) {
@@ -225,12 +219,12 @@ async function submitRecomment(commentId, content) {
   }
 }
 
-/** 0. 댓글 좋아요 클릭 **/
+/** 댓글 좋아요 클릭 **/
 async function clickLikeComment(commentId) {
   try {
-    // 0-1. 댓글 좋아요 클릭 API 호출
+    // 1. 댓글 좋아요 클릭 API 호출
     const response = await fetch(
-      `${API_BASE_URL}/posts/${postId}/comments/${commentId}/likes`,
+      `/api/posts/${postId}/comments/${commentId}/likes`,
       {
         method: 'PATCH',
         headers: {
@@ -239,27 +233,27 @@ async function clickLikeComment(commentId) {
         },
       }
     );
-    // 0-2. fetch 받아온 result를 json으로
+    // 2. fetch 받아온 result를 json으로
     const result = await response.json();
-    // 0-3. API response 결과가 ok가 아니면
+    // 3. API response 결과가 ok가 아니면
     if (!response.ok) {
       alert(result.message);
     }
-    // 0-4. 댓글목록 새로 불러오기
+    // 4. 댓글목록 새로 불러오기
     fetchComments();
   } catch (error) {
-    // 0-5. 도중에 에러가 뜬 경우
+    // 5. 도중에 에러가 뜬 경우
     alert('댓글 좋아요에서 오류가 발생했습니다.');
     console.error(error);
   }
 }
 
-/** 0. 댓글 싫어요 클릭 **/
+/** 댓글 싫어요 클릭 **/
 async function clickDislikeComment(commentId) {
   try {
-    // 0-1. 댓글 싫어요 클릭 API 호출
+    // 1. 댓글 싫어요 클릭 API 호출
     const response = await fetch(
-      `${API_BASE_URL}/posts/${postId}/comments/${commentId}/dislikes`,
+      `/api/posts/${postId}/comments/${commentId}/dislikes`,
       {
         method: 'PATCH',
         headers: {
@@ -268,16 +262,16 @@ async function clickDislikeComment(commentId) {
         },
       }
     );
-    // 0-2. fetch 받아온 result를 json으로
+    // 2. fetch 받아온 result를 json으로
     const result = await response.json();
-    // 0-3. API response 결과가 ok가 아니면
+    // 3. API response 결과가 ok가 아니면
     if (!response.ok) {
       alert(result.message);
     }
-    // 0-4. 댓글목록 새로 불러오기
+    // 4. 댓글목록 새로 불러오기
     fetchComments();
   } catch (error) {
-    // 0-5. 도중에 에러가 뜬 경우
+    // 5. 도중에 에러가 뜬 경우
     alert('댓글 싫어요에서 오류가 발생했습니다.');
     console.error(error);
   }
@@ -300,9 +294,15 @@ commentList.addEventListener('click', (event) => {
     const recommentInput = event.target.nextElementSibling;
 
     // 대댓글 입력 UI가 있는지 확인
-    if (recommentInput && recommentInput.classList.contains('recomment-input')) {
-      recommentInput.style.display = 
-        recommentInput.style.display === 'none' || recommentInput.style.display === '' ? 'block' : 'none';
+    if (
+      recommentInput &&
+      recommentInput.classList.contains('recomment-input')
+    ) {
+      recommentInput.style.display =
+        recommentInput.style.display === 'none' ||
+        recommentInput.style.display === ''
+          ? 'block'
+          : 'none';
     }
   }
 });
@@ -325,7 +325,7 @@ commentList.addEventListener('click', async (event) => {
   }
 });
 
-/** 페이지 시작!! 0. 페이지 로드 시 댓글 fetch 및 render **/
+/** 페이지 시작!! 페이지 로드 시 댓글 fetch 및 render **/
 if (postId) {
   fetchComments(); // 댓글 불러오는 함수 호출
 }

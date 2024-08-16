@@ -65,7 +65,7 @@ export class AuthService {
     private verifyPasswordRepository: Repository<VerifyPassword>
   ) {}
 
-  /** 1. 회원 가입(sign-up) API **/
+  /** 회원 가입(sign-up) API **/
   async signUp(signUpDto: SignUpDto) {
     // 0. dto에서 데이터 꺼내기
     const { email, nickname, password, passwordConfirm } = signUpDto;
@@ -153,7 +153,7 @@ export class AuthService {
     }
   }
 
-  /** 2. 로그인(log-in) API **/
+  /** 로그인(log-in) API **/
   async logIn(logInDto: LogInDto) {
     // 0. dto에서 데이터 꺼내기
     const { email, password } = logInDto;
@@ -225,7 +225,7 @@ export class AuthService {
     };
   }
 
-  /** 3. 로그아웃(log-out) API **/
+  /** 로그아웃(log-out) API **/
   async logOut(user: User) {
     // 0. user에서 데이터 가져오기
     const userId = user.id;
@@ -250,7 +250,7 @@ export class AuthService {
     };
   }
 
-  /** 4. 토큰 재발급 API **/
+  /** 토큰 재발급 API **/
   async reToken(user: User, refreshToken: string) {
     try {
       // 0. user에서 데이터 가져오기
@@ -314,7 +314,7 @@ export class AuthService {
     }
   }
 
-  /** 5. 이메일 인증 API **/
+  /** 이메일 인증 API **/
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
     // 0. dto에서 데이터 추출
     const { email, certification } = verifyEmailDto;
@@ -355,7 +355,7 @@ export class AuthService {
     };
   }
 
-  /** 6-1-2. 소셜로그인 - 네이버 콜백 **/
+  /** 소셜로그인 - 네이버 콜백 **/
   async logInNaver(req: any) {
     try {
       // 0. 필요한 정보 받아오기 + 생성
@@ -455,7 +455,7 @@ export class AuthService {
     }
   }
 
-  /** 6-1-3. 소셜로그인 - 네이버 리콜 (임시 데이터) **/
+  /** 소셜로그인 - 네이버 리콜 (임시 데이터) **/
   async logInNaverRC(userId, certification) {
     // 1. 유저id + 인증번호로 토큰 받아오기
     const data = await this.socialDataRepository.findOne({
@@ -480,10 +480,10 @@ export class AuthService {
     return tokens;
   }
 
-  /** 6-2. 소셜로그인 - 구글 **/
+  /** 소셜로그인 - 구글 **/
   async logInGoogle() {}
 
-  /** 7. 비밀번호 변경 요청 API **/
+  /** 비밀번호 변경 요청 API **/
   async rePassword(rePasswordDto: RePasswordDto) {
     // 0. dto에서 데이터 꺼내기
     const { email } = rePasswordDto;
@@ -507,7 +507,7 @@ export class AuthService {
     await this.mailService.sendEmail(user.email);
   }
 
-  /** 8. 비밀번호 변경 인증 API **/
+  /** 비밀번호 변경 인증 API **/
   async verifyPassword(verifyPasswordDto: VerifyPasswordDto) {
     // 0. dto에서 데이터 추출
     const { email, certification } = verifyPasswordDto;
@@ -552,7 +552,7 @@ export class AuthService {
     };
   }
 
-  /** 9. 비밀번호 변경 API **/
+  /** 비밀번호 변경 API **/
   async updatePassword(updatePasswordDto: UpdatePasswordDto) {
     // 0. dto에서 데이터 꺼내기
     const { email, password, passwordConfirm } = updatePasswordDto;
@@ -614,7 +614,7 @@ export class AuthService {
     };
   }
 
-  /** 10. 아이디 찾기(find-id) API **/
+  /** 아이디 찾기(find-id) API **/
   async findId(findIdDto: FindIdDto) {
     // 0. dto에서 데이터 꺼내기
     const { nickname } = findIdDto;
@@ -633,7 +633,7 @@ export class AuthService {
     };
   }
 
-  /** 0. Token 발급기 **/
+  /** Token 발급기 **/
   async tokenMaker(payload, refresh: boolean) {}
 
   /** 인증 코드 생성 **/

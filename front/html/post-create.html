@@ -39,7 +39,11 @@
       </select>
 
       <!-- 해시태그 입력란 추가 -->
-      <input type="text" id="post-hashtags" placeholder="해시태그를 입력하세요." />
+      <input
+        type="text"
+        id="post-hashtags"
+        placeholder="해시태그를 입력하세요."
+      />
       <!-- 해시태그 입력 -->
 
       <div class="editor-text-box" id="editor"></div>
@@ -82,9 +86,7 @@
       //postId가 존재하고 숫자이면 해당 숫자로 게시글 상세 조회
       async function fetchPost(postId) {
         try {
-          const response = await fetch(
-            `../api/posts/${postId}`
-          );
+          const response = await fetch(`/api/posts/${postId}`);
           if (!response.ok)
             throw new Error('게시글을 불러오는 데 실패했습니다.');
           return await response.json();

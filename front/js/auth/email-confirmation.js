@@ -1,10 +1,13 @@
-import { API_BASE_URL } from '../../config/config.js';
-
-if (!document.referrer.includes('sign-up.html') && !document.referrer.includes('change-password.html') && !document.referrer.includes('email-confirmation.html')) {
-  // alert(document.referrer);
-  alert('잘못된 접근입니다.');
-  window.location.href = "./main.html"
-}
+// // 회원가입, 비밀번호 변경, 이메일 인증(notification)
+// if (
+//   !document.referrer.includes('sign-up.html') &&
+//   !document.referrer.includes('change-password.html')
+//   // !document.referrer.includes('email-confirmation.html')
+// ) {
+//   // alert(document.referrer);
+//   alert('잘못된 접근입니다.');
+//   window.location.href = './main.html';
+// }
 
 document.addEventListener('DOMContentLoaded', () => {
   const verifyEmailForm = document.getElementById('verify-email-form');
@@ -17,14 +20,15 @@ document.addEventListener('DOMContentLoaded', () => {
     event.preventDefault();
 
     // 폼 데이터 가져오기
+    // 이메일, 인증번호
     const email = document.getElementById('email').value;
     const token = document.getElementById('token').value;
-    alert('token 값은 : ' + token);
 
+    // 이전 페이지 여부로 회원가입, 비밀번호 변경때 다른 API 호출
     // 회원가입 이메일 인증
     if (document.referrer.includes('sign-up.html')) {
       try {
-        const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
+        const response = await fetch(`/api/auth/verify-email`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -50,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 비밀번호 변경
     } else if (document.referrer.includes('change-password.html')) {
       try {
-        const response = await fetch(`${API_BASE_URL}/auth/verify-password`, {
+        const response = await fetch(`/api/auth/verify-password`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -61,8 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (response.ok) {
           // 성공적인 응답 시 로그인 페이지로 이동
-          alert('이메일 인증이 성공적으로 완료되었습니다.\n비밀번호를 변경해 주십시오.');
-          event.preventDefault();
+          alert(
+            '이메일 인증이 성공적으로 완료되었습니다.\n비밀번호를 변경해 주십시오.'
+          );
           window.location.href = './update-password.html';
         } else {
           // 오류 처리

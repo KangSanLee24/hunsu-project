@@ -1,10 +1,8 @@
-import { API_BASE_URL } from '../../config/config.js';
-
 async function getAuthor() {
   try {
     const accessToken = localStorage.getItem('accessToken');
 
-    const response = await fetch(`${API_BASE_URL}/users/me`, {
+    const response = await fetch(`/api/users/me`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -25,15 +23,14 @@ async function getAuthor() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-
   // 로그인 여부 확인
   const accessToken = localStorage.getItem('accessToken');
   if (!accessToken) {
     alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
     window.location.href = '/html/log-in.html';
-    return; 
+    return;
   }
-  
+
   const socket = io('');
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -203,7 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       formData.append('roomId', roomId);
       formData.append('author', currentUser);
 
-      fetch(`${API_BASE_URL}/chatrooms/${roomId}/image`, {
+      fetch(`/api/chatrooms/${roomId}/image`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -281,7 +278,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   toggleIcon.addEventListener('click', () => {
     const img = document.getElementById('fixedImageContent');
     const isHidden = img.style.display === 'none';
-    
+
     if (isHidden) {
       img.style.display = 'block';
       toggleIcon.textContent = '🔼'; // 펼쳐진 상태일 때 아이콘 변경
