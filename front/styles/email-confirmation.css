@@ -30,7 +30,7 @@ label {
 }
 
 input[type='email'],
-input[type='password'] {
+input[type='token'] {
   width: 95%;
   padding: 10px;
   margin-bottom: 15px;

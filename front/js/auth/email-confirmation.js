@@ -2,9 +2,7 @@
 if (
   !document.referrer.includes('sign-up.html') &&
   !document.referrer.includes('change-password.html')
-  // !document.referrer.includes('email-confirmation.html')
 ) {
-  // alert(document.referrer);
   alert('잘못된 접근입니다.');
   window.location.href = './main.html';
 }
