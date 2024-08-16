@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const row = document.createElement('div');
       row.innerHTML = `        
           <div class="hot-live-chat-card">            
-            <div class="hot-live-chat-card-inner">
+            <div class="hot-live-chat-card-inner" onClick="clickLiveChat(${data[i].id})">
               <div class="card-thumbnail">
                 <img
                   class="card-thumbnail-image"
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span>${data[2 * i]}</span>
                 </div>                  
                   <div class="point-rank-point">
-                  <span>${data[2 * i + 1]}</span>
+                  <span>${Number(data[2 * i + 1])}</span>
                   </div>
                   </div>
                   `;
@@ -346,10 +346,10 @@ document.addEventListener('DOMContentLoaded', () => {
       <span class="point-rank-ranking-var">${rankMark(i + 1)}</span>
       </div>                  
       <div class="point-rank-nickname">
-      <span>${levelMark(data[2 * i + 1])}${data[2 * i]}</span>
+      <span>${levelMark(Number(data[2 * i + 1]))}${data[2 * i]}</span>
       </div>                  
       <div class="point-rank-point">
-      <span>${data[2 * i + 1]}</span>
+      <span>${Number(data[2 * i + 1])}</span>
       </div>
       </div>
       `;
@@ -373,13 +373,19 @@ document.addEventListener('DOMContentLoaded', () => {
       <span>${data[i - 1].hashtag}</span>
       </div>                  
       <div class="hashtag-rank-count">
-      <span>${data[i - 1].count}</span>
+      <span>${Number(data[i - 1].count)}</span>
       </div>
       </div>
       `;
       // 1-2. HASHTAG RANK TAB에 데이터 넣어주기
       hashtagRank.appendChild(row);
     }
+  }
+
+  /** LIVECHAT 클릭 **/
+  // 라이브챗을 클릭하면 해당 채팅방으로 이동
+  async function clickLiveChat(roomId) {
+    window.location.href = `/html/chat.html?roomId=${roomId}`;
   }
 
   /** HOT POST 클릭 **/
@@ -476,5 +482,6 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchHashtagRank(10);
 
   /** 함수 전역 선언 **/
+  window.clickLiveChat = clickLiveChat;
   window.clickPost = clickPost;
 });
