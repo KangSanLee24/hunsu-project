@@ -1,69 +1,50 @@
 config:
-  # base url 정의 (우리는 domain을 작성)
-  target: "http://localhost:3000/socket.io"
+  target: "http://localhost:3000"
+  socketio:
+      transports: ["websocket"]
   phases:
-    # 부하테스트 시간 (초)
-    - duration: 60
-    # 부하테스트 동안의 사용자 수 (초당 요청 수)
-    # 목표 수치 2초 언더 / 사용자 수 300
-      arrivalRate: 50
-      # rampTo: 300
-      name: socketio-api-request-test
+      - duration: 60
+        arrivalCount: 90
+        name: socket.io_test
   payload:
     path: "user.csv"
     fields:
-      - "roomId"
-      - "author"
-      - "body"
-    skipHeader: true  # CSV 파일의 첫 줄이 헤더인 경우 true로 설정
-    loadAll: true
-    name: "userData"
-    
-  engines:
-    socketio: {} # Socket.IO 엔진 사용
-  socketio:
-    transports: ["websocket"] # WebSocket을 전송 수단으로 사용
-# 부하 테스트 시나리오
+      - "user"
+    # skipHeader: true  # CSV 파일의 첫 줄이 헤더인 경우 true로 설정
+    # loadAll: true # 한 번에 다 불러오기
+    # name: user # user라는 이름에 묶여 배열화됨.
+
 scenarios:
-  # 시나리오 정의
-  - name: "Connect and join room"
-    engine: "socketio"
+  # - name: "Login and Get User Info and Chatting" # 시나리오 제목2
+  #   flow:
+  #     - post:
+  #         url: "/api/auth/log-in"
+  #         body: | # user 테이블에 있는 아이디 아무거나
+  #           { 
+  #             "email": "test01@test.com",
+  #             "password": "test01"
+  #           }
+  #         headers:
+  #           Content-Type: "application/json"
+  #         capture:
+  #         - json: "$.data.accessToken"  # 응답 본문에서 토큰 캡처
+  #           as: "accessToken"
+  - name: "Chat" # 시나리오 제목2
+    engine: "socketio" # socketio
     flow:
       - loop:
           - emit:
-              channel: "chat" # chat이라는 channel로 보냄 event.gateway.ts
+              channel: "chat" # evnets.gateway.ts @SubscribeMessage('chat')
               data:
-                roomId: "21"
-                author: "박근균"
-                body: "안녕하세요 1트"
-          - think: 2  # 각 반복 사이에 충분한 대기 시간 추가
+                  roomId: "29" # 접속할 룸 id
+                  author: "{{ user }}" # 닉네임
+                  body: "안녕하세요 {{ user }}입니다." # 채팅 내용
+          - think: 1 # 대기시간 2초 / arrivalCount가 2초 간격으로 채팅을 침.
           - emit:
-              channel: "chat"
+              channel: "chat" # evnets.gateway.ts @SubscribeMessage('chat')
               data:
-                roomId: "21"
-                author: "박근균"
-                body: "안녕하세요 2트"
-          - think: 2  # 각 반복 사이에 충분한 대기 시간 추가
-          - emit:
-              channel: "chat"
-              data:
-                roomId: "21"
-                author: "박근균"
-                body: "안녕하세요 3트"
-          - think: 2  # 각 반복 사이에 충분한 대기 시간 추가
-          - emit:
-              channel: "chat"
-              data:
-                roomId: "21"
-                author: "박근균"
-                body: "안녕하세요 4트"
-          - think: 2  # 각 반복 사이에 충분한 대기 시간 추가
-          - emit:
-              channel: "chat"
-              data:
-                roomId: "21"
-                author: "박근균"
-                body: "안녕하세요 5트"
-          - think: 2  # 각 반복 사이에 충분한 대기 시간 추가
-      - think: 11
-    count: 10
+                  roomId: "29" # 접속할 룸 id
+                  author: "{{ user }}" # 닉네임
+                  body: "안녕하세요 {{ user }}입니다." # 채팅 내용
+          - think: 1 # 대기시간 2초 / arrivalCount가 2초 간격으로 채팅을 침.
+        count: 50 # 루프 반복 횟수
