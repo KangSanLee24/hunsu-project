@@ -1,6 +1,6 @@
 /** TOTAL POINT 레벨 분류 **/
 export const levelMark = (point) => {
-  if (point < 0) {
+  if (isNaN(point) || point < 0) {
     return '💩';
   } else if (point < 200) {
     return '🥚';

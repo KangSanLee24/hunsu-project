@@ -1,13 +1,13 @@
-// // 회원가입, 비밀번호 변경, 이메일 인증(notification)
-// if (
-//   !document.referrer.includes('sign-up.html') &&
-//   !document.referrer.includes('change-password.html')
-//   // !document.referrer.includes('email-confirmation.html')
-// ) {
-//   // alert(document.referrer);
-//   alert('잘못된 접근입니다.');
-//   window.location.href = './main.html';
-// }
+// 회원가입, 비밀번호 변경, 이메일 인증(notification)
+if (
+  !document.referrer.includes('sign-up.html') &&
+  !document.referrer.includes('change-password.html')
+  // !document.referrer.includes('email-confirmation.html')
+) {
+  // alert(document.referrer);
+  alert('잘못된 접근입니다.');
+  window.location.href = './main.html';
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const verifyEmailForm = document.getElementById('verify-email-form');
