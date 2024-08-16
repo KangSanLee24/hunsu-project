@@ -4,8 +4,8 @@ import { elapsedTime } from '../common/elapsed-time.js';
 // 1. 로그인 관련 변수 선언
 const accessToken = localStorage.getItem('accessToken');
 const isLoggedIn = !!accessToken;
-const loginLink = document.querySelector('a[href="./log-in.html"]');
-const signUpLink = document.querySelector('a[href="./sign-up.html"]');
+const loginLink = document.querySelector('a[href="./log-in"]');
+const signUpLink = document.querySelector('a[href="./sign-up"]');
 
 // 2. 알람 리스트 관련 변수 선언
 const afterAlarmList = document.getElementById('after-alarm-list');
@@ -322,7 +322,7 @@ async function clickAlarm(alarmId) {
       // 3. 결과 처리
       if (response.status === 200) {
         // 3-1. API 호출에 성공한 경우 링크로 이동
-        window.location.href = `post-detail.html?id=${result.data}`;
+        window.location.href = `post-detail?id=${result.data}`;
       } else {
         // 3-2. API 호출에 실패한 경우
         alert(result.message);

@@ -15,11 +15,10 @@ async function updatePassword() {
       body: JSON.stringify({ email, password, passwordConfirm }),
     });
 
-
     const result = await response.json();
 
     // 409
-    if (result.status = 409) {
+    if ((result.status = 409)) {
       alert('새 비밀번호와 비밀번호 확인이 일치하지 않습니다.');
     }
 
@@ -31,7 +30,7 @@ async function updatePassword() {
 
     // // 확인 버튼 클릭 시 페이지 이동
     // alert('이메일이 전송되었습니다.');
-    // window.location.href = './email-confirmation.html';
+    // window.location.href = './email-confirmation';
     // 사용자 정의 알림 표시
     const notification = document.getElementById('notification');
     const confirmBtn = document.getElementById('confirm-btn');
@@ -39,7 +38,7 @@ async function updatePassword() {
 
     // 확인 버튼 클릭 시 페이지 이동
     confirmBtn.addEventListener('click', () => {
-      window.location.href = './log-in.html';
+      window.location.href = './log-in';
     });
   } catch (error) {
     console.error('비밀번호 변경 중 오류 발생:', error);

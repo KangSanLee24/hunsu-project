@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
   } else {
     alert('닉네임을 불러올 수 없습니다.');
     // window.location.href = document.referrer;
-    window.location.href = './main.html';
+    window.location.href = './index';
   }
 });
 
@@ -53,7 +53,7 @@ async function updateProfile() {
     // 성공적으로 업데이트된 경우 알림 표시
     if (result.status === 200) {
       alert('닉네임이 성공적으로 수정되었습니다.');
-      window.location.href = './my-page.html';
+      window.location.href = './my-page';
     }
   } catch (error) {
     console.error('닉네임 변경 중 오류 발생:', error);

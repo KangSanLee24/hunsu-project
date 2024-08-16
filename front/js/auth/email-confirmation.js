@@ -1,10 +1,10 @@
 // 회원가입, 비밀번호 변경, 이메일 인증(notification)
 if (
-  !document.referrer.includes('sign-up.html') &&
-  !document.referrer.includes('change-password.html')
+  !document.referrer.includes('sign-up') &&
+  !document.referrer.includes('change-password')
 ) {
   alert('잘못된 접근입니다.');
-  window.location.href = './main.html';
+  window.location.href = './index';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 이전 페이지 여부로 회원가입, 비밀번호 변경때 다른 API 호출
     // 회원가입 이메일 인증
-    if (document.referrer.includes('sign-up.html')) {
+    if (document.referrer.includes('sign-up')) {
       try {
         const response = await fetch(`/api/auth/verify-email`, {
           method: 'PATCH',
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (response.ok && result.status === 200) {
           // 성공적인 응답 시 로그인 페이지로 이동
           alert('이메일 인증이 성공적으로 완료되었습니다.');
-          window.location.href = './log-in.html';
+          window.location.href = './log-in';
         } else {
           // 오류 처리
           alert(result.message || '이메일 인증에 실패했습니다.');
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // 비밀번호 변경
-    } else if (document.referrer.includes('change-password.html')) {
+    } else if (document.referrer.includes('change-password')) {
       try {
         const response = await fetch(`/api/auth/verify-password`, {
           method: 'PATCH',
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
           alert(
             '이메일 인증이 성공적으로 완료되었습니다.\n비밀번호를 변경해 주십시오.'
           );
-          window.location.href = './update-password.html';
+          window.location.href = './update-password';
         } else {
           // 오류 처리
           alert(result.message || '이메일 인증에 실패했습니다.');

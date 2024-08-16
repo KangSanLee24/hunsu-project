@@ -54,7 +54,7 @@ async function createPost() {
     const postId = postData.data.id; // 생성된 게시글 ID를 저장
 
     // 해당 게시글 상세 페이지로 이동
-    window.location.href = `./post-detail.html?id=${postId}`;
+    window.location.href = `./post-detail?id=${postId}`;
   } else {
     alert('게시글 생성 실패');
   }
@@ -85,7 +85,7 @@ async function updatePost() {
   if (postResponse.ok) {
     alert('게시글이 수정되었습니다.');
     // 수정된 게시글 상세 페이지로 이동
-    window.location.href = `./post-detail.html?id=${postId}`;
+    window.location.href = `./post-detail?id=${postId}`;
   } else {
     alert('게시글 수정 실패');
   }

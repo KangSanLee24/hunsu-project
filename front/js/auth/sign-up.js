@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 확인 버튼 클릭 시 페이지 이동
         confirmBtn.addEventListener('click', () => {
-          window.location.href = './email-confirmation.html';
+          window.location.href = './email-confirmation';
         });
       } else {
         // 오류 처리

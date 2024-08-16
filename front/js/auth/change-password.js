@@ -25,7 +25,7 @@ async function rePassword() {
 
     // // 확인 버튼 클릭 시 페이지 이동
     // alert('이메일이 전송되었습니다.');
-    // window.location.href = './email-confirmation.html';
+    // window.location.href = './email-confirmation';
     // 사용자 정의 알림 표시
     const notification = document.getElementById('notification');
     const confirmBtn = document.getElementById('confirm-btn');
@@ -33,7 +33,7 @@ async function rePassword() {
 
     // 확인 버튼 클릭 시 페이지 이동
     confirmBtn.addEventListener('click', () => {
-      window.location.href = './email-confirmation.html';
+      window.location.href = './email-confirmation';
     });
   } catch (error) {
     console.error('이메일 전송 중 오류 발생:', error);

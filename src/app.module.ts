@@ -25,10 +25,16 @@ import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'front'), // public 폴더를 정적 파일의 루트로 설정
-      serveRoot: '/', // 기본 URL 경로를 '/'로 설정
-    }),
+    ServeStaticModule.forRoot(
+      {
+        rootPath: join(__dirname, '..', 'front', 'html'), // public 폴더를 정적 파일의 루트로 설정
+        serveRoot: '/', // 기본 URL 경로를 '/'로 설정
+      },
+      {
+        rootPath: join(__dirname, '..', 'front'), // public 폴더를 정적 파일의 루트로 설정
+        serveRoot: '/static', // 기본 URL 경로를 '/'로 설정
+      }
+    ),
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: configValidationSchema,

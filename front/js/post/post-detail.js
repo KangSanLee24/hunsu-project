@@ -189,7 +189,7 @@ async function deletePost() {
 
     if (response.ok) {
       alert('게시글이 삭제되었습니다.');
-      window.location.href = './post-list.html';
+      window.location.href = './post-list';
     } else {
       alert('게시글 삭제 실패');
     }
@@ -243,7 +243,7 @@ async function handleDislike() {
 submitLikeButton.addEventListener('click', handleLike);
 submitDislikeButton.addEventListener('click', handleDislike);
 postUpdateButton.addEventListener('click', () => {
-  window.location.href = `post-create.html?id=${postId}`;
+  window.location.href = `post-create?id=${postId}`;
 });
 postDeleteButton.addEventListener('click', deletePost);
 
