@@ -11,20 +11,16 @@ import { ChatImage } from './entities/chat-image.entity';
 import { AwsModule } from 'src/aws/aws.module';
 import { Point } from 'src/point/entities/point.entity';
 import { RedisModule } from 'src/redis/redis.module';
+import { AlarmModule } from 'src/alarm/alarm.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      ChatRoom,
-      ChatMember,
-      User,
-      ChatImage,
-      Point,
-    ]),
+    TypeOrmModule.forFeature([ChatRoom, ChatMember, User, ChatImage, Point]),
     UserModule,
     AuthModule,
     AwsModule,
-    RedisModule
+    AlarmModule,
+    RedisModule,
   ],
   controllers: [ChatController],
   providers: [ChatService],

@@ -17,11 +17,12 @@ import { ChatImage } from './entities/chat-image.entity';
 import { Order } from 'src/post/types/post-order.type';
 import { Point } from 'src/point/entities/point.entity';
 import { RedisService } from 'src/redis/redis.service';
+import { AlarmService } from 'src/alarm/alarm.service';
 
 @Injectable()
 export class ChatService {
   constructor(
-    private readonly redisService : RedisService,
+    private readonly redisService: RedisService,
     @InjectRepository(ChatRoom)
     private readonly chatRoomRepository: Repository<ChatRoom>,
     @InjectRepository(ChatMember)
@@ -33,6 +34,7 @@ export class ChatService {
     @InjectRepository(ChatImage)
     private readonly chatImageRepository: Repository<ChatImage>,
     private readonly awsService: AwsService,
+    private readonly alarmService: AlarmService,
     private entityManager: EntityManager
   ) {}
 
@@ -236,14 +238,27 @@ export class ChatService {
 
     const currentTime = Date.now();
     const sevenDaysInMilliseconds = 7 * 24 * 60 * 60 * 1000; // 7일을 밀리초로 변환
-    const expireTime = format(currentTime + sevenDaysInMilliseconds, 'yyyy-MM-dd');
+    const expireTime = format(
+      currentTime + sevenDaysInMilliseconds,
+      'yyyy-MM-dd'
+    );
 
-    if(hashtagitem) {
+    if (hashtagitem) {
       for (const tag of hashtagitem) {
         const uniqueTag = `${tag}:${currentTime}`;
 
         // ZINCRBY가 멤버가 없을 때는 추가, 있을 때는 증가시킴
         client.zincrby('hashtag', 1, tag);
+
+        // 해시태그 카운트 증감에 따른 이벤트 등록
+        const data = await client.zrevrange('hashtag', 0, 9, 'WITHSCORES');
+        console.log(data);
+        const alarmData = {
+          type: 'hashtag',
+          message: `${tag}`,
+          data: data,
+        };
+        this.alarmService.newEventRegister(0, alarmData);
 
         //만료기간을 따로 저장
         client.hset('hashtag_expire', uniqueTag, expireTime);
@@ -284,8 +299,7 @@ export class ChatService {
   }
 
   //이미지 시간 조회
-  async imageTime (roomId: number, author: string, fileUrl: string) {
-
+  async imageTime(roomId: number, author: string, fileUrl: string) {
     const findUser = await this.userRepository.findOne({
       where: { nickname: author },
       select: { id: true },
@@ -293,14 +307,14 @@ export class ChatService {
 
     const imageLog = await this.chatImageRepository.findOne({
       where: { roomId: roomId, userId: findUser.id, imgUrl: fileUrl },
-      select: { createdAt: true }
+      select: { createdAt: true },
     });
 
     const imageTime = format(new Date(imageLog.createdAt), 'HH:mm');
 
     return imageTime;
   }
-  
+
   //채팅방 검색
   async chatRoomSearch(title?: string, sort?: Order) {
     const findChatRoom = await this.chatRoomRepository.find({
@@ -348,27 +362,28 @@ export class ChatService {
     //2024-08-13 채팅 내역 테이블 삭제 (레디스로 이동)
 
     await this.entityManager.transaction(
-      "READ UNCOMMITTED",
+      'READ UNCOMMITTED',
       async (manager) => {
-      try {
-        for (const room of findDeleteChat) {
-          await manager.delete(ChatImage, { roomId: room.id });
-          await manager.delete(ChatMember, { roomId: room.id });
-          await manager.delete(ChatRoom, { id: room.id });
-        }
+        try {
+          for (const room of findDeleteChat) {
+            await manager.delete(ChatImage, { roomId: room.id });
+            await manager.delete(ChatMember, { roomId: room.id });
+            await manager.delete(ChatRoom, { id: room.id });
+          }
 
-        // 트랜잭션이 성공했을 때 S3 삭제
-        await Promise.all(
-          findDeleteChat.map(async (chat) => {
-            for (const image of chat.chatImages) {
-              await this.awsService.deleteImageFromS3(image.imgUrl);
-            }
-          })
-        );
-      } catch (error) {
-        console.error('트랜잭션 중 오류 발생:', error);
+          // 트랜잭션이 성공했을 때 S3 삭제
+          await Promise.all(
+            findDeleteChat.map(async (chat) => {
+              for (const image of chat.chatImages) {
+                await this.awsService.deleteImageFromS3(image.imgUrl);
+              }
+            })
+          );
+        } catch (error) {
+          console.error('트랜잭션 중 오류 발생:', error);
+        }
       }
-    });
+    );
   }
 
   //랭킹 (숫자 입력 가능)
@@ -421,33 +436,31 @@ export class ChatService {
 
   //마지막 고정 이미지
   async findChatImage(chatRoomId: number) {
-
     const findChatImage = await this.chatImageRepository.findOne({
       where: { roomId: chatRoomId },
-      select: { 
+      select: {
         userId: true,
-        imgUrl: true,      
-       },
-      order: { createdAt: 'DESC'}
+        imgUrl: true,
+      },
+      order: { createdAt: 'DESC' },
     });
 
-    if(findChatImage) {
+    if (findChatImage) {
       const findUser = await this.userRepository.findOne({
         where: { id: findChatImage.userId },
         select: { nickname: true },
       });
-  
-      return {findChatImage, findUser};
+
+      return { findChatImage, findUser };
     } else {
       return null;
     }
   }
 
   //죽은 방인지 확인
-  async isChatRoom (chatRoomId: number) {
-
+  async isChatRoom(chatRoomId: number) {
     const isChatRoom = await this.chatRoomRepository.findOne({
-      where: {id: chatRoomId, isDeleted: false},
+      where: { id: chatRoomId, isDeleted: false },
     });
 
     return isChatRoom;
