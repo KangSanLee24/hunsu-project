@@ -20,6 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    if (nickname.length < 3 || nickname.length > 12) {
+      alert('닉네임은 3글자 이상 12글자 이하로 입력해 주세요.');
+      return;
+    }
+
     try {
       const response = await fetch(`/api/auth/sign-up`, {
         method: 'POST',

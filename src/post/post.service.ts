@@ -25,7 +25,6 @@ import { PostDislike } from 'src/post/entities/post-dislike.entity';
 import { RedisService } from 'src/redis/redis.service';
 import { format } from 'date-fns';
 import { SubRedisService } from 'src/redis/sub.redis.service';
-import RedisJson from 'redis-json';
 
 @Injectable()
 export class PostService {
@@ -108,6 +107,10 @@ export class PostService {
       'yyyy-MM-dd'
     );
 
+    // 5. redis 비우는 작업 (게시글 목록 조회 캐시 삭제)
+    const postKey = `post:1:20:all:DESC:none`;
+    await this.subRedisService.deleteValue(postKey); // 해당 캐시 삭제
+
     //hashtags = [#청바지, #모자]
     const postHashtag = hashtags.map((item) => {
       const uniqueTag = `${item}:${currentTime}`;
@@ -137,21 +140,18 @@ export class PostService {
     sort?: Order,
     keyword?: string
   ) {
-    // 1. redis 값 불러오기
-    const subRedisClient = this.subRedisService.getClient();
-    const redisJson = new RedisJson(subRedisClient, { prefix: 'cache:' });
-
-    // 2. 검색 필터위한 조건, 캐시 키 생성
+    // 1. 검색 필터위한 조건, 캐시 키 생성
     const postKey = `post:${page}:${limit}:${category || 'all'}:${sort || 'default'}:${keyword || 'none'}`;
 
-    // 3. redis에서 postKey값으로 검색
-    const cachePost = await redisJson.get(postKey);
+    // 2. redis에서 postKey값으로 검색
+    const cachePost = await this.subRedisService.getValue(postKey);
 
-    // 4-1. 만약, 레디스에 데이터가 있을 때
+    // 3-1. 만약, 레디스에 데이터가 있을 때
     if (cachePost) {
       console.log(`redis에서 가져옴 : ${cachePost}`);
-      return cachePost;
-      // 4-2. Redis에 데이터가 없을 경우 : DB에서 조회
+      const parsedResult = JSON.parse(cachePost);
+      return parsedResult;
+      // 3-2. Redis에 데이터가 없을 경우 : DB에서 조회
     } else {
       // 카테고리에 따른 정렬
       const sortCategory = category ? { category } : {};
@@ -201,8 +201,8 @@ export class PostService {
       };
 
       // 4-4. redis에 저장
-      await redisJson.set(postKey, result); // 값 저장
-      await subRedisClient.expire(`cache:${postKey}`, 120); // ttl 5분 설정
+      const stringifiedResult = JSON.stringify(result);
+      await this.subRedisService.setValue(postKey, stringifiedResult, 120); //값저장
 
       return result;
     }
@@ -240,16 +240,14 @@ export class PostService {
 
   /* 화제글 목록 조회 API */
   async findHotPost(category: Category) {
-    // 1. redis 값 불러오기
-    const subRedisClient = this.subRedisService.getClient();
-    const redisJson = new RedisJson(subRedisClient, { prefix: 'cache:' });
-    const hotPost = `hotPosts:${category}`; // 카테고리로 key설정
-
-    const cacheHotPost = await redisJson.get(hotPost);
+    const hotPost = `hotPosts:${category || 'all'}`; // 카테고리로 key설정
+    const cacheHotPost = await this.subRedisService.getValue(hotPost);
 
     // 1-1. 만약, Redis에 캐시된 데이터가 있을 경우
     if (cacheHotPost) {
-      return cacheHotPost;
+      console.log(`redis에서 가져옴 : ${cacheHotPost}`);
+      const hotPostResult = JSON.parse(cacheHotPost);
+      return hotPostResult;
       // 1-2. Redis에 데이터가 없을 경우 : DB에서 조회
     } else {
       const now = new Date(); // 현재시간
@@ -291,8 +289,8 @@ export class PostService {
       }));
 
       // 2. redis 값 저장
-      await redisJson.set(hotPost, topResult); // 값 저장
-      await subRedisClient.expire(`cache:${hotPost}`, 120); // ttl
+      const stringifiedResult = JSON.stringify(topResult); // 값설정
+      await this.subRedisService.setValue(hotPost, stringifiedResult, 120); //값저장
 
       return topResult;
     }

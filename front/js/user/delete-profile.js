@@ -60,7 +60,7 @@ submitDeleteProfileButton.addEventListener('click', (event) => {
   deleteProfile();
 });
 
-// 페이지를 벗어날때 nickname을 localstorage에서 지운다.
+// 페이지를 벗어날때 nickname을 localStorage에서 지운다.
 window.addEventListener('beforeunload', () => {
   localStorage.removeItem('nickname');
   localStorage.removeItem('email');
