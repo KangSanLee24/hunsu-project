@@ -84,6 +84,7 @@ h2:hover {
   height: 315px;
   margin-right: 5px;
   position: relative;
+  cursor: pointer;
 }
 
 /* 1-2-2. 카드 내부 속성 */
@@ -272,6 +273,7 @@ ul.hot-post-rank-tabs li.current {
   flex-direction: row;
   overflow: hidden;
   height: 22px;
+  cursor: pointer;
 }
 
 /* 2-1-6-1. POST TITLE */
@@ -335,8 +337,8 @@ ul.hot-post-rank-tabs li.current {
 
 /* 2-2. WEEKLY & TOTAL POINT RANK */
 .point-rank {
-  width: 25%;
-  min-width: 195px;
+  width: 285px;
+  min-width: 260px;
   height: 285px;
   border: 1px solid black;
   border-radius: 10px;
@@ -350,6 +352,7 @@ ul.hot-post-rank-tabs li.current {
 /* 2-2-1. POINTT RANK TABS*/
 ul.point-rank-tabs {
   height: 42px;
+  min-width: 42px;
   margin: 0px;
   padding: 0px;
   list-style: none;
@@ -360,7 +363,7 @@ ul.point-rank-tabs {
 
 /* 2-2-2. POINT RANK TAB LISTS */
 ul.point-rank-tabs li {
-  width: 65px;
+  width: 97px;
   border-radius: 10px 10px 0px 0px;
   background: rgb(207, 206, 214);
   color: black;
@@ -408,6 +411,7 @@ ul.point-rank-tabs li.current {
   flex-direction: row;
   overflow: hidden;
   height: 22px;
+  cursor: pointer;
 }
 
 /* 2-2-6-1. POINT RANK RANKING */
@@ -525,6 +529,7 @@ ul.hashtag-rank-tabs li.current {
   flex-direction: row;
   overflow: hidden;
   height: 22px;
+  cursor: pointer;
 }
 
 /* 2-3-6-1. HASHTAG RANK RANKING */

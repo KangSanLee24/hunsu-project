@@ -328,8 +328,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // 현재 페이지가 메인페이지 인 경우에만
         const nowUrl = localStorage.getItem('redirectUrl');
         if (
-          nowUrl == 'http://localhost:3000/html/main.html' ||
+          nowUrl == 'http://localhost:3000' ||
+          nowUrl == 'http://localhost:3000/' ||
+          nowUrl == 'http://localhost:3000/index' ||
           nowUrl == 'https://5zirap.shop' ||
+          nowUrl == 'https://5zirap.shop/' ||
           nowUrl == 'https://5zirap.shop/index'
         ) {
           renderHashtagRank(data.data);
