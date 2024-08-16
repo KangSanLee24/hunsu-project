@@ -68,7 +68,12 @@ export class AlarmService {
     });
 
     // 3. 신규 생성 이벤트 등록
-    this.newEventRegister(userId, notification);
+    const alarmData = {
+      type: 'alarm',
+      message: notification,
+      data: 'null',
+    };
+    this.newEventRegister(userId, alarmData);
 
     // 4. 반환
     return alarm;
@@ -286,14 +291,17 @@ export class AlarmService {
     return this.observer.pipe(
       // 2. 알람 소유주의 알람만 전송하도록
       filter((user) => {
+        if (user.id == 0) {
+          return true;
+        }
         return user.id == userId;
       }),
       // 3. 알람 전송
       map((user) => {
         return {
-          data: {
-            message: user.data,
-          },
+          type: user.type,
+          message: user.message,
+          data: user.data,
         } as MessageEvent;
       })
     );
