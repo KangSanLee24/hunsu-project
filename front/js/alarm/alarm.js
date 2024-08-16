@@ -193,7 +193,7 @@ async function deleteAlarm(alarmId) {
 async function deleteAllAlarm() {
   try {
     // 0. 재확인
-    if (window.confirm('[읽음]상태의 알람을 모두 삭제하시겠습니까?')) {
+    if (window.confirm('[읽음O]상태의 알람을 모두 삭제하시겠습니까?')) {
       // 1. 읽은 알람 전체 삭제 request => response 받기
       const response = await fetch(`/api/alarms`, {
         method: 'DELETE',
@@ -231,7 +231,7 @@ async function deleteAllAlarm() {
 async function readAllAlarm() {
   try {
     // 0. 재확인
-    if (window.confirm('모든 알람을 [읽음]상태로 변경하시겠습니까?')) {
+    if (window.confirm('모든 알람을 [읽음O]상태로 변경하시겠습니까?')) {
       // 1. 남은 알람 전부 읽음 처리 request => response 받기
       const response = await fetch(`/api/alarms`, {
         method: 'PATCH',
@@ -264,15 +264,11 @@ async function readAllAlarm() {
   }
 }
 
-/** 읽음 처리 취소 **/
+/** 읽음 처리 반전 **/
 async function checkAlarm(alarmId) {
   try {
     // 0. 재확인
-    if (
-      window.confirm(
-        '해당 알람의 [읽음]상태를 [읽지 않음]상태로 변경하시겠습니까?'
-      )
-    ) {
+    if (window.confirm('해당 알람의 [읽음O]/[읽음X] 상태를 바꾸시겠습니까?')) {
       // 1. 알람 [읽음]상태 취소 request => response 받기
       const response = await fetch(`/api/alarms/${alarmId}`, {
         method: 'PATCH',
@@ -301,7 +297,7 @@ async function checkAlarm(alarmId) {
     }
   } catch (error) {
     // 4. 그 밖의 에러 발생
-    console.error('알람 [읽음]상태 반전 중 오류 발생:', error);
+    console.error('알람 읽음 상태 변경 중 오류 발생:', error);
   }
 }
 
