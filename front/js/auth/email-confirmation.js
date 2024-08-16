@@ -1,12 +1,3 @@
-// 회원가입, 비밀번호 변경, 이메일 인증(notification)
-if (
-  !document.referrer.includes('sign-up') &&
-  !document.referrer.includes('change-password')
-) {
-  alert('잘못된 접근입니다.');
-  window.location.href = './index';
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   const verifyEmailForm = document.getElementById('verify-email-form');
   if (!verifyEmailForm) {

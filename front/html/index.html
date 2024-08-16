@@ -1,143 +1,142 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>5ZIRAP</title>
-    <!-- CSS -->
-    <link rel="stylesheet" href="/static/styles/style.css" />
-    <link rel="stylesheet" href="/static/styles/main.css" />
-  </head>
 
-  <body>
-    <!-- HEADER -->
-    <header>
-      <div id="logo-home" class="logo" onClick="window.location.href='./index'">
-        5ZIRAP
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5ZIRAP</title>
+  <!-- CSS -->
+  <link rel="stylesheet" href="/static/styles/style.css" />
+  <link rel="stylesheet" href="/static/styles/index.css" />
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header>
+    <div id="logo-home" class="logo" onClick="window.location.href='./index'">
+      5ZIRAP
+    </div>
+    <nav>
+      <ul>
+        <li><a href="./log-in">로그인</a></li>
+        <li><a href="./sign-up">회원가입</a></li>
+        <li><a id="userNickname"></a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- MAIN BODY -->
+  <main>
+    <!-- 1. HOT LIVECHATS SECTION -->
+    <div class="hot-live-chats">
+      <!-- HOT LIVECHATS SECTION TITLE -->
+      <div class="hot-live-chats-title">
+        <h2>💬 HOT - LiveChat</h2>
       </div>
-      <nav>
-        <ul>
-          <li><a href="./log-in">로그인</a></li>
-          <li><a href="./sign-up">회원가입</a></li>
-          <li><a id="userNickname"></a></li>
-        </ul>
-      </nav>
-    </header>
-
-    <!-- MAIN BODY -->
-    <main>
-      <!-- 1. HOT LIVECHATS SECTION -->
-      <div class="hot-live-chats">
-        <!-- HOT LIVECHATS SECTION TITLE -->
-        <div class="hot-live-chats-title"><h2>💬 HOT - LiveChat</h2></div>
-        <!-- HOT LIVECHATS CONTAINER -->
-        <div id="hot-live-chat-list" class="hot-live-chats-container">
-          <!-- 여기에 HOT LIVECHATS 데이터 들어옴 -->
-        </div>
+      <!-- HOT LIVECHATS CONTAINER -->
+      <div id="hot-live-chat-list" class="hot-live-chats-container">
+        <!-- 여기에 HOT LIVECHATS 데이터 들어옴 -->
       </div>
+    </div>
 
-      <!-- 2. HOT 5ZIRAP SECTION -->
-      <div class="hot-ozirap">
-        <!-- HOT 5ZIRAP SECTION TITLE -->
-        <div class="hot-ozirap-title"><h2>🌶️ HOT - 5ZIRAP</h2></div>
-        <!-- HOT 5ZIRAP CONTAINER -->
-        <div class="hot-ozirap-container">
-          <!-- 2-1. HOT POSTS RANK -->
-          <div class="hot-post-rank">
-            <!-- 2-1-1. HOT POST RANK TABLE -->
-            <div class="hot-post-rank-inner">
-              <!-- 2-1-1-L. POSTS RANK TAB LISTS -->
-              <ul class="hot-post-rank-tabs">
-                <li class="tab-link" data-tab="tab-fashion">👜Fashion</li>
-                <li class="tab-link current" data-tab="tab-chat">💬Chat</li>
-                <!--<li class="tab-link" data-tab="tab-cooking">🍝Cooking</li> -->
-              </ul>
-              <!-- 2-1-1-L-a. POSTS RANK TABS CONTENTS : CHAT -->
-              <div id="tab-chat" class="tab-contents-box current">
-                <!-- 여기에 HOT POST : CHAT 데이터가 들어옴 -->
-              </div>
-              <!-- 2-1-1-L-b. POSTS RANK TABS CONTENTS : FASHION -->
-              <div id="tab-fashion" class="tab-contents-box">
-                <!-- 여기에 HOT POST : FASHION 데이터가 들어옴 -->
-              </div>
-              <!-- 2-1-1-L-c. POSTS RANK TABS CONTENTS : COOKING -->
-              <div id="tab-cooking" class="tab-contents-box">
-                <!-- 여기에 HOT POST : COOKING 데이터가 들어옴 -->
-              </div>
+    <!-- 2. HOT 5ZIRAP SECTION -->
+    <div class="hot-ozirap">
+      <!-- HOT 5ZIRAP SECTION TITLE -->
+      <div class="hot-ozirap-title">
+        <h2>🌶️ HOT - 5ZIRAP</h2>
+      </div>
+      <!-- HOT 5ZIRAP CONTAINER -->
+      <div class="hot-ozirap-container">
+        <!-- 2-1. HOT POSTS RANK -->
+        <div class="hot-post-rank">
+          <!-- 2-1-1. HOT POST RANK TABLE -->
+          <div class="hot-post-rank-inner">
+            <!-- 2-1-1-L. POSTS RANK TAB LISTS -->
+            <ul class="hot-post-rank-tabs">
+              <li class="tab-link" data-tab="tab-fashion">👜Fashion</li>
+              <li class="tab-link current" data-tab="tab-chat">💬Chat</li>
+              <!--<li class="tab-link" data-tab="tab-cooking">🍝Cooking</li> -->
+            </ul>
+            <!-- 2-1-1-L-a. POSTS RANK TABS CONTENTS : CHAT -->
+            <div id="tab-chat" class="tab-contents-box current">
+              <!-- 여기에 HOT POST : CHAT 데이터가 들어옴 -->
             </div>
-          </div>
-
-          <!-- 2-2. WEEKLY & TOTAL POINT RANK -->
-          <div class="point-rank">
-            <!-- 2-1-1. HOT POINT RANK TABLE -->
-            <div class="point-rank-inner">
-              <!-- 2-1-1-L. POINT RANK TAB LISTS -->
-              <ul class="point-rank-tabs">
-                <li class="point-tab-link current" data-tab="tab-weekly-rank">
-                  🎖️LastWeek
-                </li>
-                <li class="point-tab-link" data-tab="tab-total-rank">
-                  🏆Total
-                </li>
-              </ul>
-              <!-- 2-1-1-L-a. POINT RANK TABS CONTENTS : WEEKLY -->
-              <div id="tab-weekly-rank" class="tab-ranking-box current">
-                <!-- 여기에 WEEKLY RANK 데이터가 들어옴 -->
-              </div>
-              <!-- 2-1-1-L-b. POINT RANK TABS CONTENTS : TOTAL -->
-              <div id="tab-total-rank" class="tab-ranking-box">
-                <!-- 여기에 TOTAL RANK 데이터가 들어옴 -->
-              </div>
+            <!-- 2-1-1-L-b. POSTS RANK TABS CONTENTS : FASHION -->
+            <div id="tab-fashion" class="tab-contents-box">
+              <!-- 여기에 HOT POST : FASHION 데이터가 들어옴 -->
             </div>
-          </div>
-
-          <!-- 2-3. WEEKLY HASHTAG RANK -->
-          <div class="weekly-hashtag-rank">
-            <!-- 2-3-1. WEEKLY HASHTAG RANK TABLE -->
-            <div class="hashtag-rank-inner">
-              <!-- 2-1-1-L. HASHTAG RANK TAB LISTS -->
-              <ul class="hashtag-rank-tabs">
-                <li
-                  class="hashtag-tab-link current"
-                  data-tab="tab-hashtag-rank"
-                >
-                  #Hashtag
-                </li>
-              </ul>
-              <!-- 2-1-1-L-a. HASHTAG RANK TABS CONTENTS : WEEKLY -->
-              <div id="tab-hashtag-rank" class="tab-hashtag-box current">
-                <!-- 여기에 HASHTAG RANK 데이터가 들어옴 -->
-              </div>
+            <!-- 2-1-1-L-c. POSTS RANK TABS CONTENTS : COOKING -->
+            <div id="tab-cooking" class="tab-contents-box">
+              <!-- 여기에 HOT POST : COOKING 데이터가 들어옴 -->
             </div>
           </div>
         </div>
-      </div>
-    </main>
 
-    <!-- FOOTER -->
-    <footer>
-      <div class="footer-menu">
-        <button onclick="window.location.href='./chat-list'">
-          💬 Live Chat
-        </button>
-        <button onclick="window.location.href='./post-list'">📝 게시판</button>
-        <button onclick="window.location.href='./index'">🏠 홈으로</button>
-        <button id="alarmButton" class="footerAlarm" onclick="clickAlarmBtn()">
-          🔔 알람
-        </button>
-        <button
-          id="myPageButton"
-          class="my-page-button"
-          onclick="clickMyPageBtn()"
-        >
-          🏆 마이페이지
-        </button>
-      </div>
-    </footer>
+        <!-- 2-2. WEEKLY & TOTAL POINT RANK -->
+        <div class="point-rank">
+          <!-- 2-1-1. HOT POINT RANK TABLE -->
+          <div class="point-rank-inner">
+            <!-- 2-1-1-L. POINT RANK TAB LISTS -->
+            <ul class="point-rank-tabs">
+              <li class="point-tab-link current" data-tab="tab-weekly-rank">
+                🎖️LastWeek
+              </li>
+              <li class="point-tab-link" data-tab="tab-total-rank">
+                🏆Total
+              </li>
+            </ul>
+            <!-- 2-1-1-L-a. POINT RANK TABS CONTENTS : WEEKLY -->
+            <div id="tab-weekly-rank" class="tab-ranking-box current">
+              <!-- 여기에 WEEKLY RANK 데이터가 들어옴 -->
+            </div>
+            <!-- 2-1-1-L-b. POINT RANK TABS CONTENTS : TOTAL -->
+            <div id="tab-total-rank" class="tab-ranking-box">
+              <!-- 여기에 TOTAL RANK 데이터가 들어옴 -->
+            </div>
+          </div>
+        </div>
 
-    <!-- JS  -->
-    <script type="module" src="/static/js/common/header.js"></script>
-    <script type="module" src="/static/js/main/main.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  </body>
+        <!-- 2-3. WEEKLY HASHTAG RANK -->
+        <div class="weekly-hashtag-rank">
+          <!-- 2-3-1. WEEKLY HASHTAG RANK TABLE -->
+          <div class="hashtag-rank-inner">
+            <!-- 2-1-1-L. HASHTAG RANK TAB LISTS -->
+            <ul class="hashtag-rank-tabs">
+              <li class="hashtag-tab-link current" data-tab="tab-hashtag-rank">
+                #Hashtag
+              </li>
+            </ul>
+            <!-- 2-1-1-L-a. HASHTAG RANK TABS CONTENTS : WEEKLY -->
+            <div id="tab-hashtag-rank" class="tab-hashtag-box current">
+              <!-- 여기에 HASHTAG RANK 데이터가 들어옴 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-menu">
+      <button onclick="window.location.href='./chat-list'">
+        💬 Live Chat
+      </button>
+      <button onclick="window.location.href='./post-list'">📝 게시판</button>
+      <button onclick="window.location.href='./index'">🏠 홈으로</button>
+      <button id="alarmButton" class="footerAlarm" onclick="clickAlarmBtn()">
+        🔔 알람
+      </button>
+      <button id="myPageButton" class="my-page-button" onclick="clickMyPageBtn()">
+        🏆 마이페이지
+      </button>
+    </div>
+  </footer>
+
+  <!-- JS  -->
+  <script type="module" src="/static/js/common/header.js"></script>
+  <script type="module" src="/static/js/index/index.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</body>
+
 </html>

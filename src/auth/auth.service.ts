@@ -63,7 +63,7 @@ export class AuthService {
 
     @InjectRepository(VerifyPassword)
     private verifyPasswordRepository: Repository<VerifyPassword>
-  ) {}
+  ) { }
 
   /** 회원 가입(sign-up) API **/
   async signUp(signUpDto: SignUpDto) {
@@ -481,7 +481,7 @@ export class AuthService {
   }
 
   /** 소셜로그인 - 구글 **/
-  async logInGoogle() {}
+  async logInGoogle() { }
 
   /** 비밀번호 변경 요청 API **/
   async rePassword(rePasswordDto: RePasswordDto) {
@@ -634,7 +634,7 @@ export class AuthService {
   }
 
   /** Token 발급기 **/
-  async tokenMaker(payload, refresh: boolean) {}
+  async tokenMaker(payload, refresh: boolean) { }
 
   /** 인증 코드 생성 **/
   async createCertification() {
