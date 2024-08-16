@@ -222,6 +222,7 @@ h2:hover {
 
 /* 2-1-1. POST RANK TABS*/
 ul.hot-post-rank-tabs {
+  height: 42px;
   margin: 0px;
   padding: 0px;
   list-style: none;
@@ -348,6 +349,7 @@ ul.hot-post-rank-tabs li.current {
 
 /* 2-2-1. POINTT RANK TABS*/
 ul.point-rank-tabs {
+  height: 42px;
   margin: 0px;
   padding: 0px;
   list-style: none;
@@ -464,6 +466,7 @@ ul.point-rank-tabs li.current {
 
 /* 2-3-1. HASHTAG RANK TABS*/
 ul.hashtag-rank-tabs {
+  height: 42px;
   margin: 0px;
   padding: 0px;
   list-style: none;

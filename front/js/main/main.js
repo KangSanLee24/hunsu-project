@@ -360,6 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /** 랜더링 - HASHTAG RANK **/
   function renderHashtagRank(data) {
+    hashtagRank.innerHTML = '';
     // 1. 들어온 데이터를 하나하나 HTML화
     for (let i = 1; i <= data.length; i++) {
       // 1-1. 데이터로 row HTML 생성

@@ -1,4 +1,5 @@
 import { levelMark } from './level-rank.js';
+import { rankMark } from './level-rank.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   /** 헤더에 필요한 변수들 선언 **/
@@ -12,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const signUpLink = document.querySelector('a[href="./sign-up"]');
   const userNickname = document.getElementById('userNickname'); // 사용자 닉네임
   const headerNav = document.querySelector('header nav ul'); // header 요소 선언
+
+  const hashtagRank = document.getElementById('tab-hashtag-rank');
 
   if (accessToken) {
     fetchUserInfo(accessToken, refreshToken);
@@ -281,43 +284,80 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  /** 랜더링 - HASHTAG RANK **/
+  function renderHashtagRank(data) {
+    hashtagRank.innerHTML = '';
+    // 1. 들어온 데이터를 하나하나 HTML화
+    for (let i = 0; i < data.length / 2; i++) {
+      // 1-1. 데이터로 row HTML 생성
+      const row = document.createElement('div');
+      row.innerHTML = `        
+          <div class="hashtag-rank-info">                  
+          <div class="hashtag-rank-ranking">
+          <span class="hashtag-rank-ranking-var">${rankMark(i + 1)}</span>
+          </div>                  
+          <div class="hashtag-rank-hashtag">
+          <span>${data[2 * i]}</span>
+          </div>                  
+          <div class="hashtag-rank-count">
+          <span>${Number(data[2 * i + 1])}</span>
+          </div>
+          </div>
+          `;
+      // 1-2. HASHTAG RANK TAB에 데이터 넣어주기
+      hashtagRank.appendChild(row);
+    }
+  }
+
   // 전역선언
   window.clickAlarmBtn = clickAlarmBtn;
   window.clickMyPageBtn = clickMyPageBtn;
   window.clickCreatePostBtn = clickCreatePostBtn;
+
+  /** SSE 알람 **/
+  function alarmSSE(userId) {
+    const eventSource = new EventSource(`/api/alarms/sse/${userId}`);
+
+    // 1. SSE - 메시지 받기
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type == 'alarm') {
+        console.log(`알람: ${data.message}`);
+        alert(`알람: ${data.message}`);
+      } else if (data.type == 'hashtag') {
+        // 현재 페이지가 메인페이지 인 경우에만
+        const nowUrl = localStorage.getItem('redirectUrl');
+        if (
+          nowUrl == 'http://localhost:3000/html/main.html' ||
+          nowUrl ==
+            'https://5zirap.shop어쩌고저쩌고 로컬스토리지에 있는 값 복붙'
+        ) {
+          renderHashtagRank(data.data);
+        }
+      }
+    };
+
+    // 2. SSE - 알람 활성화 알림
+    eventSource.onopen = () => {
+      console.log('서버의 알람기능과 연결되었습니다.');
+    };
+
+    // 3. SSE - 알람 비활성화 알림
+    eventSource.onclose = () => {
+      console.log('서버의 알람기능을 종료했습니다.');
+    };
+
+    // 4. SSE - 알람 에러
+    eventSource.onerror = (error) => {
+      console.error(
+        '서버와의 연결이 끊겨 일시적으로 알람이 중단되었습니다. 새로고침시 다시 연결됩니다.'
+      );
+    };
+
+    // 페이지 이탈 시 SSE 연결 종료
+    window.addEventListener('unload', (e) => {
+      e.preventDefault();
+      eventSource.close();
+    });
+  }
 });
-
-/** SSE 알람 **/
-function alarmSSE(userId) {
-  const eventSource = new EventSource(`/api/alarms/sse/${userId}`);
-
-  // 1. SSE - 메시지 받기
-  eventSource.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    console.log(`알람: ${data.message}`);
-    alert(`알람: ${data.message}`);
-  };
-
-  // 2. SSE - 알람 활성화 알림
-  eventSource.onopen = () => {
-    console.log('서버의 알람기능과 연결되었습니다.');
-  };
-
-  // 3. SSE - 알람 비활성화 알림
-  eventSource.onclose = () => {
-    console.log('서버의 알람기능을 종료했습니다.');
-  };
-
-  // 4. SSE - 알람 에러
-  eventSource.onerror = (error) => {
-    console.error(
-      '서버와의 연결이 끊겨 일시적으로 알람이 중단되었습니다. 새로고침시 다시 연결됩니다.'
-    );
-  };
-
-  // 페이지 이탈 시 SSE 연결 종료
-  window.addEventListener('unload', (e) => {
-    e.preventDefault();
-    eventSource.close();
-  });
-}
