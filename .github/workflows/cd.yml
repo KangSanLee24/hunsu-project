@@ -59,10 +59,13 @@ jobs:
       - name: Prepare to deploy
         run: ssh ec2 'cd ${{ env.PROJECT_DIR }} && git switch main && git pull && echo "${{ secrets.ENV }}" > .env.production && echo "${{ secrets.ENV }}" > .env.development'
 
-      - name: Copy file to EC2
+      - name: Copy dist to EC2
         run: rsync -avzP -e ssh ./dist ec2:${{ env.PROJECT_DIR }}/
 
-      - name: Copy file to EC2
+      - name: Uninstall dev dependence
+        run: npm ci --omit=dev
+
+      - name: Copy node_modules to EC2
         run: rsync -avzP -e ssh ./node_modules ec2:${{ env.PROJECT_DIR }}/
 
       - name: Restart PM2
