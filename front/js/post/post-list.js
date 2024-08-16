@@ -64,7 +64,7 @@ function renderBoardList(data) {
     row.innerHTML = `
             <td>${item.id}</td>
             <td>${item.category}</td>
-            <td><a href="post-detail.html?id=${item.id}">${item.title}</a></td>
+            <td><a href="post-detail?id=${item.id}">${item.title}</a></td>
             <td>${item.nickname}</td>
             <td>${elapsedTime(item.createdAt)}</td>
             <td>${item.numComments}</td>

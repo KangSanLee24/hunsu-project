@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. 로그인 관련 변수 선언
   const accessToken = localStorage.getItem('accessToken');
   const isLoggedIn = !!accessToken;
-  const loginLink = document.querySelector('a[href="./log-in.html"]');
-  const signUpLink = document.querySelector('a[href="./sign-up.html"]');
+  const loginLink = document.querySelector('a[href="./log-in"]');
+  const signUpLink = document.querySelector('a[href="./sign-up"]');
   // 2. 인기채팅(HOT LIVECHAT) 관련 변수 선언
   const hotLiveChatList = document.getElementById('hot-live-chat-list');
   // 3. 화제글(HOT POST) 관련 변수 선언
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 1-0. 썸네일 있는지 확인 (없으면 기본 이미지를 썸네일로 적용)
       const thumbnail = data[i].imgUrl
         ? data[i].imgUrl
-        : '../images/logo_long.png';
+        : '/static/images/logo_long.png';
       // 1-1. 데이터로 row HTML 생성
       const row = document.createElement('div');
       row.innerHTML = `        
@@ -385,13 +385,13 @@ document.addEventListener('DOMContentLoaded', () => {
   /** LIVECHAT 클릭 **/
   // 라이브챗을 클릭하면 해당 채팅방으로 이동
   async function clickLiveChat(roomId) {
-    window.location.href = `/html/chat.html?roomId=${roomId}`;
+    window.location.href = `/chat?roomId=${roomId}`;
   }
 
   /** HOT POST 클릭 **/
   // 게시글을 클릭하면 해당 게시글로 이동
   async function clickPost(postId) {
-    window.location.href = `post-detail.html?id=${postId}`;
+    window.location.href = `post-detail?id=${postId}`;
   }
 
   /** HOT POST TAB 관련 JS **/

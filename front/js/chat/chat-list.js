@@ -56,7 +56,7 @@ export function renderChatRooms(chatRooms) {
     let tempHTML = `
   <ul>
       <li key=${index}>
-      <a href="/html/chat.html?roomId=${room.id}&roomName=${encodeURIComponent(room.title)}" class="chat-list-link">
+      <a href="/chat?roomId=${room.id}&roomName=${encodeURIComponent(room.title)}" class="chat-list-link">
           <div class="chat-room-info" style="display: flex; justify-content: space-between; align-items: center;">
               <span class="chat-room-name">${room.title}</span>
               <span class="chat-room-user">${room.user.nickname}</span>

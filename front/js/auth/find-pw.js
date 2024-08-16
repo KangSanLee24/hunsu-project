@@ -1,5 +1,5 @@
 import React from 'react';
-import './styles/find-pw.style.css';
+import './static/styles/find-pw.style.css';
 
 const FindPassword = () => {
   const handleEmail = (event) => {

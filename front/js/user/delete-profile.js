@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
   } else {
     alert('정보를 불러오는 과정에서 에러가 발생했습니다.');
     // window.location.href = document.referrer;
-    window.location.href = './main.html';
+    window.location.href = './index';
   }
 });
 
@@ -47,7 +47,7 @@ async function deleteProfile() {
       alert(
         '회원 탈퇴가 완료되었습니다.\n계정복구에 대한 건은 운영자에게 문의하여 주시기 바랍니다.'
       );
-      window.location.href = './main.html';
+      window.location.href = './index';
     }
   } catch (error) {
     console.error('회원 탈퇴 중 오류 발생:', error);

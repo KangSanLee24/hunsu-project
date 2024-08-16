@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (!accessToken) {
     alert('로그인이 필요합니다.');
-    window.location.href = './log-in.html';
+    window.location.href = './log-in';
     return;
   }
 
@@ -143,7 +143,7 @@ function displayUserPosts(posts) {
   posts.forEach((post) => {
     const listItem = document.createElement('li');
     listItem.innerHTML = `
-            <a href="/html/post-detail.html?id=${post.id}">
+            <a href="/post-detail?id=${post.id}">
                 <p>${post.title}</p>
                 <p>${new Date(post.createdAt).toLocaleString()}</p>
             </a>
@@ -166,7 +166,7 @@ function displayUserComments(comments) {
     const listItem = document.createElement('li');
     // <p>게시글: ${comment.postTitle}</p>
     listItem.innerHTML = `
-            <a href="/html/post-detail.html?id=${comment.postId}">
+            <a href="/post-detail?id=${comment.postId}">
                 <p>${comment.content}</p>
                 <p>${new Date(comment.createdAt).toLocaleString()}</p>
             </a>
@@ -206,7 +206,7 @@ window.clickUpdateProfileBtn = async function () {
   localStorage.setItem('nickname', nickname);
 
   // 내 정보 수정으로 이동
-  window.location.href = './update-profile.html';
+  window.location.href = './update-profile';
 };
 
 // 회원 탈퇴 함수
@@ -244,5 +244,5 @@ window.clickDeleteProfileBtn = async function () {
   localStorage.setItem('email', email);
 
   // 내 정보 수정으로 이동
-  window.location.href = './delete-profile.html';
+  window.location.href = './delete-profile';
 };

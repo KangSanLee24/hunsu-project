@@ -15,7 +15,7 @@ async function createChatRoom(roomName) {
         // 현재 페이지 URL을 localStorage에 저장
         localStorage.setItem('currentPage', window.location.href);
         // 로그인 페이지로 리다이렉트하면서 리다이렉트 URL을 전달
-        window.location.href = './log-in.html?redirect=/chat-list.html';
+        window.location.href = './log-in?redirect=/chat-list';
       }
       return; // accessToken이 없으면 함수 종료
     }
@@ -39,7 +39,7 @@ async function createChatRoom(roomName) {
 
       closeModal();
       //채팅방으로 이동
-      window.location.href = `/html/chat.html?roomId=${roomId}&roomName=${encodeURIComponent(title)}`;
+      window.location.href = `/chat?roomId=${roomId}&roomName=${encodeURIComponent(title)}`;
     } else {
       console.error('채팅방 생성 실패:', data);
     }

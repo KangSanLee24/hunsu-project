@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const accessToken = localStorage.getItem('accessToken');
   const refreshToken = localStorage.getItem('refreshToken');
-  const loginLink = document.querySelector('a[href="./log-in.html"]');
-  const signUpLink = document.querySelector('a[href="./sign-up.html"]');
+  const loginLink = document.querySelector('a[href="./log-in"]');
+  const signUpLink = document.querySelector('a[href="./sign-up"]');
   const userNickname = document.getElementById('userNickname'); // 사용자 닉네임
   const headerNav = document.querySelector('header nav ul'); // header 요소 선언
 
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('refreshToken');
       // alert('로그아웃 되었습니다.');
       showLoginOptions();
-      window.location.href = localStorage.getItem('redirectUrl'); // 로그아웃 후 main.html로 이동
+      window.location.href = localStorage.getItem('redirectUrl'); // 로그아웃 후 index로 이동
       // }
     });
 
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
       );
       if (confirmLogin) {
         // 로그인 페이지로 리다이렉트하면서 리다이렉트 URL을 전달
-        window.location.href = './log-in.html';
+        window.location.href = './log-in';
       } else {
         // 로그인을 취소했을 때 포커스를 잃게 함
         event.target.blur();
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
     createChatButton.addEventListener('click', (event) => {
       const accessToken = localStorage.getItem('accessToken');
       if (!accessToken) {
-        handleLoginRequired(event, './chat-list.html');
+        handleLoginRequired(event, './chat-list');
       } else {
         // 로그인 되어 있으면 chat-create.js의 setupChatRoomFormToggle() 함수에 의해 모달 창이 열림
       }
@@ -239,13 +239,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // 로그인 상태가 아니라면
       if (window.confirm('로그인 하시겠습니까?')) {
         // 로그인 페이지로 이동
-        window.location.href = './log-in.html';
+        window.location.href = './log-in';
       } else {
         // 비워둠
       }
     } else {
       // 로그인 상태라면
-      window.location.href = './alarm.html';
+      window.location.href = './alarm';
     }
   };
 
@@ -255,13 +255,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // 로그인 상태가 아니라면
       if (window.confirm('로그인 하시겠습니까?')) {
         // 로그인 페이지로 이동
-        window.location.href = './log-in.html';
+        window.location.href = './log-in';
       } else {
         // 비워둠
       }
     } else {
       // 로그인 상태라면
-      window.location.href = './my-page.html';
+      window.location.href = './my-page';
     }
   };
 
@@ -271,13 +271,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // 로그인 상태가 아니라면
       if (window.confirm('로그인 하시겠습니까?')) {
         // 로그인 페이지로 이동
-        window.location.href = './log-in.html';
+        window.location.href = './log-in';
       } else {
         // 비워둠
       }
     } else {
       // 로그인 상태라면
-      window.location.href = './post-create.html';
+      window.location.href = './post-create';
     }
   };
 

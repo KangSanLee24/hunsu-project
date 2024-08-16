@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const accessToken = localStorage.getItem('accessToken');
   if (!accessToken) {
     alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-    window.location.href = '/html/log-in.html';
+    window.location.href = '/log-in';
     return;
   }
 
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (error) {
     console.error('Failed to get author:', error);
     alert('로그인 정보가 올바르지 않습니다. 로그인 페이지로 이동합니다.');
-    window.location.href = '/html/log-in.html'; // 로그인 페이지 경로로 리다이렉트
+    window.location.href = '/log-in'; // 로그인 페이지 경로로 리다이렉트
     return; // 이후 코드를 실행하지 않도록 중단
   }
 
@@ -307,11 +307,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   socket.on('ownerLeft', () => {
     console.log('ownerLeft');
     alert('방장이 채팅방을 나갔습니다. 채팅 목록 페이지로 이동합니다.');
-    window.location.href = '/html/chat-list.html';
+    window.location.href = '/chat-list';
   });
 
   socket.on('outRoom', () => {
     alert('삭제된 채팅방입니다. 채팅 목록 페이지로 이동합니다.');
-    window.location.href = '/html/chat-list.html';
+    window.location.href = '/chat-list';
   });
 });

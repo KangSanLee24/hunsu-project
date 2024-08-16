@@ -5,19 +5,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>게시글 상세</title>
-  <link rel="stylesheet" href="/styles/style.css" />
-  <link rel="stylesheet" href="/styles/post-detail.css" />
+  <link rel="stylesheet" href="/static/styles/style.css" />
+  <link rel="stylesheet" href="/static/styles/post-detail.css" />
 </head>
 
 <body>
   <header>
-    <div id="logo-home" class="logo" onClick="window.location.href='./main.html'">
+    <div id="logo-home" class="logo" onClick="window.location.href='./index'">
       5ZIRAP
     </div>
     <nav>
       <ul>
-        <li><a href="./log-in.html">로그인</a></li>
-        <li><a href="./sign-up.html">회원가입</a></li>
+        <li><a href="./log-in">로그인</a></li>
+        <li><a href="./sign-up">회원가입</a></li>
         <li><a id="userNickname"></a></li>
       </ul>
     </nav>
@@ -73,13 +73,13 @@
 
   <footer>
     <div class="footer-menu">
-      <button onclick="window.location.href='./chat-list.html'">
+      <button onclick="window.location.href='./chat-list'">
         💬 Live Chat
       </button>
-      <button onclick="window.location.href='./post-list.html'">
+      <button onclick="window.location.href='./post-list'">
         📝 게시판
       </button>
-      <button onclick="window.location.href='./main.html'">🏠 홈으로</button>
+      <button onclick="window.location.href='./index'">🏠 홈으로</button>
       <button id="alarmButton" class="footerAlarm" onclick="clickAlarmBtn()">
         🔔 알람
       </button>
@@ -90,9 +90,9 @@
   </footer>
 
   <script type="module" src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script type="module" src="/js/common/header.js"></script>
-  <script type="module" src="/js/post/post-detail.js"></script>
-  <script type="module" src="/js/post/comments.js"></script>
+  <script type="module" src="/static/js/common/header.js"></script>
+  <script type="module" src="/static/js/post/post-detail.js"></script>
+  <script type="module" src="/static/js/post/comments.js"></script>
 
 </body>
 

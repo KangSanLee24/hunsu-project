@@ -43,11 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // alert(result.message);
 
         // // 메인 페이지로 이동
-        // window.location.href = './main.html';
+        // window.location.href = './index';
 
         // localstorage에서 redirectUrl 가져오기
-        const redirectUrl =
-          localStorage.getItem('redirectUrl') || './main.html';
+        const redirectUrl = localStorage.getItem('redirectUrl') || './index';
 
         // 리다이렉트 URL로 이동
         window.location.href = redirectUrl;
@@ -63,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1-4-B-1. 위 메시지 alert
         alert(result.message);
         // 1-4-B-2. 이메일 인증 페이지로 이동
-        window.location.href = './email-confirmation.html';
+        window.location.href = './email-confirmation';
       } else {
         // 1-4-C. 기타 로그인 에러 처리
         alert(result.message || '로그인에 실패했습니다.');
