@@ -143,8 +143,10 @@ function displayUserPosts(posts) {
   posts.forEach((post) => {
     const listItem = document.createElement('li');
     listItem.innerHTML = `
-            <p>${post.title}</p>
-            <p>${new Date(post.createdAt).toLocaleString()}</p>
+            <a href="/html/post-detail.html?id=${post.id}">
+                <p>${post.title}</p>
+                <p>${new Date(post.createdAt).toLocaleString()}</p>
+            </a>
         `;
     myPostsList.appendChild(listItem);
   });
@@ -164,15 +166,17 @@ function displayUserComments(comments) {
     const listItem = document.createElement('li');
     // <p>게시글: ${comment.postTitle}</p>
     listItem.innerHTML = `
-            <p>${comment.content}</p>
-            <p>${new Date(comment.createdAt).toLocaleString()}</p>
+            <a href="/html/post-detail.html?id=${comment.postId}">
+                <p>${comment.content}</p>
+                <p>${new Date(comment.createdAt).toLocaleString()}</p>
+            </a>
         `;
     myCommentsList.appendChild(listItem);
   });
 }
 
 // 닉네임변경 버튼 함수
-window.clickupdateProfileBtn = async function () {
+window.clickUpdateProfileBtn = async function () {
   let nickname = '';
 
   // 내 정보 조회 API
@@ -198,7 +202,7 @@ window.clickupdateProfileBtn = async function () {
     return;
   }
 
-  // localstorage에 nickname 저장
+  // localStorage에 nickname 저장
   localStorage.setItem('nickname', nickname);
 
   // 내 정보 수정으로 이동
@@ -206,7 +210,7 @@ window.clickupdateProfileBtn = async function () {
 };
 
 // 회원 탈퇴 함수
-window.clickdeleteProfileBtn = async function () {
+window.clickDeleteProfileBtn = async function () {
   let email = '';
   let nickname = '';
 
@@ -235,7 +239,7 @@ window.clickdeleteProfileBtn = async function () {
     return;
   }
 
-  // localstorage에 nickname, email 저장
+  // localStorage에 nickname, email 저장
   localStorage.setItem('nickname', nickname);
   localStorage.setItem('email', email);
 
