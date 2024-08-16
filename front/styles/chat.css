@@ -265,3 +265,11 @@ code {
 .close-image {
   z-index: 10; /* 이미지 위에 표시되도록 z-index 설정 */
 }
+
+#toggleIcon {
+  position: absolute; /* 절대 위치 설정 */
+  right: 10px; /* 오른쪽 여백 */
+  top: 10px; /* 상단 여백 */
+  cursor: pointer; /* 클릭 가능한 아이콘으로 표시 */
+  font-size: 1.2em; /* 아이콘 크기 조정 */
+}

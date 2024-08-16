@@ -1,5 +1,3 @@
-import { API_BASE_URL } from '../../config/config.js';
-
 document.addEventListener('DOMContentLoaded', () => {
   const signUpForm = document.querySelector('form');
   if (!signUpForm) {
@@ -22,8 +20,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    if (nickname.length < 3 || nickname.length > 12) {
+      alert('닉네임은 3글자 이상 12글자 이하로 입력해 주세요.');
+      return;
+    }
+
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/sign-up`, {
+      const response = await fetch(`/api/auth/sign-up`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 확인 버튼 클릭 시 페이지 이동
         confirmBtn.addEventListener('click', () => {
-          window.location.href = './email-confirmation.html';
+          window.location.href = './email-confirmation';
         });
       } else {
         // 오류 처리

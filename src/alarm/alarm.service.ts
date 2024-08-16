@@ -15,7 +15,6 @@ import { Comment } from 'src/comment/entities/comment.entity';
 
 import { AlarmFromType } from './types/alarm-from.type';
 import { ALARM_MESSAGES } from 'src/constants/alarm-message.constant';
-import { ConfigService } from '@nestjs/config';
 import { Observable, Subject, filter, map } from 'rxjs';
 import { paginate } from 'nestjs-typeorm-paginate';
 
@@ -28,8 +27,6 @@ export class AlarmService {
   private observer = this.users$.asObservable();
 
   constructor(
-    private readonly configService: ConfigService,
-
     @InjectRepository(Alarm)
     private readonly alarmRepository: Repository<Alarm>,
 
@@ -40,7 +37,7 @@ export class AlarmService {
     private readonly commentRepository: Repository<Comment>
   ) {}
 
-  /** 1. 알람 생성(C) **/
+  /** 알람 생성(C) **/
   async createAlarm(
     userId: number, // 알람 소유주가 될 사용자ID
     fromType: AlarmFromType,
@@ -71,13 +68,18 @@ export class AlarmService {
     });
 
     // 3. 신규 생성 이벤트 등록
-    this.newEventRegister(userId, notification);
+    const alarmData = {
+      type: 'alarm',
+      message: notification,
+      data: 'null',
+    };
+    this.newEventRegister(userId, alarmData);
 
-    // 3. 반환
+    // 4. 반환
     return alarm;
   }
 
-  /** 2. 알람 목록 조회(R-L) **/
+  /** 알람 목록 조회(R-L) **/
   async findAllAlarm(user: User, page: number, limit: number) {
     // 0. 데이터 정리
     const userId = user.id;
@@ -111,7 +113,7 @@ export class AlarmService {
     };
   }
 
-  /** 3. 알람 클릭 (Link) **/
+  /** 알람 클릭 (Link) **/
   async clickAlarm(user: User, alarmId: number) {
     // 0. 데이터 정리
     const userId = user.id;
@@ -162,8 +164,7 @@ export class AlarmService {
     throw new ForbiddenException('아직 개발 단계 입니다.');
   }
 
-  /** 4. 알람 수정(U) **/
-  /** 4-1. 알람 수정(U) - [읽음]처리 반전(개별 선택) **/
+  /** 알람 수정(U) - [읽음]처리 반전(개별 선택) **/
   async readAlarm(user: User, alarmId: number) {
     // 0. 데이터 정리
     const userId = user.id;
@@ -211,7 +212,7 @@ export class AlarmService {
     return data;
   }
 
-  /** 4-2. 알람 수정(U) - [읽음]처리(남은 알람 전부) **/
+  /** 알람 수정(U) - [읽음]처리(남은 알람 전부) **/
   async readAllAlarm(user: User) {
     // 0. 데이터 정리
     const userId = user.id;
@@ -232,8 +233,7 @@ export class AlarmService {
     };
   }
 
-  /** 5. 알람 수동 삭제(D) **/
-  /** 5-1. 알람 수동 삭제(D) - 개별 선택 **/
+  /** 알람 수동 삭제(D) - 개별 선택 **/
   async deleteAlarm(user: User, alarmId: number) {
     // 0. 데이터 정리
     const userId = user.id;
@@ -262,7 +262,7 @@ export class AlarmService {
     return data;
   }
 
-  /** 5-2. 알람 수동 삭제(D) - 읽음 처리된 것들 모두 **/
+  /** 알람 수동 삭제(D) - 읽음 처리된 것들 모두 **/
   async deleteAllCheckedAlarm(user: User) {
     // 0. 데이터 정리
     const userId = user.id;
@@ -279,26 +279,29 @@ export class AlarmService {
     };
   }
 
-  /** 6. 알람 자동 삭제(D) **/
+  /** 알람 자동 삭제(D) - 크론 적용 여부 검토 **/
   // 1. 읽음 처리 된 이후 일주일 뒤 자동 삭제
   // 2. 읽음 처리 여부와 상관 없이 한달이 지난 알람은 자동 삭제
   // 서비스 로직은 여기에 두고
   // API 호출은 schedule(모듈 생성)에서 cron <- 이거 써서 삭제
 
-  /** 7. 신규 생성 이벤트 알람 (SSE) **/
+  /** 신규 생성 이벤트 알람 (SSE) **/
   newEventAlarm(userId: number): Observable<any> {
     // 1. 이벤트 발생하면 [감지기] 작동
     return this.observer.pipe(
       // 2. 알람 소유주의 알람만 전송하도록
       filter((user) => {
+        if (user.id == 0) {
+          return true;
+        }
         return user.id == userId;
       }),
       // 3. 알람 전송
       map((user) => {
         return {
-          data: {
-            message: user.data,
-          },
+          type: user.type,
+          message: user.message,
+          data: user.data,
         } as MessageEvent;
       })
     );

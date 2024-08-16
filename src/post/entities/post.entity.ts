@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 
 import { User } from 'src/user/entities/user.entity';
-import { PostImage } from './post-image.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { PostLike } from 'src/post/entities/post-like.entity';
 import { PostDislike } from 'src/post/entities/post-dislike.entity';
@@ -47,6 +46,10 @@ export class Post {
   @VirtualColumn()
   numDislikes: number;
 
+  // 게시글 해시태그 배열
+  @Column({ type: 'simple-array' })
+  hashtags: string[];
+
   // 생성일시 = createdAt, Date
   @CreateDateColumn()
   createdAt: Date;
@@ -72,10 +75,6 @@ export class Post {
     cascade: true,
   })
   postDislikes: PostDislike[];
-
-  // 게시글과 이미지 1대:다 관계
-  @OneToMany(() => PostImage, (image) => image.post, { cascade: true })
-  postImages: PostImage[];
 
   // 가상 컬럼을 계산하는 메서드
   getLikesAndDislikes() {

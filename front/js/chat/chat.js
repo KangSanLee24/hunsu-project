@@ -1,10 +1,8 @@
-import { API_BASE_URL } from '../../config/config.js';
-
 async function getAuthor() {
   try {
     const accessToken = localStorage.getItem('accessToken');
 
-    const response = await fetch(`${API_BASE_URL}/users/me`, {
+    const response = await fetch(`/api/users/me`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -19,11 +17,20 @@ async function getAuthor() {
     return { author, authorId };
   } catch {
     console.error('Error:', error);
-    throw error;
+    // throw error;
+    return;
   }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // 로그인 여부 확인
+  const accessToken = localStorage.getItem('accessToken');
+  if (!accessToken) {
+    alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+    window.location.href = '/log-in';
+    return;
+  }
+
   const socket = io('');
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -36,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const roomNameElement = document.getElementById('roomName');
   const fileInput = document.getElementById('fileInput');
   const imagePreview = document.getElementById('imagePreview');
-  
+
   let file = null; // 파일 변수 초기화
 
   let currentUser;
@@ -45,10 +52,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const authorData = await getAuthor();
     currentUser = authorData.author;
     currentUserId = authorData.authorId;
-    // currentUser = (await getAuthor()).author;
-    // currentUserId = (await getAuthor()).authorId;
   } catch (error) {
     console.error('Failed to get author:', error);
+    alert('로그인 정보가 올바르지 않습니다. 로그인 페이지로 이동합니다.');
+    window.location.href = '/log-in'; // 로그인 페이지 경로로 리다이렉트
+    return; // 이후 코드를 실행하지 않도록 중단
   }
 
   // 채팅 목록을 자동으로 스크롤 하단으로 이동
@@ -192,7 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       formData.append('roomId', roomId);
       formData.append('author', currentUser);
 
-      fetch(`${API_BASE_URL}/chatrooms/${roomId}/image`, {
+      fetch(`/api/chatrooms/${roomId}/image`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -254,14 +262,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         const closeImage = document.getElementById('closeImage');
 
         closeImage.addEventListener('click', () => {
-            // 파일 입력 필드 초기화
-            fileInput.value = '';
-            imagePreview.style.display = 'none'; 
-            imagePreview.style.backgroundImage = ''; // 이미지 배경 초기화
-            file = null; // 파일 변수 초기화
-          });
+          // 파일 입력 필드 초기화
+          fileInput.value = '';
+          imagePreview.style.display = 'none';
+          imagePreview.style.backgroundImage = ''; // 이미지 배경 초기화
+          file = null; // 파일 변수 초기화
+        });
       };
       reader.readAsDataURL(file);
+    }
+  });
+
+  // 접기/펼치기 버튼 클릭 이벤트 핸들러 추가
+  const toggleIcon = document.getElementById('toggleIcon');
+  toggleIcon.addEventListener('click', () => {
+    const img = document.getElementById('fixedImageContent');
+    const isHidden = img.style.display === 'none';
+
+    if (isHidden) {
+      img.style.display = 'block';
+      toggleIcon.textContent = '🔼'; // 펼쳐진 상태일 때 아이콘 변경
+    } else {
+      img.style.display = 'none';
+      toggleIcon.textContent = '🔽'; // 접힌 상태일 때 아이콘 변경
     }
   });
 
@@ -284,11 +307,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   socket.on('ownerLeft', () => {
     console.log('ownerLeft');
     alert('방장이 채팅방을 나갔습니다. 채팅 목록 페이지로 이동합니다.');
-    window.location.href = '/html/chat-list.html';
+    window.location.href = '/chat-list';
   });
 
   socket.on('outRoom', () => {
     alert('삭제된 채팅방입니다. 채팅 목록 페이지로 이동합니다.');
-    window.location.href = '/html/chat-list.html';
+    window.location.href = '/chat-list';
   });
 });

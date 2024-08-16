@@ -1,12 +1,11 @@
 import React from 'react';
-import './styles/find-pw.style.css';
+import './static/styles/find-pw.style.css';
 
 const FindPassword = () => {
   const handleEmail = (event) => {
     event.preventDefault();
     const email = event.target.elements['send-email'].value;
     //
-    console.log(`Email: ${email}`);
   };
 
   const handleSubmit = (event) => {
@@ -16,7 +15,6 @@ const FindPassword = () => {
     const token = event.target.elements['find-password-token'].value;
 
     //
-    console.log(`Email: ${email}, Token: ${token}`);
   };
 
   return (

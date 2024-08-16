@@ -1,5 +1,3 @@
-import { API_BASE_URL } from '../../config/config.js';
-
 /** 로그인 페이지에 필요한 변수 선언 **/
 const naverLogInBtn = document.getElementById('naver_login');
 
@@ -19,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('password').value;
 
       // 1-2. 로그인API request 요청 => response로 받아오기
-      const response = await fetch(`${API_BASE_URL}/auth/log-in`, {
+      const response = await fetch(`/api/auth/log-in`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,13 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('출석 체크 호출 결과:', attendanceResult);
 
         // 1-4-A-2. '로그인에 성공했습니다.' alert
-        alert(result.message);
+        // alert(result.message);
 
         // // 메인 페이지로 이동
-        // window.location.href = './main.html';
+        // window.location.href = './index';
 
         // localstorage에서 redirectUrl 가져오기
-        const redirectUrl = localStorage.getItem('redirectUrl') || './main.html';
+        const redirectUrl = localStorage.getItem('redirectUrl') || './index';
 
         // 리다이렉트 URL로 이동
         window.location.href = redirectUrl;
@@ -64,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1-4-B-1. 위 메시지 alert
         alert(result.message);
         // 1-4-B-2. 이메일 인증 페이지로 이동
-        window.location.href = './email-confirmation.html';
+        window.location.href = './email-confirmation';
       } else {
         // 1-4-C. 기타 로그인 에러 처리
         alert(result.message || '로그인에 실패했습니다.');
@@ -77,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 1. 기존 동작 방지
       event.preventDefault();
       // 2. 네이버 로그인 API 실행
-      window.location.href = `${API_BASE_URL}/auth/log-in/naver`;
+      window.location.href = `/api/auth/log-in/naver`;
     });
   }
 });
@@ -85,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // 출석 체크 함수
 async function checkAttendance(accessToken) {
   try {
-    const response = await fetch(`${API_BASE_URL}/points/today`, {
+    const response = await fetch(`/api/points/today`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

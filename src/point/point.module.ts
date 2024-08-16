@@ -7,11 +7,15 @@ import { Post } from 'src/post/entities/post.entity';
 import { Point } from './entities/point.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { PointLog } from './entities/point-log.entity';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Post, Point, Comment, PointLog])],
+  imports: [
+    TypeOrmModule.forFeature([User, Post, Point, Comment, PointLog]),
+    RedisModule,
+  ],
   controllers: [PointController],
   providers: [PointService],
   exports: [PointService],
 })
-export class PointModule { }
+export class PointModule {}

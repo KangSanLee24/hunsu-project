@@ -1,4 +1,11 @@
-import { API_BASE_URL } from '../../config/config.js';
+// 회원가입, 비밀번호 변경, 이메일 인증(notification)
+if (
+  !document.referrer.includes('sign-up') &&
+  !document.referrer.includes('change-password')
+) {
+  alert('잘못된 접근입니다.');
+  window.location.href = './index';
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const verifyEmailForm = document.getElementById('verify-email-form');
@@ -11,31 +18,63 @@ document.addEventListener('DOMContentLoaded', () => {
     event.preventDefault();
 
     // 폼 데이터 가져오기
+    // 이메일, 인증번호
     const email = document.getElementById('email').value;
     const token = document.getElementById('token').value;
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, certification: parseInt(token, 10) }),
-      });
+    // 이전 페이지 여부로 회원가입, 비밀번호 변경때 다른 API 호출
+    // 회원가입 이메일 인증
+    if (document.referrer.includes('sign-up')) {
+      try {
+        const response = await fetch(`/api/auth/verify-email`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, certification: parseInt(token, 10) }),
+        });
 
-      const result = await response.json();
+        const result = await response.json();
 
-      if (response.ok && result.status === 200) {
-        // 성공적인 응답 시 로그인 페이지로 이동
-        alert('이메일 인증이 성공적으로 완료되었습니다.');
-        window.location.href = './log-in.html';
-      } else {
-        // 오류 처리
-        alert(result.message || '이메일 인증에 실패했습니다.');
+        if (response.ok && result.status === 200) {
+          // 성공적인 응답 시 로그인 페이지로 이동
+          alert('이메일 인증이 성공적으로 완료되었습니다.');
+          window.location.href = './log-in';
+        } else {
+          // 오류 처리
+          alert(result.message || '이메일 인증에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('이메일 인증 요청 중 오류 발생:', error);
+        alert('이메일 인증 요청 중 오류가 발생했습니다.');
       }
-    } catch (error) {
-      console.error('이메일 인증 요청 중 오류 발생:', error);
-      alert('이메일 인증 요청 중 오류가 발생했습니다.');
+
+      // 비밀번호 변경
+    } else if (document.referrer.includes('change-password')) {
+      try {
+        const response = await fetch(`/api/auth/verify-password`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, certification: parseInt(token, 10) }),
+        });
+        const result = await response.json();
+
+        if (response.ok) {
+          // 성공적인 응답 시 로그인 페이지로 이동
+          alert(
+            '이메일 인증이 성공적으로 완료되었습니다.\n비밀번호를 변경해 주십시오.'
+          );
+          window.location.href = './update-password';
+        } else {
+          // 오류 처리
+          alert(result.message || '이메일 인증에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('이메일 인증 요청 중 오류 발생:', error);
+        alert('이메일 인증 요청 중 오류가 발생했습니다.');
+      }
     }
   });
 });

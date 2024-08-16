@@ -14,7 +14,6 @@ import { POST_MESSAGE } from 'src/constants/post-message.constant';
 import { User } from 'src/user/entities/user.entity';
 import { Role } from 'src/user/types/user-role.type';
 import { AwsService } from 'src/aws/aws.service';
-import { PostImage } from './entities/post-image.entity';
 import { Category } from './types/post-category.type';
 import { Order } from './types/post-order.type';
 import { paginate } from 'nestjs-typeorm-paginate';
@@ -23,14 +22,17 @@ import { PointType } from 'src/point/types/point.type';
 import { v4 as uuidv4 } from 'uuid'; // ES Modules
 import { PostLike } from 'src/post/entities/post-like.entity';
 import { PostDislike } from 'src/post/entities/post-dislike.entity';
+import { RedisService } from 'src/redis/redis.service';
+import { format } from 'date-fns';
+import { SubRedisService } from 'src/redis/sub.redis.service';
 
 @Injectable()
 export class PostService {
   constructor(
+    private readonly redisService: RedisService,
+    private readonly subRedisService: SubRedisService,
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
-    @InjectRepository(PostImage)
-    private readonly postImageRepository: Repository<PostImage>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(PostLike)
@@ -42,9 +44,10 @@ export class PostService {
     private readonly pointService: PointService
   ) {}
 
-  /* 게시글 생성 API*/
+  /* 게시글 생성 API */
   async create(createPostDto: CreatePostDto, userId: number) {
-    const { title, content, category, urlsArray } = createPostDto;
+    const { title, content, category, urlsArray, hashtagsArray } =
+      createPostDto;
     const user = await this.userRepository.findOne({
       where: { id: userId },
       withDeleted: true,
@@ -71,12 +74,18 @@ export class PostService {
         notUsedUrls.map((fileUrl) => this.awsService.deleteFileFromS3(fileUrl))
       );
     }
+    //해시태그 formatting
+    const hashtags = hashtagsArray
+      .split(' ')
+      .filter((tag) => tag.trim().length > 0);
+
     // 2. 게시글 저장
     const createdPost = this.postRepository.create({
       title,
       content,
       category,
       userId,
+      hashtags: hashtags,
     });
 
     const post = await this.postRepository.save(createdPost);
@@ -89,6 +98,27 @@ export class PostService {
     if (isValidPoint)
       this.pointService.savePointLog(userId, PointType.POST, true);
 
+    //4. 해시태그 레디스에 저장
+    const client = this.redisService.getClient();
+    const currentTime = Date.now();
+    const sevenDaysInMilliseconds = 7 * 24 * 60 * 60 * 1000; // 7일을 밀리초로 변환
+    const expireTime = format(
+      currentTime + sevenDaysInMilliseconds,
+      'yyyy-MM-dd'
+    );
+
+    // 5. redis 비우는 작업 (게시글 목록 조회 캐시 삭제)
+    const postKey = `post:1:20:all:DESC:none`;
+    await this.subRedisService.deleteValue(postKey); // 해당 캐시 삭제
+
+    //hashtags = [#청바지, #모자]
+    const postHashtag = hashtags.map((item) => {
+      const uniqueTag = `${item}:${currentTime}`;
+      client.zincrby('hashtag', 1, item);
+      client.hset('hashtag_expire', uniqueTag, expireTime);
+      console.log(`redis : post-hashtag ${item}`);
+    });
+
     return {
       id: post.id,
       userId: post.userId,
@@ -96,12 +126,13 @@ export class PostService {
       title: post.title,
       category: post.category,
       content: post.content,
+      hashtags: post.hashtags, // 해시태그 추가
       createdAt: post.createdAt,
-      updatedAt: post.updatedAt, // 테스트를 위해 남겨둠 마무리에는 포스트아이디만 리턴할 예정
+      updatedAt: post.updatedAt,
     };
   }
 
-  /*게시글 목록 조회 API*/
+  /* 게시글 목록 조회 API */
   async findAll(
     page: number,
     limit: number,
@@ -109,51 +140,81 @@ export class PostService {
     sort?: Order,
     keyword?: string
   ) {
-    // 카테고리에 따른 정렬
-    const sortCategory = category ? { category } : {};
-    const keywordFilter = keyword ? { title: Like(`%${keyword}%`) } : {};
+    // 1. 검색 필터위한 조건, 캐시 키 생성
+    const postKey = `post:${page}:${limit}:${category || 'all'}:${sort || 'default'}:${keyword || 'none'}`;
 
-    const { items, meta } = await paginate<Post>(
-      this.postRepository,
-      {
-        page,
-        limit,
-      },
-      {
-        where: { ...sortCategory, ...keywordFilter },
-        relations: ['user', 'comments'],
-        order: { createdAt: sort ? sort : 'DESC' }, // 정렬조건
-      }
-    );
+    // 2. redis에서 postKey값으로 검색
+    const cachePost = await this.subRedisService.getValue(postKey);
 
-    return {
-      posts: items.map((post) => ({
-        id: post.id,
-        userId: post.userId,
-        nickname: post.user.nickname,
-        title: post.title,
-        numComments: post.comments.length, // 댓글 수 배열로 표현됨
-        category: post.category,
-        createdAt: post.createdAt,
-        updatedAt: post.updatedAt,
-      })),
-      meta,
-    };
+    // 3-1. 만약, 레디스에 데이터가 있을 때
+    if (cachePost) {
+      const parsedResult = JSON.parse(cachePost);
+      return parsedResult;
+      // 3-2. Redis에 데이터가 없을 경우 : DB에서 조회
+    } else {
+      // 카테고리에 따른 정렬
+      const sortCategory = category ? { category } : {};
+      // 검색어 조건 추가
+      const keywordFilter = keyword ? { title: Like(`%${keyword}%`) } : {};
+      // paginate 적용. items는 내용, meta는 페이지 정보
+      const { items, meta } = await paginate<Post>(
+        this.postRepository,
+        {
+          page,
+          limit,
+        },
+        {
+          where: { ...sortCategory, ...keywordFilter },
+          relations: ['user', 'comments'],
+          order: { createdAt: sort ? sort : 'DESC' }, // 정렬조건
+          select: {
+            id: true,
+            userId: true,
+            title: true,
+            category: true,
+            createdAt: true,
+            updatedAt: true,
+            user: {
+              nickname: true,
+            },
+            comments: {
+              id: true,
+            },
+          },
+        }
+      );
+
+      // 4-3
+      const result = {
+        posts: items.map((post) => ({
+          id: post.id,
+          userId: post.userId,
+          nickname: post.user.nickname,
+          title: post.title,
+          numComments: post.comments.length, // 댓글 수 배열로 표현됨
+          category: post.category,
+          createdAt: post.createdAt,
+          updatedAt: post.updatedAt,
+        })),
+        meta,
+      };
+
+      // 4-4. redis에 저장
+      const stringifiedResult = JSON.stringify(result);
+      await this.subRedisService.setValue(postKey, stringifiedResult, 120); //값저장
+
+      return result;
+    }
   }
 
-  /* 게시글 상세 조회 API*/
+  /* 게시글 상세 조회 API */
   async findOne(id: number) {
     const post = await this.postRepository.findOne({
       where: { id },
-      relations: [
-        'user',
-        'postImages',
-        'comments',
-        'postLikes',
-        'postDislikes',
-      ],
+      relations: ['user', 'comments', 'postLikes', 'postDislikes'],
     });
 
+    // 게시글이 존재하는지 확인
     if (!post) {
       throw new NotFoundException('게시글을 찾을 수 없습니다.');
     }
@@ -166,67 +227,78 @@ export class PostService {
       userId: post.userId,
       nickname: post.user.nickname,
       title: post.title,
-      images: post.postImages.map((image) => image.imgUrl), // 게시글 이미지 : { 이미지 URL}
       category: post.category,
       content: post.content,
-      // comments: post.comments, // 댓글
       numLikes: post.numLikes, // 좋아요 수
       numDislikes: post.numDislikes, // 싫어요 수
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
+      hashtagsArray: post.hashtags,
     };
   }
 
-  /*화제글 목록 조회 API*/
+  /* 화제글 목록 조회 API */
   async findHotPost(category: Category) {
-    const now = new Date(); // 현재시간
-    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 현재시간으로부터 일주일전
+    const hotPost = `hotPosts:${category || 'all'}`; // 카테고리로 key설정
+    const cacheHotPost = await this.subRedisService.getValue(hotPost);
 
-    const posts = await this.postRepository.find({
-      where: { createdAt: MoreThan(weekAgo), category }, // 최근 일주일 이내에 생성된 게시물들 가져오가
-      relations: [
-        'user',
-        'postImages',
-        'comments',
-        'postLikes',
-        'postDislikes',
-      ],
-    });
+    // 1-1. 만약, Redis에 캐시된 데이터가 있을 경우
+    if (cacheHotPost) {
+      const hotPostResult = JSON.parse(cacheHotPost);
+      return hotPostResult;
+      // 1-2. Redis에 데이터가 없을 경우 : DB에서 조회
+    } else {
+      const now = new Date(); // 현재시간
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 현재시간으로부터 일주일전
 
-    // 각 게시글에 대해 좋아요 수와 싫어요 수 계산
-    posts.forEach((post) => {
-      post.getLikesAndDislikes(); // 가상 컬럼 계산
-    });
+      const posts = await this.postRepository.find({
+        where: { createdAt: MoreThan(weekAgo), category }, // 최근 일주일 이내에 생성된 게시물들 가져오가
+        relations: ['user', 'comments', 'postLikes', 'postDislikes'],
+      });
 
-    // 좋아요 수 기준으로 정렬하고, 좋아요 수가 같을 경우 댓글 수로 정렬
-    const sortedPosts = posts.sort((a, b) => {
-      if (b.numLikes === a.numLikes) {
-        return b.comments.length - a.comments.length; // 댓글 수로 정렬
-      }
-      return b.numLikes - a.numLikes; // 좋아요 수로 정렬
-    });
+      // 각 게시글에 대해 좋아요 수와 싫어요 수 계산
+      posts.forEach((post) => {
+        post.getLikesAndDislikes(); // 가상 컬럼 계산
+      });
 
-    // 상위 10개 게시글만 가져오기
-    const topPosts = sortedPosts.slice(0, 10);
+      // 좋아요 수 기준으로 정렬하고, 좋아요 수가 같을 경우 댓글 수로 정렬
+      const sortedPosts = posts.sort((a, b) => {
+        if (b.numLikes === a.numLikes) {
+          return b.comments.length - a.comments.length; // 댓글 수로 정렬
+        }
+        return b.numLikes - a.numLikes; // 좋아요 수로 정렬
+      });
 
-    return topPosts.map((post) => ({
-      id: post.id,
-      userId: post.userId,
-      nickname: post.user.nickname,
-      category: post.category,
-      title: post.title,
-      content: post.content,
-      numLikes: post.numLikes, // 가상 컬럼 사용
-      numDislikes: post.numDislikes, // 가상 컬럼 사용
-      createdAt: post.createdAt,
-      updatedAt: post.updatedAt,
-      numComments: post.comments.length,
-    }));
+      // 상위 10개 게시글만 가져오기
+      const topPosts = sortedPosts.slice(0, 10);
+
+      const topResult = topPosts.map((post) => ({
+        id: post.id,
+        userId: post.userId,
+        nickname: post.user.nickname,
+        category: post.category,
+        title: post.title,
+        content: post.content,
+        numLikes: post.numLikes, // 가상 컬럼 사용
+        numDislikes: post.numDislikes, // 가상 컬럼 사용
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        numComments: post.comments.length,
+      }));
+
+      // 2. redis 값 저장
+      const stringifiedResult = JSON.stringify(topResult); // 값설정
+      await this.subRedisService.setValue(hotPost, stringifiedResult, 120); //값저장
+
+      return topResult;
+    }
   }
 
-  /*게시글 수정 API*/
+  /* 게시글 수정 API */
   async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
-    const { title, content, urlsArray, category } = updatePostDto;
+    const { title, content, urlsArray, category, hashtagsArray } =
+      updatePostDto;
+
     const post = await this.postRepository.findOne({
       where: { id },
       withDeleted: true,
@@ -261,11 +333,20 @@ export class PostService {
       notUsedUrls.map((fileUrl) => this.awsService.deleteFileFromS3(fileUrl))
     );
 
+    //해시태그 수정 시
+    const hashtags = hashtagsArray
+      .split(' ')
+      .filter((tag) => tag.trim().length > 0);
+
     const updatedPost = await this.postRepository.update(
       { id },
-      { title, content, category }
+      {
+        title,
+        content,
+        category,
+        hashtags: hashtagsArray.length > 0 ? hashtags : post.hashtags,
+      }
     );
-    return await this.postRepository.findOneBy({ id });
   }
 
   /*게시글 삭제 API*/
@@ -299,7 +380,7 @@ export class PostService {
     }
 
     // 게시글 삭제로 포인트 차감
-    // await this.pointService.savePointLog(userId, PointType.POST, false);
+    await this.pointService.savePointLog(userId, PointType.POST, false);
 
     // DB에서 게시글 삭제
     await this.postRepository.remove(post);
@@ -307,13 +388,9 @@ export class PostService {
 
   /*게시글 강제 삭제 API*/
   async forceRemove(id: number, userId: number) {
-    //
     const post = await this.postRepository.findOne({
       where: { id },
       withDeleted: true,
-    });
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
     });
 
     // 게시글이 존재하는지 확인
@@ -321,6 +398,9 @@ export class PostService {
       throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
     }
 
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
     // user의 역할이 admin인지 확인
     if (user.role !== Role.ADMIN) {
       throw new ForbiddenException(
@@ -338,11 +418,12 @@ export class PostService {
       );
     }
 
-    return this.postRepository.remove(post);
+    await this.postRepository.remove(post);
   }
 
   /** 이미지 업로드 API **/
   async uploadPostImages(files: Express.Multer.File[]) {
+    // const uuid = uuidv4();
     const uuid = uuidv4();
     // 업로드된 이미지 URL을 저장할 배열을 초기화한다
     const uploadedImageUrls: string[] = [];
@@ -450,7 +531,19 @@ export class PostService {
     }
     // 1-2. 본인의 게시글에는 좋아요를 누를 수 없도록
     if (existingPost.userId == userId) {
-      throw new BadRequestException(POST_MESSAGE.LIKE.CREATE.FAILURE.NO_SELF);
+      throw new BadRequestException(POST_MESSAGE.LIKE.CLICK.FAILURE.NO_SELF);
+    }
+
+    // 2. 내가 싫어요를 누른 상태인지 아닌지를 확인
+    const alreadyDislike = await this.postDislikeRepository.findOneBy({
+      userId,
+      postId,
+    });
+    // 2-1. 싫어요를 누른 상태라면 좋아요를 누를 수 없도록
+    if (alreadyDislike) {
+      throw new BadRequestException(
+        POST_MESSAGE.LIKE.CLICK.FAILURE.ALREADY_DISLIKE
+      );
     }
 
     // 3. 내가 좋아요를 누른 상태인지 아닌지를 확인
@@ -531,24 +624,34 @@ export class PostService {
     }
     // 1-2. 본인의 게시글에는 싫어요를 누를 수 없도록
     if (existingPost.userId == userId) {
+      throw new BadRequestException(POST_MESSAGE.DISLIKE.CLICK.FAILURE.NO_SELF);
+    }
+
+    // 2. 내가 좋아요를 누른 상태인지 아닌지를 확인
+    const alreadyLike = await this.postLikeRepository.findOneBy({
+      userId,
+      postId,
+    });
+    // 2-1. 좋아요를 누른 상태라면 싫어요를 누를 수 없도록
+    if (alreadyLike) {
       throw new BadRequestException(
-        POST_MESSAGE.DISLIKE.CREATE.FAILURE.NO_SELF
+        POST_MESSAGE.DISLIKE.CLICK.FAILURE.ALREADY_LIKE
       );
     }
 
-    // 2. 내가 싫어요를 누른 상태인지 아닌지를 확인
+    // 3. 내가 싫어요를 누른 상태인지 아닌지를 확인
     const postDislike = await this.postDislikeRepository.findOneBy({
       userId,
       postId,
     });
     if (!postDislike) {
-      // 2-1. 게시글 싫어요 명단에 내가 없다면 => 게시글 싫어요 등록
+      // 3-1. 게시글 싫어요 명단에 내가 없다면 => 게시글 싫어요 등록
       await this.postDislikeRepository.save({
         userId,
         postId,
       });
     } else {
-      // 2-2. 게시글 싫어요 명단에 내가 있다면 => 게시글 싫어요 취소
+      // 3-2. 게시글 싫어요 명단에 내가 있다면 => 게시글 싫어요 취소
       await this.postDislikeRepository.delete({
         userId,
         postId,

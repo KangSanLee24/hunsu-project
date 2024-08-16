@@ -4,6 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json } from 'express';
+import * as express from 'express';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -32,6 +34,13 @@ async function bootstrap() {
     credentials: true,
   });
 
+  // 정적 파일 제공 설정
+  app.use(
+    express.static(join(__dirname, '..', 'front', 'html'), {
+      extensions: ['html', 'htm'], // .html 파일을 확장자로 추가
+    })
+  );
+
   // Swagger 문서 준비
   const config = new DocumentBuilder()
     .setTitle('p6-hunsu-project')
@@ -47,6 +56,7 @@ async function bootstrap() {
       persistAuthorization: true,
       tagsSorter: 'alpha',
       operationsSorter: 'alpha',
+      docExpansion: 'none',
     },
   });
 

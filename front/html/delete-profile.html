@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>닉네임 변경</title>
+    <link rel="stylesheet" href="/static/styles/delete-profile.css" />
+  </head>
+
+  <body>
+    <!-- 닉네임 변경 페이지 -->
+    <div class="container">
+      <h1>회원 탈퇴</h1>
+      <form>
+        <!-- 현재 닉네임 -->
+        <label for="nickname">닉네임 (Current nickname)</label>
+        <input
+          type="text"
+          id="nickname"
+          placeholder="홍길동"
+          required
+          readonly
+        />
+        <!-- 현재 이메일 -->
+        <label for="email">현재 이메일 (Current email)</label>
+        <input
+          type="text"
+          id="email"
+          placeholder="홍길동@email.com"
+          required
+          readonly
+        />
+        <!-- 비밀번호 입력 -->
+        <label for="password">비밀번호 (Password)</label>
+        <input type="password" id="password" placeholder="*******" required />
+        <!-- 회원 탈퇴 버튼 -->
+        <button id="delete-profile-btn" type="submit">회원 탈퇴</button>
+        <!-- 홈으로 버튼 -->
+        <button type="submit" onclick="window.location.href='./index'">
+          홈으로
+        </button>
+      </form>
+    </div>
+
+    <script type="module" src="/static/js/user/delete-profile.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </body>
+</html>

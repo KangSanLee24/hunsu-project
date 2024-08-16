@@ -16,7 +16,7 @@ import {
 import { PostService } from './post.service';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
-import { AuthGuard, IAuthGuard, Type } from '@nestjs/passport';
+import { AuthGuard } from '@nestjs/passport';
 import { POST_MESSAGE } from 'src/constants/post-message.constant';
 import {
   ApiBearerAuth,
@@ -33,7 +33,7 @@ import { Category } from './types/post-category.type';
 import { Order } from './types/post-order.type';
 import { FindAllPostsDto } from './dtos/find-all-posts.dto';
 
-@ApiTags('3. POST API')
+@ApiTags('03. POST API')
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
@@ -93,14 +93,14 @@ export class PostController {
     );
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.READ_ALL.SUCCESS,
       data: findAllPost,
     };
   }
 
   /** 화제글 목록 조회 API **/
-  @ApiOperation({ summary: '화제글 목록 조회 API' })
+  @ApiOperation({ summary: '8. 화제글 목록 조회 API' })
   @ApiQuery({
     name: 'category',
     required: false,
@@ -110,7 +110,7 @@ export class PostController {
   async findHotPost(@Query('category') category: Category) {
     const hotPosts = await this.postService.findHotPost(category);
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.READ_HOT.SUCCESS,
       data: hotPosts,
     };
@@ -137,7 +137,7 @@ export class PostController {
   async uploadFiles(@UploadedFiles() files: Express.Multer.File[]) {
     const uploadedImageUrls = await this.postService.uploadPostImages(files);
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.IMAGE.UPLOAD.SUCCESS,
       data: uploadedImageUrls,
     };
@@ -150,7 +150,7 @@ export class PostController {
     const findOnePost = await this.postService.findOne(postId);
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.READ_DETAIL.SUCCESS,
       data: findOnePost,
     };
@@ -167,16 +167,11 @@ export class PostController {
     @Body() updatePostDto: UpdatePostDto
   ) {
     const userId = user.id;
-    const updatedPost = await this.postService.update(
-      postId,
-      updatePostDto,
-      userId
-    );
+    await this.postService.update(postId, updatePostDto, userId);
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.UPDATE.SUCCESS,
-      data: updatedPost,
     };
   }
 
@@ -190,7 +185,7 @@ export class PostController {
     await this.postService.remove(postId, userId);
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.DELETE.SUCCESS,
     };
   }
@@ -198,21 +193,20 @@ export class PostController {
   /** 게시글 강제 삭제 API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '게시글 강제 삭제 API' })
+  @ApiOperation({ summary: '7. 게시글 강제 삭제 API' })
   @Delete(':postId/admin')
   async forceRemove(@LogIn() user: User, @Param('id') id: number) {
     const userId = user.id;
     await this.postService.forceRemove(id, userId);
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: POST_MESSAGE.POST.FORCE_DELETE.SUCCESS,
     };
   }
 
   /** 게시글 좋아요 조회 API **/
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 좋아요 조회 API' })
+  @ApiOperation({ summary: '9. 게시글 좋아요 조회 API' })
   @Get(':postId/likes')
   async getPostLikes(@Param('postId', ParseIntPipe) postId: number) {
     const data = await this.postService.getPostLikes(postId);
@@ -225,8 +219,7 @@ export class PostController {
   }
 
   /** 로그인한 사람의 게시글 좋아요 조회 API **/
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '나의 게시글 좋아요 여부 조회 API' })
+  @ApiOperation({ summary: '10. 나의 게시글 좋아요 여부 조회 API' })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @Get(':postId/likes/me')
@@ -238,14 +231,13 @@ export class PostController {
     const data = await this.postService.getMyPostLike(userId, postId);
     return {
       status: HttpStatus.OK,
-      messgae: '나의 게시글 좋아요 여부 조회에 성공했습니다.',
+      message: '나의 게시글 좋아요 여부 조회에 성공했습니다.',
       data: data,
     };
   }
 
   /** 게시글 좋아요 클릭 API **/
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 좋아요 클릭 API' })
+  @ApiOperation({ summary: '11. 게시글 좋아요 클릭 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch(':postId/likes')
@@ -258,13 +250,12 @@ export class PostController {
 
     return {
       status: HttpStatus.OK,
-      message: POST_MESSAGE.LIKE.CREATE.SUCCESS,
+      message: POST_MESSAGE.LIKE.CLICK.SUCCESS,
     };
   }
 
   /** 게시글 싫어요 조회 API **/
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 싫어요 조회 API' })
+  @ApiOperation({ summary: '12. 게시글 싫어요 조회 API' })
   @Get(':postId/dislikes')
   async getPostDislikes(@Param('postId', ParseIntPipe) postId: number) {
     const data = await this.postService.getPostDislikes(postId);
@@ -277,8 +268,7 @@ export class PostController {
   }
 
   /** 로그인한 사람의 게시글 싫어요 조회 API **/
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '나의 게시글 싫어요 여부 조회 API' })
+  @ApiOperation({ summary: '13. 나의 게시글 싫어요 여부 조회 API' })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @Get(':postId/dislikes/me')
@@ -290,14 +280,13 @@ export class PostController {
     const data = await this.postService.getMyPostDislike(userId, postId);
     return {
       status: HttpStatus.OK,
-      messgae: '나의 게시글 싫어요 여부 조회에 성공했습니다.',
+      message: '나의 게시글 싫어요 여부 조회에 성공했습니다.',
       data: data,
     };
   }
 
   /** 게시글 싫어요 클릭 API **/
-  @ApiTags('3. POST API')
-  @ApiOperation({ summary: '게시글 싫어요 클릭 API' })
+  @ApiOperation({ summary: '14. 게시글 싫어요 클릭 API' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch(':postId/dislikes')
@@ -310,7 +299,7 @@ export class PostController {
 
     return {
       status: HttpStatus.OK,
-      message: POST_MESSAGE.DISLIKE.CREATE.SUCCESS,
+      message: POST_MESSAGE.DISLIKE.CLICK.SUCCESS,
     };
   }
 }

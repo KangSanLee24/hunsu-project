@@ -1,4 +1,3 @@
-import { API_BASE_URL } from '../../config/config.js';
 import { elapsedTime } from '../common/elapsed-time.js';
 
 const boardListElement = document.getElementById('board-list');
@@ -33,13 +32,11 @@ async function fetchBoardData(category, sort, page, keyword) {
     if (keyword) {
       queryParams.append('keyword', keyword);
     }
-    const response = await fetch(
-      `${API_BASE_URL}/posts?${queryParams.toString()}`
-    );
+    const response = await fetch(`/api/posts?${queryParams.toString()}`);
 
     const result = await response.json();
 
-    if (result.statusCode === 200) {
+    if (result.status === 200) {
       // data.posts가 배열인지 확인
       if (Array.isArray(result.data.posts)) {
         renderBoardList(result.data.posts); // posts 배열을 전달
@@ -67,7 +64,7 @@ function renderBoardList(data) {
     row.innerHTML = `
             <td>${item.id}</td>
             <td>${item.category}</td>
-            <td><a href="post-detail.html?id=${item.id}">${item.title}</a></td>
+            <td><a href="post-detail?id=${item.id}">${item.title}</a></td>
             <td>${item.nickname}</td>
             <td>${elapsedTime(item.createdAt)}</td>
             <td>${item.numComments}</td>

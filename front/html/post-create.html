@@ -8,22 +8,18 @@
       rel="stylesheet"
       href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"
     />
-    <link rel="stylesheet" href="/styles/style.css" />
-    <link rel="stylesheet" href="/styles/post-create.css" />
+    <link rel="stylesheet" href="/static/styles/style.css" />
+    <link rel="stylesheet" href="/static/styles/post-create.css" />
   </head>
   <body>
     <header>
-      <div
-        id="logo-home"
-        class="logo"
-        onClick="window.location.href='./main.html'"
-      >
+      <div id="logo-home" class="logo" onClick="window.location.href='./index'">
         5ZIRAP
       </div>
       <nav>
         <ul>
-          <li><a href="./log-in.html">로그인</a></li>
-          <li><a href="./sign-up.html">회원가입</a></li>
+          <li><a href="./log-in">로그인</a></li>
+          <li><a href="./sign-up">회원가입</a></li>
           <li><a id="userNickname"></a></li>
         </ul>
       </nav>
@@ -34,10 +30,18 @@
       <input type="text" id="post-title" placeholder="제목을 입력하세요." />
       <!-- 제목 입력 -->
       <select id="post-category">
-        <option value="CHAT">CHAT</option>
         <option value="FASHION">FASHION</option>
-        <option value="COOKING">COOKING</option>
+        <option value="CHAT">CHAT</option>
       </select>
+
+      <!-- 해시태그 입력란 추가 -->
+      <input
+        type="text"
+        id="post-hashtags"
+        placeholder="해시태그를 입력하세요."
+      />
+      <!-- 해시태그 입력 -->
+
       <div class="editor-text-box" id="editor"></div>
       <!-- 에디터가 렌더링될 DIV -->
       <button id="post-submit">게시글 작성</button>
@@ -46,27 +50,22 @@
 
     <footer>
       <div class="footer-menu">
-        <button onclick="window.location.href='./chat-list.html'">
+        <button onclick="window.location.href='./chat-list'">
           💬 Live Chat
         </button>
-        <button onclick="window.location.href='./post-list.html'">
-          📝 게시판
-        </button>
-        <button onclick="window.location.href='./main.html'">🏠 홈으로</button>
-        <button
-          class="footerAlarm"
-          onclick="window.location.href='./alarm.html'"
-        >
+        <button onclick="window.location.href='./post-list'">📝 게시판</button>
+        <button onclick="window.location.href='./index'">🏠 홈으로</button>
+        <button class="footerAlarm" onclick="window.location.href='./alarm'">
           🔔 알람
         </button>
-        <button onclick="window.location.href='./my-page.html'">
+        <button onclick="window.location.href='./my-page'">
           🏆 마이페이지
         </button>
       </div>
     </footer>
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-    <script type="module" src="/js/common/header.js"></script>
-    <script type="module" src="/js/post/post-create.js"></script>
+    <script type="module" src="/static/js/common/header.js"></script>
+    <script type="module" src="/static/js/post/post-create.js"></script>
     <script>
       // 전역변수로 이미지 URL 배열 선언
       window.imageUrls = []; // 전역변수로 설정
@@ -78,9 +77,7 @@
       //postId가 존재하고 숫자이면 해당 숫자로 게시글 상세 조회
       async function fetchPost(postId) {
         try {
-          const response = await fetch(
-            `../api/posts/${postId}`
-          );
+          const response = await fetch(`/api/posts/${postId}`);
           if (!response.ok)
             throw new Error('게시글을 불러오는 데 실패했습니다.');
           return await response.json();

@@ -5,27 +5,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>게시글 상세</title>
-  <link rel="stylesheet" href="/styles/style.css" />
-  <link rel="stylesheet" href="/styles/post-detail.css" />
-  <script type="module" src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script type="module" src="/js/common/header.js"></script>
-  <script type="module" src="/js/post/post-detail.js"></script>
-  <script type="module" src="/js/post/comments.js"></script>
+  <link rel="stylesheet" href="/static/styles/style.css" />
+  <link rel="stylesheet" href="/static/styles/post-detail.css" />
 </head>
 
 <body>
   <header>
-    <div
-        id="logo-home"
-        class="logo"
-        onClick="window.location.href='./main.html'"
-      >
-        5ZIRAP
-      </div>
+    <div id="logo-home" class="logo" onClick="window.location.href='./index'">
+      5ZIRAP
+    </div>
     <nav>
       <ul>
-        <li><a href="./log-in.html">로그인</a></li>
-        <li><a href="./sign-up.html">회원가입</a></li>
+        <li><a href="./log-in">로그인</a></li>
+        <li><a href="./sign-up">회원가입</a></li>
         <li><a id="userNickname"></a></li>
       </ul>
     </nav>
@@ -43,62 +35,65 @@
         <button id="post-update-btn" disabled="true">수정</button>
         <button id="post-delete-btn" disabled="true">삭제</button>
         <h2 id="post-title">게시글 제목</h2>
-        
 
-          <p id="post-content">게시글 내용</p>
-          <div id="container">
-            <!--/* 에디터 콘텐츠 렌더링 영역 */-->
-            <div id="editorContent">
-          <!-- 좋아요 및 싫어요 버튼 위치 -->
-          <div class="like-dislike">
-            <button id="like-btn">
-              <i class="fa fa-thumbs-up"></i>👍 좋아요
-              <span id="post-likes"></span>
-            </button>
-            <button id="dislike-btn">
-              <i class="fa fa-thumbs-down"></i>👎 싫어요
-              <span id="post-dislikes"></span>
-            </button>
+
+        <p id="post-content">게시글 내용</p>
+        <div id="container">
+          <!--/* 에디터 콘텐츠 렌더링 영역 */-->
+          <div id="editorContent">
+
+            <!-- 해시태그가 표시될 위치 -->
+            <div id="post-hashtags" class="hashtags">
+              <!-- 여기에 해시태그가 표시됨 -->
+            </div>
+            <!-- 좋아요 및 싫어요 버튼 위치 -->
+            <div class="like-dislike">
+              <button id="like-btn">
+                <i class="fa fa-thumbs-up"></i>👍 좋아요
+                <span id="post-likes"></span>
+              </button>
+              <button id="dislike-btn">
+                <i class="fa fa-thumbs-down"></i>👎 싫어요
+                <span id="post-dislikes"></span>
+              </button>
+            </div>
+          </div>
+          <div class="comments">
+            <h3>댓글</h3>
+            <div class="comment-input">
+              <textarea id="comment-content" placeholder="댓글을 입력하세요..." rows="4"></textarea>
+              <button id="submit-comment">댓글 작성</button>
+            </div>
+            <ul id="comment-list">
+              <!-- 여기에 댓글 목록 데이터가 들어옴 -->
+            </ul>
           </div>
         </div>
-        <div class="comments">
-          <h3>댓글</h3>
-          <div class="comment-input">
-            <textarea
-              id="comment-content"
-              placeholder="댓글을 입력하세요..."
-              rows="4"
-            ></textarea>
-            <button id="submit-comment">댓글 작성</button>
-          </div>
-          <ul id="comment-list">
-            <!-- 여기에 댓글 목록 데이터가 들어옴 -->
-          </ul>
-        </div>
-      </div>
-    </main>
+  </main>
 
   <footer>
     <div class="footer-menu">
-      <button onclick="window.location.href='./chat-list.html'">
+      <button onclick="window.location.href='./chat-list'">
         💬 Live Chat
       </button>
-      <button onclick="window.location.href='./post-list.html'">
+      <button onclick="window.location.href='./post-list'">
         📝 게시판
       </button>
-      <button onclick="window.location.href='./main.html'">🏠 홈으로</button>
+      <button onclick="window.location.href='./index'">🏠 홈으로</button>
       <button id="alarmButton" class="footerAlarm" onclick="clickAlarmBtn()">
         🔔 알람
       </button>
-      <button
-        id="myPageButton"
-        class="my-page-button"
-        onclick="clickMyPageBtn()"
-      >
+      <button id="myPageButton" class="my-page-button" onclick="clickMyPageBtn()">
         🏆 마이페이지
       </button>
     </div>
   </footer>
+
+  <script type="module" src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script type="module" src="/static/js/common/header.js"></script>
+  <script type="module" src="/static/js/post/post-detail.js"></script>
+  <script type="module" src="/static/js/post/comments.js"></script>
+
 </body>
 
 </html>

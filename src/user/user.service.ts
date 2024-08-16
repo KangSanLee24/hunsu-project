@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-
+import { v4 as uuidv4 } from 'uuid'; // ES Modules
 import { Point } from 'src/point/entities/point.entity';
 import { User } from './entities/user.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
@@ -35,8 +35,8 @@ export class UserService {
     private postRepository: Repository<Post>,
 
     @InjectRepository(Comment)
-    private commentRepository: Repository<Comment>,
-  ) { }
+    private commentRepository: Repository<Comment>
+  ) {}
 
   /** 내 정보 조회(R) API **/
   async myProfile(user: User) {
@@ -68,7 +68,7 @@ export class UserService {
       order: { createdAt: 'DESC' },
     });
 
-    return posts.map(post => ({
+    return posts.map((post) => ({
       id: post.id,
       userId: post.userId,
       nickname: post.user.nickname,
@@ -88,7 +88,7 @@ export class UserService {
       order: { createdAt: 'DESC' },
     });
 
-    return comments.map(comment => ({
+    return comments.map((comment) => ({
       id: comment.id,
       postId: comment.postId,
       postTitle: comment.post.title, // 게시글 제목 추가
@@ -218,8 +218,10 @@ export class UserService {
     return data;
   }
 
-  /** 회원탈퇴 API*/
+  /** 회원탈퇴 API **/
   async softdeleteUser(user: User, softdeleteUserDto: SoftdeleteUserDto) {
+    const uuid = require('uuid');
+    // uuid.v1().substring(0, 8);
     const foundUser = await this.userRepository.findOne({
       where: { id: user.id },
     });
@@ -230,7 +232,7 @@ export class UserService {
     }
 
     // 유저 정보를 업데이트
-    user.nickname = `탈퇴한 회원입니다 : ${user.nickname}`;
+    user.nickname = `del-${uuid.v1().substring(0, 8)}`;
     user.deletedAt = new Date();
 
     return this.userRepository.save(user);

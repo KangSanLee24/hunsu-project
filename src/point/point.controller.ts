@@ -12,25 +12,33 @@ import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/user/entities/user.entity';
 import { LogIn } from 'src/decorators/log-in.decorator';
 
-@ApiTags('11. 포인트 API')
+@ApiTags('10. POINT API')
 @Controller('points')
 export class PointController {
   constructor(private readonly pointService: PointService) {}
 
-  // 출석 체크
+  /**
+   * 출석 체크
+   * @param user
+   * @returns
+   */
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '출석 체크' })
   @Post('today')
   async create(@LogIn() user: User) {
-    await this.pointService.checkAttendance(user.id);
+    await this.pointService.checkAttendance(user);
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: `출석 체크!`,
     };
   }
 
-  // 오늘 포인트 획득 포인트와 누적포인트 조회
+  /**
+   * 오늘 포인트 획득 포인트와 누적포인트 조회
+   * @param user
+   * @returns
+   */
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '포인트 조회' })
@@ -39,7 +47,7 @@ export class PointController {
     const data = await this.pointService.getPointSummary(user.id);
 
     return {
-      statusCode: HttpStatus.OK,
+      status: HttpStatus.OK,
       message: `포인트 조회에 성공했습니다.`,
       data,
     };
@@ -53,7 +61,7 @@ export class PointController {
   async pointRank(@Query('num') num: number) {
     const data = await this.pointService.pointRank(+num);
     return {
-      status: 200,
+      status: HttpStatus.OK,
       message: '종합 랭킹 조회에 성공했습니다.',
       data: data,
     };
@@ -67,8 +75,30 @@ export class PointController {
   async pointWeeklyRank(@Query('num') num: number) {
     const data = await this.pointService.pointWeeklyRank(+num);
     return {
-      status: 200,
+      status: HttpStatus.OK,
       message: '주간 랭킹 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 주간 랭킹 조회 - 레디스 **/
+  @Get('ranks-lastweek-redis')
+  async getLastWeekPointRank() {
+    const data = await this.pointService.getLastWeekPointRank();
+    return {
+      status: HttpStatus.OK,
+      message: '주간 랭킹 조회에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 종합 랭킹 조회 - 레디스 **/
+  @Get('ranks-total-redis')
+  async getTotalPointRank() {
+    const data = await this.pointService.getTotalPointRank();
+    return {
+      status: HttpStatus.OK,
+      message: '종합 랭킹 조회에 성공했습니다.',
       data: data,
     };
   }

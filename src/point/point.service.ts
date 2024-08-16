@@ -8,9 +8,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { PointLog } from './entities/point-log.entity';
 import { User } from 'src/user/entities/user.entity';
-import { Post } from 'src/post/entities/post.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
 import { MaxPointScore, PointScore, PointType } from './types/point.type';
+import { RedisService } from 'src/redis/redis.service';
+import { SERVER_START_DATE } from 'src/constants/point-redis.constant';
 
 @Injectable()
 export class PointService {
@@ -21,21 +21,24 @@ export class PointService {
     private readonly pointRepository: Repository<Point>,
     @InjectRepository(PointLog)
     private readonly pointLogRepository: Repository<PointLog>,
-    @InjectRepository(Post)
-    private readonly postRepository: Repository<Post>,
-    @InjectRepository(Comment)
-    private readonly commentRepository: Repository<Comment>
+
+    private readonly redisService: RedisService
   ) {}
 
   // 출석 체크 메소드
-  async checkAttendance(userId: number): Promise<void> {
+  async checkAttendance(user: User): Promise<void> {
+    // 0. 데이터 정리
+    const userId = user.id;
+
     // 1. 유효한 사용자인지 체크
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) {
+    const validUser = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!validUser) {
       throw new NotFoundException('유효한 사용자를 찾을 수 없습니다.');
     }
 
-    // 2. 오늘 출석을 했는지 체크
+    // 2. 오늘 출석을 했는지 확인
     const todayPoint = await this.findTodayPointById(
       userId,
       PointType.ATTENTION
@@ -109,33 +112,9 @@ export class PointService {
   }
 
   // 포인트 추가, 차감 메소드
-  async savePointLog(
-    userId: number,
-    pointType: PointType,
-    sign: boolean,
-    postId?: number
-  ) {
-    let point = await this.pointRepository.findOne({ where: { userId } });
-
-    // 댓글 작성 시, 작성자와 포스트 작성자가 동일한지 확인
-    if (pointType === PointType.COMMENT) {
-      const post = await this.postRepository.findOne({ where: { id: postId } });
-
-      if (post.userId === userId) {
-        // 작성자가 포스트 작성자와 동일하면 포인트 추가하지 않음
-        console.log(
-          '작성자가 포스트 작성자와 동일하여 포인트 추가하지 않습니다.'
-        );
-        return;
-      }
-    }
-
-    const isValidPoint = await this.validatePointLog(userId, pointType);
-    if (!isValidPoint) {
-      throw new ForbiddenException(
-        '오늘 해당 유형의 포인트를 더 이상 얻을 수 없습니다.'
-      );
-    }
+  async savePointLog(userId: number, pointType: PointType, sign: boolean) {
+    const point = await this.pointRepository.findOne({ where: { userId } });
+    const user = await this.userRepository.findOneBy({ id: userId });
 
     const pointScore = PointScore[pointType];
     const newPoint = sign
@@ -147,11 +126,14 @@ export class PointService {
 
     // sign = true 면 포인트 추가, sign = false 면 포인트 차감
     // 포인트 로그 테이블에 추가
-    await this.pointLogRepository.save({
+    const pointResult = await this.pointLogRepository.save({
       userId,
       pointType,
       point: sign ? pointScore : -pointScore,
     });
+
+    // 4. 레디스 포인트 증감
+    await this.setPointLog(user, pointResult.point);
   }
 
   // 포인트 유효성 검사 메소드
@@ -196,54 +178,64 @@ export class PointService {
     return pointLogs.reduce((acc, log) => acc + log.point, 0);
   }
 
-  //누적 포인트 랭킹 조회
-  async pointRank(num: number) {
+  //누적 포인트 조회 (전체)
+  async totalPoint(): Promise<any[]> {
+    const totalPoint = await this.pointRepository.query(
+      `
+      select a.acc_point AS point , b.nickname
+      from points a join users b
+      on a.user_id = b.id
+      `
+    );
+    return totalPoint;
+  }
+
+  //누적 포인트 랭킹 조회 (TOP N명)
+  async pointRank(num: number): Promise<any[]> {
     const pointRank = await this.pointRepository.query(
       `
-      select a.acc_point , b.nickname
+      select a.acc_point AS point , b.nickname
       from points a join users b
       on a.user_id = b.id
       order by acc_point DESC
       limit ${num};
       `
     );
-
-    const data = pointRank.map((point) => ({
-      accPoint: point.acc_point,
-      nickname: point.nickname,
-    }));
-
-    return data;
+    return pointRank;
   }
 
-  //주간 포인트 랭킹 조회 (매주 일요일~토요일))
-  async pointWeeklyRank(num: number) {
+  //주간 포인트 랭킹 조회 (지난주 : 일요일 ~ 토요일)
+  async pointWeeklyRank(num: number): Promise<any[]> {
     const pointRank = await this.pointLogRepository.query(
+      `
+      select c.id AS userId, c.nickname, c.point, d.acc_point AS accPoint
+      from (SELECT b.id as id, b.nickname as nickname, SUM(a.point) AS point
+      FROM point_logs a
+      JOIN users b ON a.user_id = b.id
+      WHERE a.created_at >=  DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 8) DAY)
+      AND a.created_at < DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 1) DAY)
+      GROUP BY b.nickname
+      ORDER BY point DESC) c left join points d
+      on c.id = d.user_id
+      limit ${num};
+      `
+    );
+    return pointRank;
+  }
+
+  //주간 포인트 로그 합산 조회 (이번주 : 일요일 ~ 오늘)
+  async thisWeekPointLogs(): Promise<any[]> {
+    const thisWeek = await this.pointLogRepository.query(
       `
       SELECT b.id, b.nickname, SUM(a.point) AS point
       FROM point_logs a
       JOIN users b ON a.user_id = b.id
-      WHERE a.created_at >=  DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 8) DAY)  
-        AND a.created_at < DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 1) DAY)
+      WHERE a.created_at >=  DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)  
+        AND a.created_at < DATE_SUB(CURDATE(), INTERVAL -(6 - WEEKDAY(CURDATE())) DAY)
       GROUP BY b.nickname 
-      ORDER BY point DESC
-      limit ${num};
       `
     );
-
-    const data = await Promise.all(
-      pointRank.map(async (point: any) => {
-        const accPoint = await this.pointRepository.findOneBy({
-          userId: point.id,
-        });
-        return {
-          accPoint: accPoint.accPoint,
-          point: point.point,
-          nickname: point.nickname,
-        };
-      })
-    );
-    return data;
+    return thisWeek;
   }
 
   // 오늘 포인트 타입 횟수 검색하는 메소드
@@ -274,5 +266,200 @@ export class PointService {
     });
 
     return count;
+  }
+
+  /** Point 증감 행동시 Redis에도 저장 **/
+  async setPointLog(user: User, point: number) {
+    // 1. Redis Update 여부 확인
+    await this.updatePointRedisExecute();
+    // 2. Redis 저장 SortedSET : This Week Point
+    await this.sumThisWeekPoint(point, user.nickname);
+    // 3. Redis 저장 SortedSET : Total Point
+    await this.sumTotalPoint(point, user.nickname);
+  }
+
+  /** This Week Point Rank 누적 (= 이번주 [point_logs] 합산)  **/
+  async sumThisWeekPoint(point: number, nickname: string) {
+    // 1. Redis Key 생성
+    const thisWeekNum = this.thisWeekNumber();
+    const thisWeekKey = this.weekKey(thisWeekNum);
+    // 2. Point 추가해주기
+    await this.redisService.zincrbyValue(thisWeekKey, point, nickname);
+  }
+
+  /** Total Point Rank 누적 **/
+  async sumTotalPoint(point: number, nickname: string) {
+    // 1. Redis Key 생성
+    const totalPointKey = 'point:total';
+    // 2. Point 추가해주기
+    await this.redisService.zincrbyValue(totalPointKey, point, nickname);
+  }
+
+  /** Last-week Point Rank 조회 **/
+  async getLastWeekPointRank() {
+    // 1. Redis Key 생성
+    const lastWeekNum = this.lastWeekNumber();
+    const lastWeekKey = this.weekKey(lastWeekNum);
+    // 2. Redis Key로 조회
+    const lastWeekPointRank = await this.redisService.zgetRank(lastWeekKey, 10);
+    // 3. Redis 데이터가 존재하는가?
+    if (!lastWeekPointRank || lastWeekPointRank.length == 0) {
+      // 3-1. 없으면 기존 API 실행 (TOP 10)
+      const data = await this.pointWeeklyRank(10);
+      // 3-2. Redis 데이터 생성
+      const dataArray = await this.makeLastWeekPointRankRedisData(data);
+      // 3-3. 데이터 반환
+      return dataArray;
+    }
+    // 4. Redis 데이터가 있으면 Redis 데이터 반환
+    return lastWeekPointRank;
+  }
+
+  /** Total Point Rank 조회 **/
+  async getTotalPointRank() {
+    // 1. Redis Key 생성
+    const totalPointKey = 'point:total';
+    // 2. Redis Key로 조회
+    const totalPointRank = await this.redisService.zgetRank(totalPointKey, 10);
+    // 3. Redis 데이터가 존재하는가?
+    if (!totalPointRank || totalPointRank.length == 0) {
+      // 3-1. 없으면 기존 API 실행 (TOP 10)
+      const data = await this.pointRank(10);
+      // 3-2. Redis 데이터 생성
+      const dataArray = await this.makeTotalPointRankRedisData(data);
+      // 3-3. 데이터 반환
+      return dataArray;
+    }
+    // 4. Redis 데이터가 있으면 Redis 데이터 반환
+    return totalPointRank;
+  }
+
+  /** Weekly Point TOP10 Redis 데이터가 없는 경우 생성 **/
+  async makeLastWeekPointRankRedisData(data: any[]) {
+    // 1. Redis Key 생성
+    const lastWeekNum = this.lastWeekNumber();
+    const lastWeekKey = this.weekKey(lastWeekNum);
+    // 2. Redis 데이터 생성
+    const dataArray = await this.redisService.zaddValue(
+      lastWeekKey,
+      data,
+      true
+    );
+    // 3. Redis 데이터 반환
+    return dataArray;
+  }
+
+  /** Total Point TOP10 Redis 데이터가 없는 경우 생성 **/
+  async makeTotalPointRankRedisData(data: any[]) {
+    // 1. Redis Key 생성
+    const totalPointKey = 'point:total';
+    // 2. Redis 데이터 생성
+    const dataArray = await this.redisService.zaddValue(
+      totalPointKey,
+      data,
+      true
+    );
+    // 3. Redis 데이터 반환
+    return dataArray;
+  }
+
+  /** 데이터 최신화(복원) 분기 **/
+  async updatePointRedisExecute() {
+    // A. This Week Point
+    // A-1. Redis Key 생성
+    const weeklyKey = 'update:point';
+    // A-2. Redis에서 Redis Key로 데이터 확인
+    const weeklyData = await this.redisService.getValue(weeklyKey);
+    // A-3. 데이터 최신화(복원) 실행 결정 - weekly
+    if (!weeklyData || weeklyData !== 'done') {
+      // A-3-1. This Week Point ALL Redis 데이터 최신화(복원) 실행
+      await this.updateThisWeekPointRedisDate();
+      // A-3-2. 최신화(복원) 확인증 생성 (1일에 1회만 실행되도록)
+      const ttlWeekly = 60 * 60 * 24;
+      await this.redisService.setValue(weeklyKey, 'done', ttlWeekly);
+    }
+
+    // B. Total Point
+    // B-1. Redis Key 생성
+    const totalKey = 'update:total';
+    // B-2. Redis에서 Redis Key로 데이터 확인
+    const totalData = await this.redisService.getValue(totalKey);
+    // B-3. 데이터 최신화(복원) 실행 결정 - total
+    if (!totalData || totalData !== 'done') {
+      // B-3-1. This Week Point ALL Redis 데이터 최신화(복원) 실행
+      await this.updateTotalPointRedisData();
+      // B-3-2. 최신화(복원) 확인증 생성 (7일에 1회만 실행되도록)
+      const ttlTotal = 60 * 60 * 24 * 7;
+      await this.redisService.setValue(totalKey, 'done', ttlTotal);
+    }
+  }
+
+  /** This Week Point ALL Redis 데이터 최신화(복원) **/
+  async updateThisWeekPointRedisDate() {
+    // 1. DB에서 [point_logs] 테이블에서 기준요일~오늘까지 합산
+    const data = await this.thisWeekPointLogs();
+    // 2. Redis Key 생성
+    const thisWeekNum = this.thisWeekNumber();
+    const thisWeekKey = this.weekKey(thisWeekNum);
+    // 3. Redis 데이터 생성(복원)
+    const dataArray = await this.redisService.zaddValue(
+      thisWeekKey,
+      data,
+      false
+    );
+  }
+
+  /** Total Point ALL Redis 데이터 최신화(복원) **/
+  async updateTotalPointRedisData() {
+    // 1. DB에서 [points] 테이블 가져오기
+    const data = await this.totalPoint();
+    // 2. Redis Key 생성
+    const totalPointKey = 'point:total';
+    // 3. Redis 데이터 생성(복원)
+    if (data) {
+      const dataArray = await this.redisService.zaddValue(
+        totalPointKey,
+        data,
+        false
+      );
+    }
+  }
+
+  // (+) N주차 구하기 (이번주)
+  private thisWeekNumber() {
+    // 1. 서버 시작일로부터 오늘은 며칠째인가?
+    const today = new Date();
+    const startDay = new Date(SERVER_START_DATE);
+    const dayNumber =
+      Math.floor(
+        (today.getTime() - startDay.getTime()) / (24 * 60 * 60 * 1000)
+      ) + 1;
+    // 2. this week는 N주차
+    const thisWeekNumber = Math.floor((dayNumber - 1) / 7) + 1;
+    // 3. N 반환
+    return thisWeekNumber;
+  }
+
+  // (+) N주차 구하기 (지난주)
+  private lastWeekNumber(): number {
+    // 1. 서버 시작일로부터 오늘은 며칠째인가?
+    const today = new Date();
+    const startDay = new Date(SERVER_START_DATE);
+    const dayNumber =
+      Math.floor(
+        (today.getTime() - startDay.getTime()) / (24 * 60 * 60 * 1000)
+      ) + 1;
+    // 2. last week는 N주차
+    const lastWeekNumber = Math.floor((dayNumber - 1) / 7);
+    // 3. N 반환
+    return lastWeekNumber;
+  }
+
+  // (+) N주차 Point RedisKey 생성기
+  private weekKey(weekNumber: number): string {
+    // 1. Redis Key 생성
+    const weekKey = `point:week:${weekNumber}`;
+    // 2. Redis Key 반환
+    return weekKey;
   }
 }
