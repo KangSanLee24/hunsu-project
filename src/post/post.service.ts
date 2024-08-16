@@ -148,7 +148,6 @@ export class PostService {
 
     // 3-1. 만약, 레디스에 데이터가 있을 때
     if (cachePost) {
-      console.log(`redis에서 가져옴 : ${cachePost}`);
       const parsedResult = JSON.parse(cachePost);
       return parsedResult;
       // 3-2. Redis에 데이터가 없을 경우 : DB에서 조회
@@ -245,7 +244,6 @@ export class PostService {
 
     // 1-1. 만약, Redis에 캐시된 데이터가 있을 경우
     if (cacheHotPost) {
-      console.log(`redis에서 가져옴 : ${cacheHotPost}`);
       const hotPostResult = JSON.parse(cacheHotPost);
       return hotPostResult;
       // 1-2. Redis에 데이터가 없을 경우 : DB에서 조회
