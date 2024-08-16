@@ -16,6 +16,12 @@ document.addEventListener('DOMContentLoaded', function () {
 // 내 정보 수정 API 호출 함수
 async function updateProfile() {
   const nickname = document.getElementById('nickname').value; // nickname 값을 가져옴
+
+  // 닉네임 길이 체크
+  if (nickname.length < 3 || nickname.length > 12) {
+    alert('닉네임은 3글자 이상 12글자 이하로 입력해 주세요.');
+    return; // 더 이상 진행하지 않음
+  }
   try {
     const response = await fetch(`/api/users/me`, {
       method: 'PATCH',
@@ -60,7 +66,7 @@ submitUpdateProfileButton.addEventListener('click', (event) => {
   updateProfile();
 });
 
-// 페이지를 벗어날때 nickname을 localstorage에서 지운다.
+// 페이지를 벗어날때 nickname을 localStorage에서 지운다.
 window.addEventListener('beforeunload', () => {
   localStorage.removeItem('nickname');
 });
