@@ -329,8 +329,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const nowUrl = localStorage.getItem('redirectUrl');
         if (
           nowUrl == 'http://localhost:3000/html/main.html' ||
-          nowUrl ==
-            'https://5zirap.shop어쩌고저쩌고 로컬스토리지에 있는 값 복붙'
+          nowUrl == 'https://5zirap.shop' ||
+          nowUrl == 'https://5zirap.shop/index'
         ) {
           renderHashtagRank(data.data);
         }
