@@ -143,7 +143,7 @@ export class PostService {
   ) {
     // 1. redis 값 불러오기
     const subRedisClient = this.subRedisService.getClient();
-    const redisJson = new RedisJson(subRedisClient, { prefix: 'cache:' });
+    const redisJson = new RedisJson(subRedisClient, { prefix: 'cache:' }); // RedisJson이 prefix: 'cache' 이용해서 키 구별, TTL 작동 시 필요
 
     // 2. 검색 필터위한 조건, 캐시 키 생성
     const postKey = `post:${page}:${limit}:${category || 'all'}:${sort || 'default'}:${keyword || 'none'}`;
@@ -206,7 +206,7 @@ export class PostService {
 
       // 4-4. redis에 저장
       await redisJson.set(postKey, result); // 값 저장
-      await subRedisClient.expire(`cache:${postKey}`, 120); // ttl 5분 설정
+      await subRedisClient.expire(`cache:${postKey}`, 120); // ttl 2분 설정
 
       return result;
     }
@@ -303,7 +303,7 @@ export class PostService {
 
       // 2. redis 값 저장
       await redisJson.set(hotPost, topResult); // 값 저장
-      await subRedisClient.expire(`cache:${hotPost}`, 120); // ttl
+      await subRedisClient.expire(`cache:${hotPost}`, 120); // ttl 2분 설정
 
       return topResult;
     }
