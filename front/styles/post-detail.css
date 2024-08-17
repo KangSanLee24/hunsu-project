@@ -226,3 +226,8 @@
   border: 0px;
   background-color: white;
 }
+
+/* 댓글 수정/삭제 버튼 */
+.comment-edit-del {
+  margin-left: 10px;
+}

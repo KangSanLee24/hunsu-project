@@ -257,7 +257,7 @@ export class ChatService {
         const zAfter = await client.zrevrange('hashtag', 0, 9, 'WITHSCORES');
 
         // TOP10 변동이 있는 경우에만 이벤트 등록
-        if (zBefore !== zAfter) {
+        if (zBefore.join() !== zAfter.join()) {
           // 이벤트 등록
           const alarmData = {
             type: 'hashtag',
