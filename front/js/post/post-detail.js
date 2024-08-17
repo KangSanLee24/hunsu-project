@@ -1,3 +1,5 @@
+import { identifyUser } from '../common/identify-user.js';
+
 /** 게시글 상세 페이지에 필요한 변수 선언 **/
 // 1. URL에서 게시글 ID를 가져와서 상세 내용 로드
 const urlParams = new URLSearchParams(window.location.search);
@@ -10,7 +12,9 @@ const postDeleteButton = document.getElementById('post-delete-btn');
 const submitLikeButton = document.getElementById('like-btn');
 const submitDislikeButton = document.getElementById('dislike-btn');
 
+// 3. 로그인 관련
 const accessToken = localStorage.getItem('accessToken');
+const user = accessToken ? await identifyUser(accessToken) : null;
 
 /** 게시글 상세 페이지 랜더링 **/
 async function renderPostDetail(postId) {
@@ -49,11 +53,18 @@ async function renderPostDetail(postId) {
     }
 
     try {
-      // accessToken으로 사용자 정보 체크
-      const result = await fetchAccessToken(accessToken);
-      if (result.status === 200 && result.data.id == post.data.userId) {
-        document.getElementById('post-update-btn').disabled = false;
-        document.getElementById('post-delete-btn').disabled = false;
+      if (!accessToken) {
+        document.getElementById('post-update-btn').disabled = true;
+        document.getElementById('post-delete-btn').disabled = true;
+      } else {
+        // accessToken으로 사용자 정보 체크
+        if (user.status === 200 && user.data.id == post.data.userId) {
+          document.getElementById('post-update-btn').disabled = false;
+          document.getElementById('post-delete-btn').disabled = false;
+        } else {
+          document.getElementById('post-update-btn').disabled = true;
+          document.getElementById('post-delete-btn').disabled = true;
+        }
       }
     } catch (error) {}
   }
@@ -112,68 +123,64 @@ async function fetchLD(postId) {
 
 /** 게시글 좋아요 클릭 **/
 async function clickLikes(postId) {
-  try {
-    // 1. 게시글 좋아요 클릭 API 호출
-    const response = await fetch(`/api/posts/${postId}/likes`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      },
-    });
-    // 2. fetch 받아온 result를 json으로
-    const result = await response.json();
-    // 3. API response 결과가 ok가 아니면
-    if (!response.ok) {
-      alert(result.message);
+  if (user) {
+    try {
+      // 1. 게시글 좋아요 클릭 API 호출
+      const response = await fetch(`/api/posts/${postId}/likes`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+      // 2. fetch 받아온 result를 json으로
+      const result = await response.json();
+      // 3. API response 결과가 ok가 아니면
+      if (!response.ok) {
+        alert(result.message);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      // 4. 도중에 에러가 뜬 경우
+      alert('게시글 좋아요에서 오류가 발생했습니다.');
+      console.error(error);
       return false;
     }
-    return true;
-  } catch (error) {
-    // 4. 도중에 에러가 뜬 경우
-    alert('게시글 좋아요에서 오류가 발생했습니다.');
-    console.error(error);
-    return false;
+  } else {
+    alert('로그인한 상태에서만 좋아요를 누를 수 있습니다.');
   }
 }
 
 /** 게시글 싫어요 클릭 **/
 async function clickDislikes(postId) {
-  try {
-    // 1. 게시글 싫어요 클릭 API 호출
-    const response = await fetch(`/api/posts/${postId}/dislikes`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      },
-    });
-    // 2. fetch 받아온 result를 json으로
-    const result = await response.json();
-    // 3. API response 결과가 ok가 아니면
-    if (!response.ok) {
-      alert(result.message);
+  if (user) {
+    try {
+      // 1. 게시글 싫어요 클릭 API 호출
+      const response = await fetch(`/api/posts/${postId}/dislikes`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+      // 2. fetch 받아온 result를 json으로
+      const result = await response.json();
+      // 3. API response 결과가 ok가 아니면
+      if (!response.ok) {
+        alert(result.message);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      // 4. 도중에 에러가 뜬 경우
+      alert('게시글 싫어요에서 오류가 발생했습니다.');
+      console.error(error);
       return false;
     }
-    return true;
-  } catch (error) {
-    // 4. 도중에 에러가 뜬 경우
-    alert('게시글 싫어요에서 오류가 발생했습니다.');
-    console.error(error);
-    return false;
+  } else {
+    alert('로그인한 상태에서만 싫어요를 누를 수 있습니다.');
   }
-}
-
-// 내 정보 조회 API
-async function fetchAccessToken(accessToken) {
-  const response = await fetch(`/api/users/me`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return await response.json();
 }
 
 // 게시글 삭제 API 호출
@@ -198,45 +205,53 @@ async function deletePost() {
 
 // 좋아요 버튼 클릭 핸들러
 async function handleLike() {
-  // 버튼이 이미 눌린 상태라면 좋아요를 취소합니다.
-  if (submitLikeButton.classList.contains('liked')) {
-    const clicked = await clickLikes(postId);
+  if (user) {
+    // 버튼이 이미 눌린 상태라면 좋아요를 취소합니다.
+    if (submitLikeButton.classList.contains('liked')) {
+      const clicked = await clickLikes(postId);
 
-    if (clicked !== false) {
-      submitLikeButton.classList.remove('liked');
-      submitLikeButton.innerHTML = '👍 좋아요'; // 좋아요 취소 시 이모지 변경
-      submitDislikeButton.disabled = false; // 싫어요 버튼 활성화
+      if (clicked !== false) {
+        submitLikeButton.classList.remove('liked');
+        submitLikeButton.innerHTML = '👍 좋아요'; // 좋아요 취소 시 이모지 변경
+        submitDislikeButton.disabled = false; // 싫어요 버튼 활성화
+      }
+    } else {
+      const clicked = await clickLikes(postId);
+      if (clicked !== false) {
+        submitLikeButton.classList.add('liked');
+        submitLikeButton.innerHTML = '❤️ 좋아요!'; // 좋아요 추가 시 이모지 변경
+        submitDislikeButton.disabled = true; // 싫어요 버튼 활성화
+      }
     }
+    await renderPostDetail(postId);
   } else {
-    const clicked = await clickLikes(postId);
-    if (clicked !== false) {
-      submitLikeButton.classList.add('liked');
-      submitLikeButton.innerHTML = '❤️ 좋아요!'; // 좋아요 추가 시 이모지 변경
-      submitDislikeButton.disabled = true; // 싫어요 버튼 활성화
-    }
+    alert('로그인한 상태에서만 좋아요를 누를 수 있습니다.');
   }
-  await renderPostDetail(postId);
 }
 
 // 싫어요 버튼 클릭 핸들러
 async function handleDislike() {
-  // 버튼이 이미 눌린 상태라면 싫어요를 취소합니다.
-  if (submitDislikeButton.classList.contains('disliked')) {
-    const clicked = await clickDislikes(postId);
-    if (clicked !== false) {
-      submitDislikeButton.classList.remove('disliked');
-      submitDislikeButton.innerHTML = '👎 싫어요'; // 싫어요 취소 시 이모지와 텍스트
-      submitLikeButton.disabled = false; // 좋아요 버튼 활성화
+  if (user) {
+    // 버튼이 이미 눌린 상태라면 싫어요를 취소합니다.
+    if (submitDislikeButton.classList.contains('disliked')) {
+      const clicked = await clickDislikes(postId);
+      if (clicked !== false) {
+        submitDislikeButton.classList.remove('disliked');
+        submitDislikeButton.innerHTML = '👎 싫어요'; // 싫어요 취소 시 이모지와 텍스트
+        submitLikeButton.disabled = false; // 좋아요 버튼 활성화
+      }
+    } else {
+      const clicked = await clickDislikes(postId);
+      if (clicked !== false) {
+        submitDislikeButton.classList.add('disliked');
+        submitDislikeButton.innerHTML = '💔 싫어요!'; // 싫어요 추가 시 이모지와 텍스트
+        submitLikeButton.disabled = true; // 좋아요 버튼 비활성화
+      }
     }
+    await renderPostDetail(postId);
   } else {
-    const clicked = await clickDislikes(postId);
-    if (clicked !== false) {
-      submitDislikeButton.classList.add('disliked');
-      submitDislikeButton.innerHTML = '💔 싫어요!'; // 싫어요 추가 시 이모지와 텍스트
-      submitLikeButton.disabled = true; // 좋아요 버튼 비활성화
-    }
+    alert('로그인한 상태에서만 싫어요를 누를 수 있습니다.');
   }
-  await renderPostDetail(postId);
 }
 
 // 버튼 클릭 이벤트 리스너 추가
@@ -250,5 +265,7 @@ postDeleteButton.addEventListener('click', deletePost);
 /** 페이지 시작!! 페이지 로드 시 게시글 fetch 및 render **/
 if (postId) {
   renderPostDetail(postId);
-  fetchLD(postId);
+  if (user) {
+    fetchLD(postId);
+  }
 }
