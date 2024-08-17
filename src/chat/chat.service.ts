@@ -247,17 +247,25 @@ export class ChatService {
       for (const tag of hashtagitem) {
         const uniqueTag = `${tag}:${currentTime}`;
 
-        // ZINCRBY가 멤버가 없을 때는 추가, 있을 때는 증가시킴
+        // ZINCRBY 이전 데이터
+        const zBefore = await client.zrevrange('hashtag', 0, 9, 'WITHSCORES');
+
+        // 해시태그 카운트 1 증가 (해시태그 명단에 없으면 새로 생성)
         client.zincrby('hashtag', 1, tag);
 
-        // 해시태그 카운트 증감에 따른 이벤트 등록
-        const data = await client.zrevrange('hashtag', 0, 9, 'WITHSCORES');
-        const alarmData = {
-          type: 'hashtag',
-          message: `${tag}`,
-          data: data,
-        };
-        this.alarmService.newEventRegister(0, alarmData);
+        // ZINCRBY 이후 데이터
+        const zAfter = await client.zrevrange('hashtag', 0, 9, 'WITHSCORES');
+
+        // TOP10 변동이 있는 경우에만 이벤트 등록
+        if (zBefore !== zAfter) {
+          // 이벤트 등록
+          const alarmData = {
+            type: 'hashtag',
+            message: `${tag}`,
+            data: zAfter,
+          };
+          this.alarmService.newEventRegister(0, alarmData);
+        }
 
         //만료기간을 따로 저장
         client.hset('hashtag_expire', uniqueTag, expireTime);
