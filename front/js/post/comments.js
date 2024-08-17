@@ -44,8 +44,10 @@ function renderComments(comments) {
 /** 댓글 리스트에 추가하는 함수 **/
 async function addCommentToList(comment) {
   const commentItem = document.createElement('li');
+  commentItem.setAttribute('data-comment-id', comment.id); // 댓글 ID 저장
+
   commentItem.innerHTML = `
-    <div class="comment-header">
+     <div class="comment-header">
       <span>${comment.nickname} | 작성일: ${elapsedTime(comment.createdAt)} | </span>
       <div class="comment-like-btn-count">
         <button class="comment-like-btn" data-comment-id="${comment.id}" onclick="clickLikeComment(${comment.id})">👍</button>
@@ -56,11 +58,12 @@ async function addCommentToList(comment) {
         <span class="comment-dislike-count"> ${comment.dislikes || 0} </span>
       </div>
       <div>
-        <button class="edit-comment-btn" onclick="editComment(${comment.id}, '${comment.content}')">수정</button>
+        <button class="edit-comment-btn" onclick="enableEditComment(${comment.id})">수정</button>
         <button class="delete-comment-btn" onclick="deleteComment(${comment.id})">삭제</button>
       </div>       
     </div>
-    <p>${comment.content}</p>
+    <p class="comment-content">${comment.content}</p>
+    <textarea class="edit-comment-input" placeholder="댓글을 입력하세요..." rows="4" style="display: none;">${comment.content}</textarea>
     <button class="recomment-btn" data-comment-id="${comment.id}" onclick="fetchRecomments(${comment.id})">대댓글 (${comment.recommentsCount})</button>
     <div class="recomment-list" id="recomment-list-${comment.id}" style="display: none;"></div>  
   `;
@@ -192,7 +195,7 @@ async function createComment(content) {
       addCommentToList(result.data);
       commentContentInput.value = ''; // 입력란 초기화
       // 페이지 새로고침
-      window.location.reload();
+      await fetchComments();
     } else {
       alert(result.message);
     }
@@ -218,6 +221,86 @@ async function submitRecomment(commentId, content) {
     console.error(error);
   }
 }
+
+/** 댓글 수정 활성화 함수 **/
+function enableEditComment(commentId) {
+  const commentItem = document.querySelector(
+    `li[data-comment-id="${commentId}"]`
+  );
+  const inputField = commentItem.querySelector('.edit-comment-input');
+  const commentContent = commentItem.querySelector('.comment-content');
+  const editButton = commentItem.querySelector('.edit-comment-btn');
+
+  inputField.style.display = 'block'; // 입력 필드 보이기
+  inputField.focus(); // 입력 필드에 포커스
+  commentContent.style.display = 'none'; // 기존 댓글 내용 숨기기
+  editButton.innerText = '수정 완료'; // 버튼 텍스트 변경
+
+  // 입력 필드에서 Enter 키를 누르면 수정 완료
+  inputField.addEventListener('keypress', async (event) => {
+    if (event.key === 'Enter') {
+      const newContent = inputField.value;
+      await editComment(commentId, newContent);
+      await fetchComments();
+    }
+  });
+
+  // 수정 완료 버튼 클릭 시 처리
+  editButton.addEventListener('click', async () => {
+    const newContent = inputField.value;
+    await editComment(commentId, newContent);
+    await fetchComments();
+  });
+}
+
+/** 댓글 수정 API 호출 **/
+async function editComment(commentId, content) {
+  try {
+    const response = await fetch(`/api/posts/${postId}/comments/${commentId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+      body: JSON.stringify({ content }),
+    });
+
+    if (response.status !== 200) {
+      alert('댓글 수정에 실패하였습니다.');
+    }
+  } catch (error) {
+    console.error('댓글 수정에 실패하였습니다.', error);
+  }
+}
+
+/** 댓글 삭제 함수 **/
+async function deleteComment(commentId) {
+  try {
+    const confirmDelete = confirm('정말로 댓글을 삭제하시겠습니까?');
+    if (!confirmDelete) return;
+
+    const response = await fetch(`/api/posts/${postId}/comments/${commentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+
+    if (response.status === 200) {
+      // 댓글 리스트에서 삭제
+      await fetchComments();
+    } else {
+      alert(result.message);
+    }
+  } catch (error) {
+    console.error('댓글 삭제에 실패하였습니다.', error);
+  }
+}
+
+/** 대댓글 수정 함수 **/
+
+/** 대댓글 삭제 함수 **/
 
 /** 댓글 좋아요 클릭 **/
 async function clickLikeComment(commentId) {
@@ -318,7 +401,7 @@ commentList.addEventListener('click', async (event) => {
     if (recommentContent) {
       await submitRecomment(commentId, recommentContent);
       recommentInput.style.display = 'none'; // 입력 후 숨김
-      window.location.reload();
+      await fetchComments();
     } else {
       alert('대댓글 내용을 입력하세요.');
     }
@@ -334,3 +417,5 @@ if (postId) {
 window.clickLikeComment = clickLikeComment;
 window.clickDislikeComment = clickDislikeComment;
 window.fetchRecomments = fetchRecomments;
+window.enableEditComment = enableEditComment;
+window.deleteComment = deleteComment;
