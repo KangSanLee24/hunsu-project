@@ -46,7 +46,7 @@ export class PostService {
 
   /* 게시글 생성 API */
   async create(createPostDto: CreatePostDto, userId: number) {
-    const { title, content, category, urlsArray, hashtagsArray } =
+    const { title, content, category, urlsArray, hashtagsString } =
       createPostDto;
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -56,6 +56,12 @@ export class PostService {
     // 1. 권한 확인
     if (!user) {
       throw new UnauthorizedException(POST_MESSAGE.POST.UNAUTHORIZED);
+    }
+
+    // 2. 해시태그 유효성 체크
+    const isValidHashtags = this.validateHashtags(hashtagsString);
+    if (!isValidHashtags) {
+      throw new BadRequestException('해시태그를 양식에 맞게 입력해주세요.'); // 유효하지 않은 해시태그에 대한 예외 처리
     }
 
     // urlsArray가 비어있다면 pass
@@ -74,12 +80,13 @@ export class PostService {
         notUsedUrls.map((fileUrl) => this.awsService.deleteFileFromS3(fileUrl))
       );
     }
-    //해시태그 formatting
-    const hashtags = hashtagsArray
+
+    // 해시태그 formatting
+    const hashtags = hashtagsString
       .split(' ')
       .filter((tag) => tag.trim().length > 0);
 
-    // 2. 게시글 저장
+    // 3. 게시글 저장
     const createdPost = this.postRepository.create({
       title,
       content,
@@ -90,7 +97,7 @@ export class PostService {
 
     const post = await this.postRepository.save(createdPost);
 
-    // 3. 게시글 생성 포인트 지급
+    // 4. 게시글 생성 포인트 지급
     const isValidPoint = await this.pointService.validatePointLog(
       userId,
       PointType.POST
@@ -98,7 +105,7 @@ export class PostService {
     if (isValidPoint)
       this.pointService.savePointLog(userId, PointType.POST, true);
 
-    //4. 해시태그 레디스에 저장
+    // 5. 해시태그 Redis에 저장
     const client = this.redisService.getClient();
     const currentTime = Date.now();
     const sevenDaysInMilliseconds = 7 * 24 * 60 * 60 * 1000; // 7일을 밀리초로 변환
@@ -107,11 +114,11 @@ export class PostService {
       'yyyy-MM-dd'
     );
 
-    // 5. redis 비우는 작업 (게시글 목록 조회 캐시 삭제)
+    // 6. 게시글 목록 조회 Redis 삭제
     const postKey = `post:1:20:all:DESC:none`;
     await this.subRedisService.deleteValue(postKey); // 해당 캐시 삭제
 
-    //hashtags = [#청바지, #모자]
+    // hashtags = [#청바지, #모자]
     const postHashtag = hashtags.map((item) => {
       const uniqueTag = `${item}:${currentTime}`;
       client.zincrby('hashtag', 1, item);
@@ -233,7 +240,7 @@ export class PostService {
       numDislikes: post.numDislikes, // 싫어요 수
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-      hashtagsArray: post.hashtags,
+      hashtagsString: post.hashtags,
     };
   }
 
@@ -296,7 +303,7 @@ export class PostService {
 
   /* 게시글 수정 API */
   async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
-    const { title, content, urlsArray, category, hashtagsArray } =
+    const { title, content, urlsArray, category, hashtagsString } =
       updatePostDto;
 
     const post = await this.postRepository.findOne({
@@ -312,6 +319,12 @@ export class PostService {
     // 작성자 본인인지 확인
     if (post.userId !== userId) {
       throw new ForbiddenException(POST_MESSAGE.POST.UPDATE.FAILURE.FORBIDDEN);
+    }
+
+    // 해시태그 유효성 체크
+    const isValidHashtags = this.validateHashtags(hashtagsString);
+    if (!isValidHashtags) {
+      throw new BadRequestException('해시태그를 양식에 맞게 입력해주세요.'); // 유효하지 않은 해시태그에 대한 예외 처리
     }
 
     // 1. existingUrlsArray : 기존 작성물의 content에서 urls. (A)
@@ -333,8 +346,8 @@ export class PostService {
       notUsedUrls.map((fileUrl) => this.awsService.deleteFileFromS3(fileUrl))
     );
 
-    //해시태그 수정 시
-    const hashtags = hashtagsArray
+    // 해시태그 수정 시
+    const hashtags = hashtagsString
       .split(' ')
       .filter((tag) => tag.trim().length > 0);
 
@@ -344,7 +357,7 @@ export class PostService {
         title,
         content,
         category,
-        hashtags: hashtagsArray.length > 0 ? hashtags : post.hashtags,
+        hashtags: hashtagsString.length > 0 ? hashtags : post.hashtags,
       }
     );
   }
@@ -657,5 +670,31 @@ export class PostService {
         postId,
       });
     }
+  }
+
+  /** 해시태그 유효성 검사 함수 **/
+  private validateHashtags(hashtagsString: string): boolean {
+    // 해시태그가 비어있으면 true 반환
+    if (!hashtagsString.trim()) {
+      return true; // 아무것도 입력되지 않았을 경우 유효한 것으로 간주
+    }
+
+    const hashtagPattern = /#\S+/g; // 해시태그 정규 표현식
+    const hashtagItem = hashtagsString.match(hashtagPattern); // 입력된 해시태그와 매칭
+
+    // 유효한 해시태그가 한 개도 없을 경우
+    if (!hashtagItem || hashtagItem.length === 0) {
+      return false;
+    }
+
+    // 모든 해시태그가 #으로 시작하고 공백이 없는지 체크
+    for (const tag of hashtagItem) {
+      if (tag.trim().length < 2) {
+        // #포함 최소 2글자 이상이어야 함
+        return false;
+      }
+    }
+
+    return true; // 모든 해시태그가 유효할 경우
   }
 }

@@ -39,9 +39,9 @@ async function renderPostDetail(postId) {
       marked.parse(post.data.content) || '내용 없음';
     //해시태그 렌더링
     const hashtagsContainer = document.getElementById('post-hashtags');
-    const hashtagsArray = post.data.hashtagsArray;
-    if (hashtagsArray && hashtagsArray.length > 0) {
-      hashtagsContainer.innerHTML = hashtagsArray
+    const hashtagsString = post.data.hashtagsString;
+    if (hashtagsString && hashtagsString.length > 0) {
+      hashtagsContainer.innerHTML = hashtagsString
         .map((tag) => `<span class="hashtag">${tag}</span>`)
         .join(' ');
     } else {

@@ -34,6 +34,14 @@ async function createPost() {
   const hashtags = document.getElementById('post-hashtags').value;
   const content = editor.getMarkdown();
 
+  // 해시태그 유효성 체크
+  const isValidHashtags = validateHashtags(hashtags);
+  if (!isValidHashtags) {
+    alert('해시태그를 양식에 맞게 입력해주세요. (예: #해시태그 #5ZIRAP)');
+    return;
+  }
+
+  // 게시글 생성 API 호출
   const postResponse = await fetch(`/api/posts`, {
     method: 'POST',
     headers: {
@@ -45,10 +53,11 @@ async function createPost() {
       content: content,
       category: category,
       urlsArray: window.imageUrls, // 이미지 URL 배열 추가
-      hashtagsArray: hashtags,
+      hashtagsString: hashtags,
     }),
   });
 
+  // 생성 성공
   if (postResponse.status === 201) {
     const postData = await postResponse.json();
     const postId = postData.data.id; // 생성된 게시글 ID를 저장
@@ -56,6 +65,7 @@ async function createPost() {
     // 해당 게시글 상세 페이지로 이동
     window.location.href = `./post-detail?id=${postId}`;
   } else {
+    // 생성 실패
     alert('게시글 생성 실패');
   }
 }
@@ -64,9 +74,17 @@ async function createPost() {
 async function updatePost() {
   const title = document.getElementById('post-title').value;
   const category = document.getElementById('post-category').value;
-  const content = editor.getMarkdown();
   const hashtags = document.getElementById('post-hashtags').value;
+  const content = editor.getMarkdown();
 
+  // 해시태그 유효성 체크
+  const isValidHashtags = validateHashtags(hashtags);
+  if (!isValidHashtags) {
+    alert('해시태그를 양식에 맞게 입력해주세요. (예: #해시태그 #5ZIRAP)');
+    return;
+  }
+
+  // 게시글 수정 API 호출
   const postResponse = await fetch(`/api/posts/${postId}`, {
     method: 'PATCH',
     headers: {
@@ -78,15 +96,17 @@ async function updatePost() {
       content: content,
       category: category,
       urlsArray: window.imageUrls, // 이미지 URL 배열 추가
-      hashtagsArray: hashtags,
+      hashtagsString: hashtags,
     }),
   });
 
+  // 수정 성송
   if (postResponse.ok) {
     alert('게시글이 수정되었습니다.');
     // 수정된 게시글 상세 페이지로 이동
     window.location.href = `./post-detail?id=${postId}`;
   } else {
+    // 수정 실패
     alert('게시글 수정 실패');
   }
 }
@@ -112,6 +132,33 @@ export async function addImageBlobHook(blob, callback) {
   } catch (error) {
     console.error('업로드 실패 : ', error);
   }
+}
+
+// 해시태그 유효성 검사 체크하는 함수
+function validateHashtags(hashtags) {
+  // 해시태그가 비어있으면 true 반환
+  if (!hashtags.trim()) {
+    return true;
+  }
+
+  const hashtagPattern = /#\S+/g; // 해시태그 정규 표현식
+  const hashtagItem = hashtags.match(hashtagPattern); // 해시태그와 매칭
+  console.log('🚀 ~ validateHashtags ~ hashtagItem:', hashtagItem);
+
+  // 유효한 해시태그가 한 개도 없을 경우
+  if (!hashtagItem || hashtagItem.length === 0) {
+    return false;
+  }
+
+  //모든 해시태그가 #으로 시작하고 공백이 없는지 체크
+  for (const tag of hashtagItem) {
+    if (tag.trim().length < 2) {
+      // #포함 최소 2글자 이상이어야 함
+      return false;
+    }
+  }
+
+  return true; // 모든 해시태그가 유효할 경우
 }
 
 // 게시글 작성 버튼 클릭 이벤트 리스너
