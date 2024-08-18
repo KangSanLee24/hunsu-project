@@ -82,9 +82,8 @@ export class PostService {
     }
 
     // 해시태그 formatting
-    const hashtags = hashtagsString
-      .split(' ')
-      .filter((tag) => tag.trim().length > 0);
+    const hashtagPattern = /#\S+/g; // 해시태그 정규 표현식
+    const hashtags = hashtagsString.match(hashtagPattern); // 해시태그와 매칭
 
     // 3. 게시글 저장
     const createdPost = this.postRepository.create({

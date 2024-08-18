@@ -4,13 +4,11 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
-import { UpdateChatDto } from './dto/update-chat.dto';
 import { ChatRoom } from './entities/chat-room.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Like, Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { ChatMember } from './entities/chat-member.entity';
-import moment from 'moment';
 import { format, isSameDay } from 'date-fns';
 import { AwsService } from 'src/aws/aws.service';
 import { ChatImage } from './entities/chat-image.entity';
