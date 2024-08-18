@@ -155,7 +155,7 @@ function renderRecomments(commentId, recomments, recommentList) {
           </div> 
         </div>
         <p class="comment-content">${recomment.content}</p>
-        <textarea class="edit-comment-input" placeholder="대댓글을 입력하세요..." rows="4" style="display: none;">${recomment.content}</textarea>
+        <textarea id="recomment-content" class="edit-comment-input" placeholder="대댓글을 입력하세요..." rows="4" style="display: none;">${recomment.content}</textarea>
         `;
       } else if (user.data.id == recomment.userId) {
         commentItem.innerHTML = `
@@ -175,7 +175,7 @@ function renderRecomments(commentId, recomments, recommentList) {
         </div> 
       </div>
       <p class="comment-content">${recomment.content}</p>
-      <textarea class="edit-comment-input" placeholder="대댓글을 입력하세요..." rows="4" style="display: none;">${recomment.content}</textarea>
+      <textarea id="recomment-content" class="edit-comment-input" placeholder="대댓글을 입력하세요..." rows="4" style="display: none;">${recomment.content}</textarea>
       `;
       }
       recommentList.appendChild(commentItem);
@@ -189,7 +189,7 @@ function renderRecomments(commentId, recomments, recommentList) {
   recommentInputContainer.innerHTML = `
     <button class="recomment-btn">대댓글 작성</button>
     <div class="recomment-input" id="recomment-input-${commentId}" style="display: none;">
-      <textarea placeholder="대댓글을 입력하세요..." rows="2"></textarea>
+      <textarea id="recomment-content" placeholder="대댓글을 입력하세요..." rows="2"></textarea>
       <button class="submit-recomment">작성</button>
     </div>
   `;
@@ -484,7 +484,7 @@ commentList.addEventListener('click', (event) => {
     ) {
       recommentInput.style.display =
         recommentInput.style.display === 'none' ||
-        recommentInput.style.display === ''
+          recommentInput.style.display === ''
           ? 'block'
           : 'none';
     }

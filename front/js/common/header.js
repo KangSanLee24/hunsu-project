@@ -205,6 +205,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // 대댓글 작성 textarea 클릭 이벤트 리스너 추가
+  const recommentContentTextarea = document.getElementById('recomment-content');
+  if (recommentContentTextarea) {
+    recommentContentTextarea.addEventListener('click', (event) => {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        alert('흐에에에엑')
+        handleLoginRequired(event, window.location.href);
+      }
+    });
+  }
+
   // 채팅방 만들기 버튼 별도로 처리
   // 로그인하면 모달창이 켜지면서 자꾸 리디렉션 페이지로 넘어가져서 따로 뺐음.
   const createChatButton = document.getElementById('createChatButton');
