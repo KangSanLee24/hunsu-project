@@ -219,23 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 대댓글 버튼 클릭 이벤트 리스너 추가
-  const commentList = document.getElementById('comment-list');
-  if (commentList) {
-    commentList.addEventListener('click', (event) => {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        handleLoginRequired(event, window.location.href);
-      } else {
-        if (event.target.classList.contains('submit-recomment')) {
-          const recommentInput = event.target.nextElementSibling;
-          recommentInput.style.display =
-            recommentInput.style.display === 'none' ? 'block' : 'none';
-        }
-      }
-    });
-  }
-
   const clickAlarmBtn = function () {
     // 로그인 상태인지 확인
     if (!accessToken) {
@@ -328,8 +311,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // 현재 페이지가 메인페이지 인 경우에만
         const nowUrl = localStorage.getItem('redirectUrl');
         if (
-          nowUrl == 'http://localhost:3000/html/main.html' ||
+          nowUrl == 'http://localhost:3000' ||
+          nowUrl == 'http://localhost:3000/' ||
+          nowUrl == 'http://localhost:3000/index' ||
           nowUrl == 'https://5zirap.shop' ||
+          nowUrl == 'https://5zirap.shop/' ||
           nowUrl == 'https://5zirap.shop/index'
         ) {
           renderHashtagRank(data.data);

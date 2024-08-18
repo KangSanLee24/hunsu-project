@@ -46,7 +46,7 @@ async function fetchAlarmData(page) {
     });
 
     // 2. fetch 받아오기 (알람 목록)
-    const response = await fetch(`/api/alarms`, {
+    const response = await fetch(`/api/alarms?${queryParams.toString()}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -134,6 +134,11 @@ function updatePagination() {
   prevButton.disabled = currentPage === 1;
   // 4. 현재 패이지가 끝번이면 <next> 버튼 비활성화
   nextButton.disabled = currentPage === totalPages;
+  // 5. 만약에 현재 페이지가 없으면 비활성화
+  console.log(currentPageLabel);
+  if (!currentPageLabel) {
+    nextButton.disabled;
+  }
 }
 /** (+) 페이지 이동 버튼 <prev> **/
 prevButton.addEventListener('click', () => {

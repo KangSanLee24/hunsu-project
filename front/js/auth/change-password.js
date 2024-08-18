@@ -19,7 +19,7 @@ async function rePassword() {
     const result = await response.json();
 
     if (!response.ok) {
-      alert('이메일 전송에 실패했습니다.');
+      alert(result.message);
       return; // 더 이상 진행하지 않음
     }
 

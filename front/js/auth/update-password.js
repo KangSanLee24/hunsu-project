@@ -17,14 +17,9 @@ async function updatePassword() {
 
     const result = await response.json();
 
-    // 409
-    if ((result.status = 409)) {
-      alert('새 비밀번호와 비밀번호 확인이 일치하지 않습니다.');
-    }
-
-    // 그 외
-    else if (!response.ok) {
-      alert('비밀번호 변경에 실패했습니다.');
+    // 예외처리
+    if (!response.ok) {
+      alert(result.message);
       return; // 더 이상 진행하지 않음
     }
 

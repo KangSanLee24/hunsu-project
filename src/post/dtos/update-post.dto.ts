@@ -28,8 +28,8 @@ export class UpdatePostDto extends PartialType(CreatePostDto) {
   @ApiProperty({ example: 'CHAT', enum: Category })
   category?: Category;
 
-  @IsOptional() 
+  @IsOptional()
   @IsString()
   @ApiProperty({ example: '#청바지 #안경 #모자' }) // 올바른 배열 예시
-  hashtagsArray?: string;
+  hashtagsString?: string;
 }

@@ -11,7 +11,11 @@
     <!-- 로그인 페이지 -->
     <div class="container">
       <!-- 로고 이미지 -->
-      <img class="logo-image" src="/static/images/5zirap_logo.jpg" />
+      <img
+        class="logo-image"
+        src="/static/images/5zirap_logo.jpg"
+        onclick="window.location.href='./index'"
+      />
       <h1>로그인</h1>
       <hr />
       <!-- 이메일 입력 -->
@@ -42,42 +46,22 @@
 
         <!-- [일반 로그인] 버튼 -->
         <button type="submit">로그인 하기</button>
-        <!-- [홈으로] 버튼 -->
-        <button type="submit" onclick="window.location.href='./index'">
-          홈으로
-        </button>
 
         <!-- [소셜 로그인] 버튼들 -->
         <div class="social-buttons">
           <div id="naver_id_login" class="naver_id_login">
-            <!-- 네이버 버튼이 들어감 -->
             <img
               id="naver_login"
-              class="naver_login"
-              src="/static/images/naver_login.png"
+              class="naver_login_long"
+              src="/static/images/naver_login_long.png"
             />
           </div>
-          <img
-            id="kakao_login"
-            class="kakao_login"
-            src="/static/images/kakao_login.png"
-          />
-          <img
-            id="google_login"
-            class="google_login"
-            src="/static/images/google_login.png"
-          />
-          <img
-            id="instagram_login"
-            class="instagram_login"
-            src="/static/images/instagram_login.png"
-          />
-          <img
-            id="facebook_login"
-            class="facebook_login"
-            src="/static/images/facebook_login.png"
-          />
         </div>
+
+        <!-- [홈으로] 버튼 -->
+        <button type="submit" onclick="window.location.href='./index'">
+          홈으로
+        </button>
       </form>
     </div>
 
