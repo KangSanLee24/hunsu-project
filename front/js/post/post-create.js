@@ -143,7 +143,6 @@ function validateHashtags(hashtags) {
 
   const hashtagPattern = /#\S+/g; // 해시태그 정규 표현식
   const hashtagItem = hashtags.match(hashtagPattern); // 해시태그와 매칭
-  console.log('🚀 ~ validateHashtags ~ hashtagItem:', hashtagItem);
 
   // 유효한 해시태그가 한 개도 없을 경우
   if (!hashtagItem || hashtagItem.length === 0) {
