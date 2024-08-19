@@ -273,3 +273,28 @@ code {
   cursor: pointer; /* 클릭 가능한 아이콘으로 표시 */
   font-size: 1.2em; /* 아이콘 크기 조정 */
 }
+
+.user-list-container {
+  width: 200px;
+  padding: 10px;
+  border-left: 1px solid #ddd;
+  background-color: #f9f9f9;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.user-list-container h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.user-list-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.user-list-container li {
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
+}
