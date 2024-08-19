@@ -7,9 +7,10 @@ import { User } from 'src/user/entities/user.entity';
 import { VerifyEmail } from './entities/verify-email.entity';
 import { VerifyPassword } from 'src/auth/entities/verify-password.entity';
 import { UserModule } from 'src/user/user.module';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
-  imports: [MailerModule, TypeOrmModule.forFeature([User, VerifyEmail, VerifyPassword]), UserModule,],
+  imports: [MailerModule, TypeOrmModule.forFeature([User, VerifyEmail, VerifyPassword]), UserModule, RedisModule],
   controllers: [MailController],
   providers: [MailService],
   exports: [MailService],

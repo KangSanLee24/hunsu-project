@@ -42,6 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const confirmBtn = document.getElementById('confirm-btn');
         notification.classList.remove('hidden');
 
+        localStorage.setItem('email', email);
+
         // 확인 버튼 클릭 시 페이지 이동
         confirmBtn.addEventListener('click', () => {
           window.location.href = './email-confirmation';

@@ -36,6 +36,7 @@ import { PointService } from 'src/point/point.service';
 import { PointType } from 'src/point/types/point.type';
 import { SocialData } from './entities/social-data.entity';
 import { access } from 'fs';
+import { SubRedisService } from 'src/redis/sub.redis.service';
 
 @Injectable()
 export class AuthService {
@@ -48,6 +49,7 @@ export class AuthService {
     private mailService: MailService,
     private readonly jwtService: JwtService,
     private pointService: PointService,
+    private readonly subRedisService: SubRedisService,
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -316,32 +318,24 @@ export class AuthService {
 
   /** 이메일 인증 API **/
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
-    // 0. dto에서 데이터 추출
+    const client = this.subRedisService.getSubClient();
+
     const { email, certification } = verifyEmailDto;
 
-    // 1. 해당 email로 인증번호를 받은 것이 맞는지 확인
-    const isExistingEmail = await this.verifyEmailRepository.findOneBy({
-      email,
-    });
-    // 1-1. 그렇지 않다면 에러처리
-    if (!isExistingEmail) {
+    const verifiedCode = await client.get(`verified:${email}`);
+
+    if (!verifiedCode) {
       throw new BadRequestException(
         AUTH_MESSAGES.VERIFY_EMAIL.FAILURE.WRONG_EMAIL
       );
     }
 
-    // 2. 인증번호가 일치하는지 검증. 불일치 시 에러처리
-    if (certification !== isExistingEmail.certification) {
+    if (certification !== +verifiedCode) {
       throw new BadRequestException(
         AUTH_MESSAGES.VERIFY_EMAIL.FAILURE.WRONG_CERTIFICATION
       );
     }
 
-    // 3. 더이상 사용하지 않는 데이터 삭제
-    await this.verifyEmailRepository.delete({ email });
-
-    // 4. 해당 email에 대한 인증여부를 true로 변경
-    const user: User = await this.userService.findByEmail(email);
     await this.userRepository.update(
       { email },
       {

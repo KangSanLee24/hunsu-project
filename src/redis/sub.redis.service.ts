@@ -56,4 +56,9 @@ export class SubRedisService implements OnModuleInit, OnModuleDestroy {
   async deleteValue(key: string): Promise<number> {
     return this.subRedisClient.del(key);
   }
+
+    /** 클라이언트 함수 **/
+  getSubClient(): Redis {
+    return this.subRedisClient;
+  }
 }

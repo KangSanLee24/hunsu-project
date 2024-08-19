@@ -22,6 +22,7 @@ import { Point } from 'src/point/entities/point.entity';
 import { PointModule } from 'src/point/point.module';
 import { PointLog } from 'src/point/entities/point-log.entity';
 import { SocialData } from './entities/social-data.entity';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { SocialData } from './entities/social-data.entity';
     UserModule,
     MailModule,
     PointModule,
+    RedisModule
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, NaverStrategy],
