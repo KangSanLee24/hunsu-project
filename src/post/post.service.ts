@@ -233,7 +233,7 @@ export class PostService {
     return {
       id: post.id,
       userId: post.userId,
-      nickname: post.user.nickname,
+      nickname: post.user?.nickname,
       title: post.title,
       category: post.category,
       content: post.content,
