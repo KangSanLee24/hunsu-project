@@ -41,6 +41,7 @@ export class MailService {
       await client.expire(`verified:${email}`, 300);
       console.log(`redis : verified ${email}`);
 
+      //어떤 페이지에서 요청이 왔느냐에 따라 메일 전송 내용 달라짐
       if(sourcePage === 'sign-up') {
 
         console.log('회원가입 페이지에서의 요청');

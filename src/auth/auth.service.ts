@@ -7,7 +7,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { DataSource, Repository, QueryFailedError } from 'typeorm';
+import { DataSource, Repository, QueryFailedError, LessThan, EntityManager } from 'typeorm';
 
 import { compare, hash } from 'bcrypt';
 import _ from 'lodash';
@@ -35,6 +35,7 @@ import { PointType } from 'src/point/types/point.type';
 import { SocialData } from './entities/social-data.entity';
 import { access } from 'fs';
 import { SubRedisService } from 'src/redis/sub.redis.service';
+import { PointLog } from 'src/point/entities/point-log.entity';
 
 @Injectable()
 export class AuthService {
@@ -48,6 +49,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private pointService: PointService,
     private readonly subRedisService: SubRedisService,
+    private entityManager: EntityManager,
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -603,5 +605,37 @@ export class AuthService {
     // 1. 1000 ~ 9999 사이 랜덤수 생성
     const certification = Math.floor(1000 + Math.random() * 8999);
     return certification;
+  }
+
+  /** 이메일 인증하지 않은 사용자 삭제 **/
+  async removeUserNotVerify() {
+
+    //인증 유효시간 5분
+    const koreaOffset = 9 * 60 * 60 * 1000; 
+    const verifyTime = new Date(Date.now() + koreaOffset - 5 * 60 * 1000);
+    console.log(verifyTime);
+
+    const findUsers = await this.userRepository.find({
+      where: { 
+        verifiedEmail: false,
+        createdAt: LessThan(verifyTime)}
+    });
+
+    if(findUsers) {
+      await this.entityManager.transaction(
+        async (manager) => {
+          try {
+            for(const user of findUsers) {
+              await manager.delete(PointLog, {userId: user.id});
+              await manager.delete(Point, {userId: user.id});
+              await manager.delete(User, {id: user.id});
+              console.log(`이메일 인증 미완료로 인한 삭제 : ${user.id}`)
+            }
+          }catch(error) {
+            console.error('트랜잭션 중 오류 발생:', error);
+          }
+        }
+      )
+    }
   }
 }
