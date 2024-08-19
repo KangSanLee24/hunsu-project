@@ -283,7 +283,7 @@ export class PostService {
       const topResult = topPosts.map((post) => ({
         id: post.id,
         userId: post.userId,
-        nickname: post.user.nickname,
+        nickname: post?.user?.nickname,
         category: post.category,
         title: post.title,
         content: post.content,
