@@ -199,10 +199,12 @@
 .comment-like-btn {
   border: 0px;
   background-color: white;
+  cursor: pointer;
 }
 .comment-dislike-btn {
   border: 0px;
   background-color: white;
+  cursor: pointer;
 }
 
 /*대댓글 좋아요, 싫어요 버튼*/
@@ -227,7 +229,19 @@
   background-color: white;
 }
 
+/* 게시글 수정/삭제 버튼 */
+.edit-del-btn {
+  cursor: pointer;
+}
+
 /* 댓글 수정/삭제 버튼 */
 .comment-edit-del {
   margin-left: 10px;
+  cursor: pointer;
+}
+
+/* 대댓글 수정/삭제 버튼 */
+.edit-comment-btn,
+.delete-comment-btn {
+  cursor: pointer;
 }
