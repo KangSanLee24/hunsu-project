@@ -81,7 +81,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       //채팅방 update
       await this.chatRoomRepository.update(
         {id: +payload.roomId},
-        {updatedAt: Date.now() + 9 * 60 * 60 * 1000}
+        {updatedAt: new Date(Date.now() + 9 * 60 * 60 * 1000) }
       );
 
       return payload;
