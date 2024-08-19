@@ -82,25 +82,25 @@ export class RecommentService {
   }
 
   /** 대댓글 목록 조회 **/
-  async findRecommentsById(commentId:number) {
+  async findRecommentsById(commentId: number) {
     // 1. commentId로 대댓글을 확인
     const recomments = await this.commentRepository.find({
-      where: { parentId: commentId},
+      where: { parentId: commentId },
       relations: ['user', 'commentLikes', 'commentDislikes'],
-      select:{
-        user:{
-          nickname:true
-        }
-      }
-    }) 
+      select: {
+        user: {
+          nickname: true,
+        },
+      },
+    });
 
     // 2. 응답 형태 수정
-    return recomments.map(recomment => ({
+    return recomments.map((recomment) => ({
       id: recomment.id,
       parentId: recomment.parentId,
       content: recomment.content,
       userId: recomment.userId,
-      nickname: recomment.user.nickname,
+      nickname: recomment.user?.nickname,
       postId: recomment.postId,
       createdAt: recomment.createdAt,
       updateAt: recomment.updateAt,

@@ -34,11 +34,15 @@ async function createPost() {
   const hashtags = document.getElementById('post-hashtags').value;
   const content = editor.getMarkdown();
 
-  // 해시태그 유효성 체크
-  const isValidHashtags = validateHashtags(hashtags);
-  if (!isValidHashtags) {
-    alert('해시태그를 양식에 맞게 입력해주세요. (예: #해시태그 #5ZIRAP)');
-    return;
+  // 해시태그 유효성 검사 : 기본적으로 true
+  let isValidHashtags = true;
+  // 만약 카테고리가 CHAT이 아닌 경우 hashtags를 유효성 검사
+  if (category !== 'CHAT') {
+    isValidHashtags = validateHashtags(hashtags);
+    if (!isValidHashtags) {
+      alert('해시태그를 양식에 맞게 입력해주세요. (예: #해시태그 #5ZIRAP)');
+      return;
+    }
   }
 
   // 게시글 생성 API 호출
@@ -77,11 +81,15 @@ async function updatePost() {
   const hashtags = document.getElementById('post-hashtags').value;
   const content = editor.getMarkdown();
 
-  // 해시태그 유효성 체크
-  const isValidHashtags = validateHashtags(hashtags);
-  if (!isValidHashtags) {
-    alert('해시태그를 양식에 맞게 입력해주세요. (예: #해시태그 #5ZIRAP)');
-    return;
+  // 해시태그 유효성 검사 : 기본적으로 true
+  let isValidHashtags = true;
+  // 만약 카테고리가 CHAT이 아닌 경우 hashtags를 유효성 검사
+  if (category !== 'CHAT') {
+    isValidHashtags = validateHashtags(hashtags);
+    if (!isValidHashtags) {
+      alert('해시태그를 양식에 맞게 입력해주세요. (예: #해시태그 #5ZIRAP)');
+      return;
+    }
   }
 
   // 게시글 수정 API 호출
@@ -143,7 +151,6 @@ function validateHashtags(hashtags) {
 
   const hashtagPattern = /#\S+/g; // 해시태그 정규 표현식
   const hashtagItem = hashtags.match(hashtagPattern); // 해시태그와 매칭
-  console.log('🚀 ~ validateHashtags ~ hashtagItem:', hashtagItem);
 
   // 유효한 해시태그가 한 개도 없을 경우
   if (!hashtagItem || hashtagItem.length === 0) {

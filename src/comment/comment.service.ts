@@ -39,14 +39,14 @@ export class CommentService {
     private readonly pointService: PointService
   ) {}
 
-  /** 댓글 생성 **/ 
+  /** 댓글 생성 **/
   async createComment(
     userId: number,
     postId: number,
     createCommentDto: CreateCommentDto
   ) {
-     // 1. 사용자 정보 확인
-     const user = await this.userRepository.findOne({
+    // 1. 사용자 정보 확인
+    const user = await this.userRepository.findOne({
       where: { id: userId },
       withDeleted: true,
     });
@@ -60,8 +60,8 @@ export class CommentService {
     });
     if (!post) {
       throw new NotFoundException(COMMENT_MESSAGE.COMMENT.NO_POST);
-    } 
-    // 닉네임 저장 
+    }
+    // 닉네임 저장
     const nickname = user.nickname;
 
     // 3. 댓글 저장
@@ -70,7 +70,7 @@ export class CommentService {
       postId,
       ...createCommentDto,
     });
-    
+
     // 4. 댓글 생성 포인트 확인
     const isValidPoint = await this.pointService.validatePointLog(
       userId,
@@ -105,43 +105,43 @@ export class CommentService {
     };
   }
 
-  /** 댓글 목록 조회 API ( 댓글만 ) **/ 
-  async findCommentsById(postId:number) {
+  /** 댓글 목록 조회 API ( 댓글만 ) **/
+  async findCommentsById(postId: number) {
     // 1. 댓글 목록 조회
     const comments = await this.commentRepository.find({
       where: { postId, parentId: IsNull() },
       relations: ['user', 'commentLikes', 'commentDislikes'],
-      select:{
-        user:{
-          nickname:true
-        }
-      }
-    })
+      select: {
+        user: {
+          nickname: true,
+        },
+      },
+    });
 
-  // 2. 각 댓글에 대한 대댓글 갯수 추가
-  const commentsWithRecommentsCount = await Promise.all(
-    comments.map(async (comment) => {
-      const recommentsCount = await this.commentRepository.count({
-        where: { parentId: comment.id }
-      });
+    // 2. 각 댓글에 대한 대댓글 갯수 추가
+    const commentsWithRecommentsCount = await Promise.all(
+      comments.map(async (comment) => {
+        const recommentsCount = await this.commentRepository.count({
+          where: { parentId: comment.id },
+        });
 
-      return {
-        id: comment.id,
-        parentId: comment.parentId,
-        content: comment.content,
-        userId: comment.userId,
-        postId: comment.postId,
-        createdAt: comment.createdAt,
-        updateAt: comment.updateAt,
-        nickname: comment.user.nickname,
-        likes: comment.commentLikes.length,
-        dislikes: comment.commentDislikes.length,
-        recommentsCount
-      };
-    })
-  );
+        return {
+          id: comment.id,
+          parentId: comment.parentId,
+          content: comment.content,
+          userId: comment.userId,
+          postId: comment.postId,
+          createdAt: comment.createdAt,
+          updateAt: comment.updateAt,
+          nickname: comment.user?.nickname,
+          likes: comment.commentLikes.length,
+          dislikes: comment.commentDislikes.length,
+          recommentsCount,
+        };
+      })
+    );
 
-  return commentsWithRecommentsCount;
+    return commentsWithRecommentsCount;
   }
 
   /** 댓글 수정**/

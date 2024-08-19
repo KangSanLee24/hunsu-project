@@ -9,6 +9,7 @@ import {
   Get,
   Patch,
   Res,
+  Headers
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -44,8 +45,8 @@ export class AuthController {
   /** 회원 가입(sign-up) API **/
   @ApiOperation({ summary: '1. 회원 가입(sign-up) API' })
   @Post('sign-up')
-  async signUp(@Body() signUpDto: SignUpDto) {
-    const data = await this.authService.signUp(signUpDto);
+  async signUp(@Headers('X-Source-Page') sourcePage: string, @Body() signUpDto: SignUpDto) {
+    const data = await this.authService.signUp(signUpDto, sourcePage);
     return {
       status: HttpStatus.CREATED,
       message: AUTH_MESSAGES.SIGN_UP.SUCCESS,
@@ -164,8 +165,8 @@ export class AuthController {
   /** 비밀번호 변경 요청 API **/
   @ApiOperation({ summary: '6. 비밀번호 변경 요청 API' })
   @Post('re-password')
-  async rePassword(@Body() rePasswordDto: RePasswordDto) {
-    const data = await this.authService.rePassword(rePasswordDto);
+  async rePassword(@Headers('X-Source-Page') sourcePage: string, @Body() rePasswordDto: RePasswordDto) {
+    const data = await this.authService.rePassword(rePasswordDto, sourcePage);
     return {
       status: HttpStatus.OK,
       message: AUTH_MESSAGES.RE_PASSWORD.SUCCESS,
