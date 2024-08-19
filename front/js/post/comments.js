@@ -144,7 +144,7 @@ function renderRecomments(commentId, recomments, recommentList) {
         <div class="comment-header">
           <span>${recomment.nickname} | 작성일: ${elapsedTime(recomment.createdAt)} </span> 
           <div class="comment-like-btn-count">
-            <button class="comment-dislike-btn" data-comment-id="${recomment.id}" onclick="clickLikeComment(${recomment.id}, ${recomment.parentId})">👍</button>
+            <button class="comment-like-btn" data-comment-id="${recomment.id}" onclick="clickLikeComment(${recomment.id}, ${recomment.parentId})">👍</button>
             <span class="recomment-like-count">${recomment.likes || 0}</span>
           </div>
           <div class="comment-dislike-btn-count">
@@ -162,7 +162,7 @@ function renderRecomments(commentId, recomments, recommentList) {
       <div class="comment-header">
         <span>${recomment.nickname} | 작성일: ${elapsedTime(recomment.createdAt)} </span> 
         <div class="comment-like-btn-count">
-          <button class="comment-dislike-btn" data-comment-id="${recomment.id}" onclick="clickLikeComment(${recomment.id}, ${recomment.parentId})">👍</button>
+          <button class="comment-like-btn" data-comment-id="${recomment.id}" onclick="clickLikeComment(${recomment.id}, ${recomment.parentId})">👍</button>
           <span class="recomment-like-count">${recomment.likes || 0}</span>
         </div>
         <div class="comment-dislike-btn-count">

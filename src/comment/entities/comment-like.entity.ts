@@ -23,7 +23,9 @@ export class CommentLike {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => Comment, (comment) => comment.commentLikes)
+  @ManyToOne(() => Comment, (comment) => comment.commentLikes, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'comment_id', referencedColumnName: 'id' })
   comment: Comment;
 

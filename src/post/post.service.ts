@@ -191,13 +191,13 @@ export class PostService {
           },
         }
       );
-      console.log('🚀 ~ PostService ~ items:', items);
+
       // 4-3
       const result = {
         posts: items.map((post) => ({
           id: post.id,
           userId: post.userId,
-          nickname: post.user.nickname,
+          nickname: post?.user?.nickname,
           title: post.title,
           numComments: post.comments.length, // 댓글 수 배열로 표현됨
           category: post.category,
@@ -233,7 +233,7 @@ export class PostService {
     return {
       id: post.id,
       userId: post.userId,
-      nickname: post.user.nickname,
+      nickname: post.user?.nickname,
       title: post.title,
       category: post.category,
       content: post.content,
@@ -283,7 +283,7 @@ export class PostService {
       const topResult = topPosts.map((post) => ({
         id: post.id,
         userId: post.userId,
-        nickname: post.user.nickname,
+        nickname: post?.user?.nickname,
         category: post.category,
         title: post.title,
         content: post.content,
@@ -372,6 +372,7 @@ export class PostService {
     const post = await this.postRepository.findOne({
       where: { id },
       withDeleted: true,
+      relations: ['postLikes', 'postDislikes', 'comments'],
     });
 
     // 게시글이 존재하는지 확인
