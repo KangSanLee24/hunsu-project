@@ -411,7 +411,6 @@ ul.point-rank-tabs li.current {
   flex-direction: row;
   overflow: hidden;
   height: 22px;
-  cursor: pointer;
 }
 
 /* 2-2-6-1. POINT RANK RANKING */
