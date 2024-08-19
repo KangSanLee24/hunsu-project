@@ -17,9 +17,9 @@ export const ALARM_MESSAGES = {
     },
   },
   UPDATE: {
-    SUCCESS: '해당 알람이 [읽음]상태가 반전 되었습니다.',
+    SUCCESS: '해당 알람의 [읽음O]/[읽음X] 상태가 변경되었습니다.',
     FAILURE: {
-      NO_ALARM: '[읽음]상태를 반전할 수 있는 알람이 없습니다.',
+      NO_ALARM: '[읽음O]/[읽음X] 상태를 변경할 수 있는 알람이 없습니다.',
     },
   },
   UPDATE_ALL: {
