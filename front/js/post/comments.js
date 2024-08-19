@@ -1,5 +1,6 @@
 import { elapsedTime } from '../common/elapsed-time.js';
 import { identifyUser } from '../common/identify-user.js';
+import { handleLoginRequired } from '../common/header.js';
 
 /** 댓글 목록 조회에 필요한 변수 선언 **/
 // 1. URL에서 게시글 ID를 가져와서 댓글 로드
@@ -488,6 +489,18 @@ commentList.addEventListener('click', (event) => {
           ? 'block'
           : 'none';
     }
+
+    // 대댓글 작성 textarea 클릭 이벤트 리스너 추가
+    const recommentContentTextarea = document.getElementById('recomment-content');
+    if (recommentContentTextarea) {
+      recommentContentTextarea.addEventListener('click', (event) => {
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          handleLoginRequired(event, window.location.href);
+        }
+      });
+    }
+
   }
 });
 
