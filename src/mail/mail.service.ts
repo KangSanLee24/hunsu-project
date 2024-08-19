@@ -29,7 +29,7 @@ export class MailService {
   }
 
   /** 인증 메일 전송 API **/
-  async sendEmail(email: string) {
+  async sendEmail(email: string, sourcePage:string) {
     try {
       const certification = await this.createCertification();
 
@@ -42,12 +42,28 @@ export class MailService {
       await client.expire(`verified:${email}`, 300);
       console.log(`redis : verified ${email}`);
 
-      subject = '[5zirap] 회원가입 인증 메일';
-      text = `
-      인증번호 4자리 : ${certification},
-      안녕하세요. [5zirap]의 회원가입을 위한 인증 메일입니다.
-      인증 유효시간은 5분 입니다.`;
-    
+      if(sourcePage === 'sign-up') {
+
+        console.log('회원가입 페이지에서의 요청');
+
+        subject = '[5zirap] 회원가입 인증 메일';
+        text = `
+        인증번호 4자리 : ${certification},
+        안녕하세요. [5zirap]의 회원가입을 위한 인증 메일입니다.
+        인증번호를 입력해 주세요.
+        인증 유효시간은 5분 입니다.`;
+      } else if(sourcePage === 'password-update') {
+
+        console.log('비밀번호 변경 페이지에서의 요청');
+
+        subject = '[5zirap] 비밀번호 변경 인증 메일';
+        text = `
+        인증번호 4자리 : ${certification},
+        안녕하세요. [5zirap]의 비밀번호 변경을 위한 인증 메일입니다.
+        인증번호를 입력해 주세요.
+        인증 유효시간은 5분 입니다.`;
+      }
+
       await this.transporter.sendMail({
         from: this.configService.get<string>('NODE_MAILER_ID'),
         to: email, // string or Array

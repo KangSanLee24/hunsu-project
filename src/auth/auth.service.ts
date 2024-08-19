@@ -29,7 +29,6 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { VerifyPassword } from './entities/verify-password.entity';
-import { VerifyEmail } from 'src/mail/entities/verify-email.entity';
 import { MailService } from 'src/mail/mail.service';
 import { SocialType } from 'src/user/types/social-type.type';
 import { PointService } from 'src/point/point.service';
@@ -60,15 +59,12 @@ export class AuthService {
     @InjectRepository(SocialData)
     private socialDataRepository: Repository<SocialData>,
 
-    @InjectRepository(VerifyEmail)
-    private verifyEmailRepository: Repository<VerifyEmail>,
-
     @InjectRepository(VerifyPassword)
     private verifyPasswordRepository: Repository<VerifyPassword>
   ) { }
 
   /** 회원 가입(sign-up) API **/
-  async signUp(signUpDto: SignUpDto) {
+  async signUp(signUpDto: SignUpDto, sourcePage: string) {
     // 0. dto에서 데이터 꺼내기
     const { email, nickname, password, passwordConfirm } = signUpDto;
     // 0-1. dto 자체 검증
@@ -115,7 +111,7 @@ export class AuthService {
         accPoint: 0,
       });
       // 4-2-3. 인증 이메일 발송
-      this.mailService.sendEmail(newMember.email);
+      this.mailService.sendEmail(newMember.email, sourcePage);
 
       // 4-2-4. 성공: 트랜잭션 묶음 종료: commit
       await queryRunner.commitTransaction();
@@ -477,8 +473,9 @@ export class AuthService {
   /** 소셜로그인 - 구글 **/
   async logInGoogle() { }
 
+
   /** 비밀번호 변경 요청 API **/
-  async rePassword(rePasswordDto: RePasswordDto) {
+  async rePassword(rePasswordDto: RePasswordDto, sourcePage:string) {
     // 0. dto에서 데이터 꺼내기
     const { email } = rePasswordDto;
 
@@ -496,47 +493,32 @@ export class AuthService {
         AUTH_MESSAGES.RE_PASSWORD.FAILURE.NOT_VERIFIED
       );
     }
-
+    
     // 4. 인증 이메일 발송
-    await this.mailService.sendEmail(user.email);
+    this.mailService.sendEmail(user.email, sourcePage);
   }
 
   /** 비밀번호 변경 인증 API **/
   async verifyPassword(verifyPasswordDto: VerifyPasswordDto) {
+    const client = this.subRedisService.getSubClient();
+
     // 0. dto에서 데이터 추출
     const { email, certification } = verifyPasswordDto;
 
     // 1. 해당 email로 인증번호를 받은 것이 맞는지 확인
-    const isExistingEmail = await this.verifyPasswordRepository.findOneBy({
-      email,
-    });
+    const verifiedCode = await client.get(`verified:${email}`);
+
     // 1-1. 그렇지 않다면 에러처리
-    if (!isExistingEmail) {
+    if (!verifiedCode) {
       throw new BadRequestException(
         AUTH_MESSAGES.VERIFY_PASSWORD.FAILURE.WRONG_EMAIL
       );
     }
 
     // 2. 인증번호가 일치하는지 검증. 불일치 시 에러처리
-    if (certification !== isExistingEmail.certification) {
+    if (certification !== +verifiedCode) {
       throw new BadRequestException(
         AUTH_MESSAGES.VERIFY_PASSWORD.FAILURE.WRONG_CERTIFICATION
-      );
-    }
-
-    // 3. 더이상 사용하지 않는 데이터 삭제
-    await this.verifyEmailRepository.delete({ email });
-
-    // 4. 해당 email에 대한 인증여부를 true로 변경
-    const verifyPassword = await this.verifyPasswordRepository.findOneBy({
-      email,
-    });
-    if (!verifyPassword.isCertified) {
-      await this.verifyPasswordRepository.update(
-        { email },
-        {
-          isCertified: true,
-        }
       );
     }
 
@@ -552,22 +534,15 @@ export class AuthService {
     const { email, password, passwordConfirm } = updatePasswordDto;
 
     // 1. 해당 email로 가입된 사용자가 있는지 확인
-    const verifyPassword = await this.verifyPasswordRepository.findOneBy({
+    const verifyUser = await this.userRepository.findOneBy({
       email,
     });
 
     // 1-1. 해당 user가 없다면 에러메시지(404)
-    if (_.isNil(verifyPassword)) {
+    if (_.isNil(verifyUser)) {
       throw new NotFoundException(
         AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.NO_VERIFYING
       );
-    }
-
-    // 2. 비밀번호 변경 인증을 완료한지 확인
-    if (!verifyPassword.isCertified) {
-      throw new ConflictException({
-        message: AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.NO_CERTIFIED,
-      });
     }
 
     // 3. 비밀번호 일치 여부 확인

@@ -14,7 +14,6 @@ import { VerifyPassword } from './entities/verify-password.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { RefreshToken } from './entities/refresh-token.entity';
-import { VerifyEmail } from 'src/mail/entities/verify-email.entity';
 import { MailModule } from 'src/mail/mail.module';
 // import { KakaoStrategy } from './guards/kakao.strategy';
 import { NaverStrategy } from './guards/naver.strategy';
@@ -40,7 +39,6 @@ import { RedisModule } from 'src/redis/redis.module';
       Post,
       Comment,
       RefreshToken,
-      VerifyEmail,
       VerifyPassword,
       PointLog,
       SocialData,

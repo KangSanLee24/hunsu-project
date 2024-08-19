@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-Source-Page': 'sign-up' // 커스텀 헤더 추가
         },
         body: JSON.stringify({ email, password, passwordConfirm, nickname }),
       });
