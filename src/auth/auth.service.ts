@@ -599,8 +599,7 @@ export class AuthService {
   async removeUserNotVerify() {
 
     //인증 유효시간 5분
-    const koreaOffset = 9 * 60 * 60 * 1000; 
-    const verifyTime = new Date(Date.now() + koreaOffset - 5 * 60 * 1000);
+    const verifyTime = new Date(Date.now() - 5 * 60 * 1000);
     console.log(verifyTime);
 
     const findUsers = await this.userRepository.find({
