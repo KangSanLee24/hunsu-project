@@ -91,7 +91,7 @@ function renderAlarmList(data) {
     // 2-2. 읽은 알람인지 아닌지 구별
     let check = '';
     if (item.isChecked == true) {
-      check = '✔️';
+      check = '✅';
     }
     // 2-3. 데이터로 row HTML 생성
     row.innerHTML = `
@@ -99,7 +99,7 @@ function renderAlarmList(data) {
             <td class="onClickAlarm" onClick="clickAlarm(${item.id})">${item.notification}</td>            
             <td>${elapsedTime(item.createdAt)}</td>
             <td><button class="checkAlarm" onClick="checkAlarm(${item.id})")>${check}</td>
-            <td><button class="deleteAlarm" onClick="deleteAlarm(${item.id})">❌</button></td>        
+            <td><button class="deleteAlarm" onClick="deleteAlarm(${item.id})">🗑️</button></td>        
         `;
     // 2-4. 생성된 row HTML 붙이기
     alarmListElement.appendChild(row);
@@ -155,7 +155,7 @@ nextButton.addEventListener('click', () => {
   }
 });
 
-/** 삭제 버튼 ❌ **/
+/** 삭제 버튼 🗑️ **/
 // 알람 개별 삭제 API 호출
 async function deleteAlarm(alarmId) {
   try {
