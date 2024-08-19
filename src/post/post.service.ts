@@ -58,10 +58,16 @@ export class PostService {
       throw new UnauthorizedException(POST_MESSAGE.POST.UNAUTHORIZED);
     }
 
-    // 2. 해시태그 유효성 체크
-    const isValidHashtags = this.validateHashtags(hashtagsString);
-    if (!isValidHashtags) {
-      throw new BadRequestException('해시태그를 양식에 맞게 입력해주세요.'); // 유효하지 않은 해시태그에 대한 예외 처리
+    // 2. 해시태그 유효성 체크 (입력된 경우에만 수행)
+    let hashtags: string[] = [];
+    const hashtagPattern = /#\S+/g; // 해시태그 정규 표현식
+    if (hashtagsString) {
+      const isValidHashtags = this.validateHashtags(hashtagsString);
+      if (!isValidHashtags) {
+        throw new BadRequestException('해시태그를 양식에 맞게 입력해주세요.'); // 유효하지 않은 해시태그에 대한 예외 처리
+      }
+      // 해시태그string에서 해시태그 패턴과 매칭되는 것만 저장
+      hashtags = hashtagsString.match(hashtagPattern);
     }
 
     // urlsArray가 비어있다면 pass
@@ -80,10 +86,6 @@ export class PostService {
         notUsedUrls.map((fileUrl) => this.awsService.deleteFileFromS3(fileUrl))
       );
     }
-
-    // 해시태그 formatting
-    const hashtagPattern = /#\S+/g; // 해시태그 정규 표현식
-    const hashtags = hashtagsString.match(hashtagPattern); // 해시태그와 매칭
 
     // 3. 게시글 저장
     const createdPost = this.postRepository.create({
@@ -189,7 +191,7 @@ export class PostService {
           },
         }
       );
-
+      console.log('🚀 ~ PostService ~ items:', items);
       // 4-3
       const result = {
         posts: items.map((post) => ({
@@ -320,10 +322,16 @@ export class PostService {
       throw new ForbiddenException(POST_MESSAGE.POST.UPDATE.FAILURE.FORBIDDEN);
     }
 
-    // 해시태그 유효성 체크
-    const isValidHashtags = this.validateHashtags(hashtagsString);
-    if (!isValidHashtags) {
-      throw new BadRequestException('해시태그를 양식에 맞게 입력해주세요.'); // 유효하지 않은 해시태그에 대한 예외 처리
+    let hashtags: string[] = [];
+    const hashtagPattern = /#\S+/g; // 해시태그 정규 표현식
+
+    // 해시태그가 입력된 경우에 유효성 체크
+    if (hashtagsString) {
+      const isValidHashtags = this.validateHashtags(hashtagsString);
+      if (!isValidHashtags) {
+        throw new BadRequestException('해시태그를 양식에 맞게 입력해주세요.'); // 유효하지 않은 해시태그에 대한 예외 처리
+      }
+      hashtags = hashtagsString.match(hashtagPattern); // 해시태그와 매칭
     }
 
     // 1. existingUrlsArray : 기존 작성물의 content에서 urls. (A)
@@ -344,11 +352,6 @@ export class PostService {
     await Promise.all(
       notUsedUrls.map((fileUrl) => this.awsService.deleteFileFromS3(fileUrl))
     );
-
-    // 해시태그 수정 시
-    const hashtags = hashtagsString
-      .split(' ')
-      .filter((tag) => tag.trim().length > 0);
 
     const updatedPost = await this.postRepository.update(
       { id },
@@ -390,6 +393,10 @@ export class PostService {
         imageUrls.map((url) => this.awsService.deleteFileFromS3(url))
       );
     }
+
+    // 6. 게시글 목록 조회 Redis 삭제
+    const postKey = `post:1:20:all:DESC:none`;
+    await this.subRedisService.deleteValue(postKey); // 해당 캐시 삭제
 
     // 게시글 삭제로 포인트 차감
     await this.pointService.savePointLog(userId, PointType.POST, false);
