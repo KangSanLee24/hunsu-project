@@ -66,7 +66,7 @@ async function renderPostDetail(postId) {
           document.getElementById('post-delete-btn').disabled = true;
         }
       }
-    } catch (error) {}
+    } catch (error) { }
   }
 }
 

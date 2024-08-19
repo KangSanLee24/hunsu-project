@@ -1,12 +1,13 @@
+# artillery run a9_ErTVkSY_R4qa1c8MmR6ckjlSPB6ftwxg
 config:
   # base url 정의 (우리는 domain을 작성)
-  target: "http://localhost:3000"
+  target: "https://5zirap.shop"
   phases:
     # 부하테스트 시간 (초)
     - duration: 60
     # 부하테스트 동안의 사용자 수 (초당 요청 수)
       arrivalRate: 150
-      rampTo: 300
+      rampTo: 400
       name: api-request-test
   payload:
     path: "categorys.csv"
@@ -26,7 +27,7 @@ scenarios:
     flow:
       - get:
           url: "/api/posts/hot?category={{category}}"
-      - log: "{{ category }}"  # 전체 응답을 로그로 출력
+      # - log: "{{ category }}"  # 전체 응답을 로그로 출력
   - name: "GET-weekly-rank"
     flow:
       - get:

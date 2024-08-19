@@ -47,6 +47,11 @@ async function deleteProfile() {
       alert(
         '회원 탈퇴가 완료되었습니다.\n계정복구에 대한 건은 운영자에게 문의하여 주시기 바랍니다.'
       );
+
+      // 회원 탈퇴 후 로컬스토리지 token 값 삭제
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+
       window.location.href = './index';
     }
   } catch (error) {
