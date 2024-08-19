@@ -31,7 +31,7 @@ export class HashtagService {
   async deleteHashtag() {
     const client = this.redisService.getClient();
 
-    const currentDay = format(Date.now(), 'yyyy-MM-dd');
+    const currentDay = format(Date.now() + 9 * 60 * 60 * 1000, 'yyyy-MM-dd');
 
     //만료기간 날짜가 오늘보다 작은 해시태그 삭제
     const expireData = await client.hgetall('hashtag_expire');

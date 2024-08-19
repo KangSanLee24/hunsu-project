@@ -7,7 +7,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { DataSource, Repository, QueryFailedError } from 'typeorm';
+import { DataSource, Repository, QueryFailedError, LessThan, EntityManager } from 'typeorm';
 
 import { compare, hash } from 'bcrypt';
 import _ from 'lodash';
@@ -27,15 +27,14 @@ import { VerifyEmailDto } from './dtos/verify-email.dto';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RefreshToken } from './entities/refresh-token.entity';
-import { VerifyPassword } from './entities/verify-password.entity';
-import { VerifyEmail } from 'src/mail/entities/verify-email.entity';
 import { MailService } from 'src/mail/mail.service';
 import { SocialType } from 'src/user/types/social-type.type';
 import { PointService } from 'src/point/point.service';
 import { PointType } from 'src/point/types/point.type';
 import { SocialData } from './entities/social-data.entity';
 import { access } from 'fs';
+import { SubRedisService } from 'src/redis/sub.redis.service';
+import { PointLog } from 'src/point/entities/point-log.entity';
 
 @Injectable()
 export class AuthService {
@@ -48,25 +47,18 @@ export class AuthService {
     private mailService: MailService,
     private readonly jwtService: JwtService,
     private pointService: PointService,
+    private readonly subRedisService: SubRedisService,
+    private entityManager: EntityManager,
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
 
-    @InjectRepository(RefreshToken)
-    private refreshTokenRepository: Repository<RefreshToken>,
-
     @InjectRepository(SocialData)
     private socialDataRepository: Repository<SocialData>,
-
-    @InjectRepository(VerifyEmail)
-    private verifyEmailRepository: Repository<VerifyEmail>,
-
-    @InjectRepository(VerifyPassword)
-    private verifyPasswordRepository: Repository<VerifyPassword>
   ) { }
 
   /** 회원 가입(sign-up) API **/
-  async signUp(signUpDto: SignUpDto) {
+  async signUp(signUpDto: SignUpDto, sourcePage: string) {
     // 0. dto에서 데이터 꺼내기
     const { email, nickname, password, passwordConfirm } = signUpDto;
     // 0-1. dto 자체 검증
@@ -113,7 +105,7 @@ export class AuthService {
         accPoint: 0,
       });
       // 4-2-3. 인증 이메일 발송
-      this.mailService.sendEmail(newMember.email);
+      this.mailService.sendEmail(newMember.email, sourcePage);
 
       // 4-2-4. 성공: 트랜잭션 묶음 종료: commit
       await queryRunner.commitTransaction();
@@ -155,6 +147,7 @@ export class AuthService {
 
   /** 로그인(log-in) API **/
   async logIn(logInDto: LogInDto) {
+    const client = this.subRedisService.getSubClient();
     // 0. dto에서 데이터 꺼내기
     const { email, password } = logInDto;
 
@@ -204,18 +197,15 @@ export class AuthService {
       secret: this.configService.get<string>('JWT_SECRET'),
       expiresIn: this.configService.get<string>('REFRESH_EXPIRES_IN'),
     });
-    // 6-2-1. 이미 존재하는 RefreshToken인가?
-    const isExistingRT = this.refreshTokenRepository.findBy({
-      userId: user.id,
-    });
+
+    const isExistingRT = await client.get(`refreshToken:${user.id}`);
+
     if (isExistingRT) {
-      await this.refreshTokenRepository.delete({ userId: user.id });
+      await client.del(`refreshToken:${user.id}`);
     }
-    // 6-2-2. RefreshToken을 DB에 저장
-    await this.refreshTokenRepository.save({
-      userId: user.id,
-      refreshToken: refreshToken,
-    });
+
+    // 6-2-2. RefreshToken을 레디스에 저장
+    await client.set(`refreshToken:${user.id}`, refreshToken);
 
     // 7. 토큰 발급 및 반환
     return {
@@ -227,22 +217,18 @@ export class AuthService {
 
   /** 로그아웃(log-out) API **/
   async logOut(user: User) {
-    // 0. user에서 데이터 가져오기
-    const userId = user.id;
+    const client = this.subRedisService.getSubClient();
 
     // 1. RefreshToken이 존재하는지 확인
-    const isExistingToken = await this.refreshTokenRepository.findOneBy({
-      userId,
-    });
+    const isExistingToken = await client.get(`refreshToken:${user.id}`);
+
     // 1-1. 존재하지 않으면 에러처리 = 이미 로그아웃 된 상태
     if (!isExistingToken) {
       throw new BadRequestException(AUTH_MESSAGES.LOG_OUT.FAILURE.NO_TOKEN);
     }
 
     // 2. RefreshToken 삭제
-    await this.refreshTokenRepository.delete({
-      userId,
-    });
+    await client.del(`refreshToken:${user.id}`);
 
     // 3. 반환
     return {
@@ -253,8 +239,9 @@ export class AuthService {
   /** 토큰 재발급 API **/
   async reToken(user: User, refreshToken: string) {
     try {
+      const client = this.subRedisService.getSubClient();
+      
       // 0. user에서 데이터 가져오기
-      const userId = user.id;
       const email = user.email;
 
       // 1. RefreshToken에서 payload로 변환
@@ -275,19 +262,16 @@ export class AuthService {
         );
       }
 
-      // 3. payload에 있는 userId로 RefreshToken 검증
-      const isValidRefreshToken: RefreshToken =
-        await this.refreshTokenRepository.findOneBy({
-          userId,
-        });
+      const isValidRefreshToken = await client.get(`refreshToken:${user.id}`);
+
       // 3-1. 만약 존재하지 않는다면 (외부에서 강제 로그아웃 시킨 경우) 에러처리
       if (!isValidRefreshToken) {
         throw new UnauthorizedException(
           AUTH_MESSAGES.RE_TOKEN.FAILURE.NO_REFRESH_TOKEN
         );
       }
-      // 3-2. 로그인한 유저가 가진 RefreshToken과 DB에 있는 RefreshToken이 다른 경우
-      if (refreshToken !== isValidRefreshToken.refreshToken) {
+      // 3-2. 로그인한 유저가 가진 RefreshToken과 레디스에 있는 RefreshToken이 다른 경우
+      if (refreshToken !== isValidRefreshToken) {
         throw new UnauthorizedException(
           AUTH_MESSAGES.RE_TOKEN.FAILURE.NOT_MATCHED_REFRESH_TOKEN
         );
@@ -316,32 +300,24 @@ export class AuthService {
 
   /** 이메일 인증 API **/
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
-    // 0. dto에서 데이터 추출
+    const client = this.subRedisService.getSubClient();
+
     const { email, certification } = verifyEmailDto;
 
-    // 1. 해당 email로 인증번호를 받은 것이 맞는지 확인
-    const isExistingEmail = await this.verifyEmailRepository.findOneBy({
-      email,
-    });
-    // 1-1. 그렇지 않다면 에러처리
-    if (!isExistingEmail) {
+    const verifiedCode = await client.get(`verified:${email}`);
+
+    if (!verifiedCode) {
       throw new BadRequestException(
         AUTH_MESSAGES.VERIFY_EMAIL.FAILURE.WRONG_EMAIL
       );
     }
 
-    // 2. 인증번호가 일치하는지 검증. 불일치 시 에러처리
-    if (certification !== isExistingEmail.certification) {
+    if (certification !== +verifiedCode) {
       throw new BadRequestException(
         AUTH_MESSAGES.VERIFY_EMAIL.FAILURE.WRONG_CERTIFICATION
       );
     }
 
-    // 3. 더이상 사용하지 않는 데이터 삭제
-    await this.verifyEmailRepository.delete({ email });
-
-    // 4. 해당 email에 대한 인증여부를 true로 변경
-    const user: User = await this.userService.findByEmail(email);
     await this.userRepository.update(
       { email },
       {
@@ -483,8 +459,9 @@ export class AuthService {
   /** 소셜로그인 - 구글 **/
   async logInGoogle() { }
 
+
   /** 비밀번호 변경 요청 API **/
-  async rePassword(rePasswordDto: RePasswordDto) {
+  async rePassword(rePasswordDto: RePasswordDto, sourcePage:string) {
     // 0. dto에서 데이터 꺼내기
     const { email } = rePasswordDto;
 
@@ -502,47 +479,32 @@ export class AuthService {
         AUTH_MESSAGES.RE_PASSWORD.FAILURE.NOT_VERIFIED
       );
     }
-
+    
     // 4. 인증 이메일 발송
-    await this.mailService.sendEmail(user.email);
+    this.mailService.sendEmail(user.email, sourcePage);
   }
 
   /** 비밀번호 변경 인증 API **/
   async verifyPassword(verifyPasswordDto: VerifyPasswordDto) {
+    const client = this.subRedisService.getSubClient();
+
     // 0. dto에서 데이터 추출
     const { email, certification } = verifyPasswordDto;
 
     // 1. 해당 email로 인증번호를 받은 것이 맞는지 확인
-    const isExistingEmail = await this.verifyPasswordRepository.findOneBy({
-      email,
-    });
+    const verifiedCode = await client.get(`verified:${email}`);
+
     // 1-1. 그렇지 않다면 에러처리
-    if (!isExistingEmail) {
+    if (!verifiedCode) {
       throw new BadRequestException(
         AUTH_MESSAGES.VERIFY_PASSWORD.FAILURE.WRONG_EMAIL
       );
     }
 
     // 2. 인증번호가 일치하는지 검증. 불일치 시 에러처리
-    if (certification !== isExistingEmail.certification) {
+    if (certification !== +verifiedCode) {
       throw new BadRequestException(
         AUTH_MESSAGES.VERIFY_PASSWORD.FAILURE.WRONG_CERTIFICATION
-      );
-    }
-
-    // 3. 더이상 사용하지 않는 데이터 삭제
-    await this.verifyEmailRepository.delete({ email });
-
-    // 4. 해당 email에 대한 인증여부를 true로 변경
-    const verifyPassword = await this.verifyPasswordRepository.findOneBy({
-      email,
-    });
-    if (!verifyPassword.isCertified) {
-      await this.verifyPasswordRepository.update(
-        { email },
-        {
-          isCertified: true,
-        }
       );
     }
 
@@ -558,22 +520,15 @@ export class AuthService {
     const { email, password, passwordConfirm } = updatePasswordDto;
 
     // 1. 해당 email로 가입된 사용자가 있는지 확인
-    const verifyPassword = await this.verifyPasswordRepository.findOneBy({
+    const verifyUser = await this.userRepository.findOneBy({
       email,
     });
 
     // 1-1. 해당 user가 없다면 에러메시지(404)
-    if (_.isNil(verifyPassword)) {
+    if (_.isNil(verifyUser)) {
       throw new NotFoundException(
         AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.NO_VERIFYING
       );
-    }
-
-    // 2. 비밀번호 변경 인증을 완료한지 확인
-    if (!verifyPassword.isCertified) {
-      throw new ConflictException({
-        message: AUTH_MESSAGES.UPDATE_PASSWORD.FAILURE.NO_CERTIFIED,
-      });
     }
 
     // 3. 비밀번호 일치 여부 확인
@@ -603,9 +558,6 @@ export class AuthService {
         password: hashedPassword,
       },
     };
-
-    // 7. 임시로 생성했던 verify_passwords 테이블의 레코드 삭제
-    await this.verifyPasswordRepository.delete({ email });
 
     // 8. 결과 반환
     return {
@@ -641,5 +593,37 @@ export class AuthService {
     // 1. 1000 ~ 9999 사이 랜덤수 생성
     const certification = Math.floor(1000 + Math.random() * 8999);
     return certification;
+  }
+
+  /** 이메일 인증하지 않은 사용자 삭제 **/
+  async removeUserNotVerify() {
+
+    //인증 유효시간 5분
+    const koreaOffset = 9 * 60 * 60 * 1000; 
+    const verifyTime = new Date(Date.now() + koreaOffset - 5 * 60 * 1000);
+    console.log(verifyTime);
+
+    const findUsers = await this.userRepository.find({
+      where: { 
+        verifiedEmail: false,
+        createdAt: LessThan(verifyTime)}
+    });
+
+    if(findUsers) {
+      await this.entityManager.transaction(
+        async (manager) => {
+          try {
+            for(const user of findUsers) {
+              await manager.delete(PointLog, {userId: user.id});
+              await manager.delete(Point, {userId: user.id});
+              await manager.delete(User, {id: user.id});
+              console.log(`이메일 인증 미완료로 인한 삭제 : ${user.id}`)
+            }
+          }catch(error) {
+            console.error('트랜잭션 중 오류 발생:', error);
+          }
+        }
+      )
+    }
   }
 }
