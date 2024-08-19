@@ -1,6 +1,6 @@
 config:
   # base url 정의
-  target: 'http://localhost:3000'
+  target: "https://5zirap.shop"
   phases:
     # 부하테스트 시간 (초)
     - duration: 60
