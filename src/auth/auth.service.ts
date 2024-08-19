@@ -151,6 +151,7 @@ export class AuthService {
 
   /** 로그인(log-in) API **/
   async logIn(logInDto: LogInDto) {
+    const client = this.subRedisService.getSubClient();
     // 0. dto에서 데이터 꺼내기
     const { email, password } = logInDto;
 
@@ -200,18 +201,15 @@ export class AuthService {
       secret: this.configService.get<string>('JWT_SECRET'),
       expiresIn: this.configService.get<string>('REFRESH_EXPIRES_IN'),
     });
-    // 6-2-1. 이미 존재하는 RefreshToken인가?
-    const isExistingRT = this.refreshTokenRepository.findBy({
-      userId: user.id,
-    });
+
+    const isExistingRT = await client.get(`refreshToken:${user.id}`);
+
     if (isExistingRT) {
-      await this.refreshTokenRepository.delete({ userId: user.id });
+      await client.del(`refreshToken:${user.id}`);
     }
-    // 6-2-2. RefreshToken을 DB에 저장
-    await this.refreshTokenRepository.save({
-      userId: user.id,
-      refreshToken: refreshToken,
-    });
+
+    // 6-2-2. RefreshToken을 레디스에 저장
+    await client.set(`refreshToken:${user.id}`, refreshToken);
 
     // 7. 토큰 발급 및 반환
     return {
@@ -223,22 +221,18 @@ export class AuthService {
 
   /** 로그아웃(log-out) API **/
   async logOut(user: User) {
-    // 0. user에서 데이터 가져오기
-    const userId = user.id;
+    const client = this.subRedisService.getSubClient();
 
     // 1. RefreshToken이 존재하는지 확인
-    const isExistingToken = await this.refreshTokenRepository.findOneBy({
-      userId,
-    });
+    const isExistingToken = await client.get(`refreshToken:${user.id}`);
+
     // 1-1. 존재하지 않으면 에러처리 = 이미 로그아웃 된 상태
     if (!isExistingToken) {
       throw new BadRequestException(AUTH_MESSAGES.LOG_OUT.FAILURE.NO_TOKEN);
     }
 
     // 2. RefreshToken 삭제
-    await this.refreshTokenRepository.delete({
-      userId,
-    });
+    await client.del(`refreshToken:${user.id}`);
 
     // 3. 반환
     return {
@@ -249,8 +243,9 @@ export class AuthService {
   /** 토큰 재발급 API **/
   async reToken(user: User, refreshToken: string) {
     try {
+      const client = this.subRedisService.getSubClient();
+      
       // 0. user에서 데이터 가져오기
-      const userId = user.id;
       const email = user.email;
 
       // 1. RefreshToken에서 payload로 변환
@@ -271,19 +266,16 @@ export class AuthService {
         );
       }
 
-      // 3. payload에 있는 userId로 RefreshToken 검증
-      const isValidRefreshToken: RefreshToken =
-        await this.refreshTokenRepository.findOneBy({
-          userId,
-        });
+      const isValidRefreshToken = await client.get(`refreshToken:${user.id}`);
+
       // 3-1. 만약 존재하지 않는다면 (외부에서 강제 로그아웃 시킨 경우) 에러처리
       if (!isValidRefreshToken) {
         throw new UnauthorizedException(
           AUTH_MESSAGES.RE_TOKEN.FAILURE.NO_REFRESH_TOKEN
         );
       }
-      // 3-2. 로그인한 유저가 가진 RefreshToken과 DB에 있는 RefreshToken이 다른 경우
-      if (refreshToken !== isValidRefreshToken.refreshToken) {
+      // 3-2. 로그인한 유저가 가진 RefreshToken과 레디스에 있는 RefreshToken이 다른 경우
+      if (refreshToken !== isValidRefreshToken) {
         throw new UnauthorizedException(
           AUTH_MESSAGES.RE_TOKEN.FAILURE.NOT_MATCHED_REFRESH_TOKEN
         );
