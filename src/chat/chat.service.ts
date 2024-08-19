@@ -174,7 +174,9 @@ export class ChatService {
 
     if (chatLastTime && !chatImageLastTime) {
       formatTime = format(new Date(chatLastTime.updatedAt), 'yyyy-MM-dd HH:mm');
+
     } else if (chatLastTime && chatImageLastTime) {
+
       const diffTime =
         chatLastTime.updatedAt < chatImageLastTime.createdAt
           ? chatImageLastTime.createdAt
@@ -184,17 +186,14 @@ export class ChatService {
 
     //오늘인지 확인
 
-    const result = await this.chatRoomRepository.query(
-      'SELECT NOW() as currentTime'
-    );
-    const dbTime = new Date(result[0].currentTime);
+    const nowDate = Date.now() * 9 * 60 * 60 * 1000;
 
     const chatDate = new Date(formatTime);
 
-    const isToday = isSameDay(chatDate, dbTime);
+    const isToday = isSameDay(chatDate, nowDate);
 
     if (isToday === true) {
-      const timeDifference = dbTime.getTime() - chatDate.getTime();
+      const timeDifference = nowDate - chatDate.getTime();
 
       const diffInMinutes = Math.floor(timeDifference / (1000 * 60)); //분단위 환산 1분
       const diffInHours = Math.floor(timeDifference / (1000 * 60 * 60)); //시간단위 환산 1시간
