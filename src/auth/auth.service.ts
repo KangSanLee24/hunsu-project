@@ -27,7 +27,6 @@ import { VerifyEmailDto } from './dtos/verify-email.dto';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RefreshToken } from './entities/refresh-token.entity';
 import { MailService } from 'src/mail/mail.service';
 import { SocialType } from 'src/user/types/social-type.type';
 import { PointService } from 'src/point/point.service';
@@ -53,9 +52,6 @@ export class AuthService {
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
-
-    @InjectRepository(RefreshToken)
-    private refreshTokenRepository: Repository<RefreshToken>,
 
     @InjectRepository(SocialData)
     private socialDataRepository: Repository<SocialData>,

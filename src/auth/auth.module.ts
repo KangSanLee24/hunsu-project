@@ -12,7 +12,6 @@ import { User } from 'src/user/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Post } from 'src/post/entities/post.entity';
-import { RefreshToken } from './entities/refresh-token.entity';
 import { MailModule } from 'src/mail/mail.module';
 // import { KakaoStrategy } from './guards/kakao.strategy';
 import { NaverStrategy } from './guards/naver.strategy';
@@ -37,7 +36,6 @@ import { RedisModule } from 'src/redis/redis.module';
       Point,
       Post,
       Comment,
-      RefreshToken,
       PointLog,
       SocialData,
     ]),
