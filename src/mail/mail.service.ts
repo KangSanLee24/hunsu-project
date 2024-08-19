@@ -3,10 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { UserService } from 'src/user/user.service';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
-import { VerifyEmail } from './entities/verify-email.entity';
 import { VerifyPassword } from 'src/auth/entities/verify-password.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { SubRedisService } from 'src/redis/sub.redis.service';
 
 @Injectable()
