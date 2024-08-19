@@ -396,7 +396,7 @@ export class ChatService {
       `
       select c.id as id, c.user_id as owner_id, c.title as title, c.img_url as img_url, d.count as count
       from (select a.id, a.user_id , a.title , b.img_url 
-      from chat_rooms a join chat_Images b
+      from chat_rooms a left join chat_Images b
       on a.user_id = b.user_id) c join (select room_id , count(*) as count
       from chat_members
       group by room_id) d
@@ -423,6 +423,7 @@ export class ChatService {
         };
       })
     );
+    console.log(data);
     return data;
   }
 
