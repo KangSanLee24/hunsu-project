@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { UserService } from 'src/user/user.service';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
-import { VerifyPassword } from 'src/auth/entities/verify-password.entity';
 import { SubRedisService } from 'src/redis/sub.redis.service';
 
 @Injectable()

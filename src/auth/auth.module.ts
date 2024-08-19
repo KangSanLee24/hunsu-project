@@ -10,7 +10,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { User } from 'src/user/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { VerifyPassword } from './entities/verify-password.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { RefreshToken } from './entities/refresh-token.entity';
@@ -39,7 +38,6 @@ import { RedisModule } from 'src/redis/redis.module';
       Post,
       Comment,
       RefreshToken,
-      VerifyPassword,
       PointLog,
       SocialData,
     ]),

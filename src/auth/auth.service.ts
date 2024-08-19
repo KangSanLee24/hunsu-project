@@ -28,7 +28,6 @@ import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshToken } from './entities/refresh-token.entity';
-import { VerifyPassword } from './entities/verify-password.entity';
 import { MailService } from 'src/mail/mail.service';
 import { SocialType } from 'src/user/types/social-type.type';
 import { PointService } from 'src/point/point.service';
@@ -58,9 +57,6 @@ export class AuthService {
 
     @InjectRepository(SocialData)
     private socialDataRepository: Repository<SocialData>,
-
-    @InjectRepository(VerifyPassword)
-    private verifyPasswordRepository: Repository<VerifyPassword>
   ) { }
 
   /** 회원 가입(sign-up) API **/
@@ -572,9 +568,6 @@ export class AuthService {
         password: hashedPassword,
       },
     };
-
-    // 7. 임시로 생성했던 verify_passwords 테이블의 레코드 삭제
-    await this.verifyPasswordRepository.delete({ email });
 
     // 8. 결과 반환
     return {
