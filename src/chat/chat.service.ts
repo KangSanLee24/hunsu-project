@@ -186,7 +186,7 @@ export class ChatService {
 
     //오늘인지 확인
 
-    const nowDate = Date.now() * 9 * 60 * 60 * 1000;
+    const nowDate = Date.now();
 
     const chatDate = new Date(formatTime);
 

@@ -72,7 +72,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const isChatRoom = await this.chatService.isChatRoom(+payload.roomId);
 
     if(isChatRoom) {
-      const currentTime = Date.now() + 9 * 60 * 60 * 1000;
+      const currentTime = Date.now();
       const chatTime = format(currentTime, 'HH:mm');
       
       this.server.to(payload.roomId).emit('chat', {author: payload.author, body: payload.body, chatTime});
@@ -81,7 +81,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       //채팅방 update
       await this.chatRoomRepository.update(
         {id: +payload.roomId},
-        {updatedAt: new Date(Date.now() + 9 * 60 * 60 * 1000) }
+        {updatedAt: new Date(Date.now()) }
       );
 
       return payload;
