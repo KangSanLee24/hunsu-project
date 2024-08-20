@@ -57,7 +57,7 @@ jobs:
           SSH_HOST: ${{ secrets.AWS_EC2_HOST }}
 
       - name: Prepare to deploy
-        run: ssh ec2 'cd ${{ env.PROJECT_DIR }} && git switch main && git pull && echo "${{ secrets.ENV }}" > .env.production && echo "${{ secrets.ENV }}" > .env.development'
+        run: ssh ec2 'cd ${{ env.PROJECT_DIR }} && git switch main && git pull && echo "${{ secrets.ENV }}" > .env.production && echo "${{ secrets.ENV }}" > .env.development && echo "${{secrets.SENTRY}}" > .sentryclirc'
 
       - name: Copy dist to EC2
         run: rsync -avzP -e ssh ./dist ec2:${{ env.PROJECT_DIR }}/
