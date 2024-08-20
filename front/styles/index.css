@@ -573,3 +573,30 @@ ul.hashtag-rank-tabs li.current {
   white-space: nowrap;
   text-align: right;
 }
+
+/* 쇼핑몰 검색 */
+.shopping-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.shopping-item img {
+  max-width: 120px;
+  /* 이미지 크기를 줄이기 */
+  margin-right: 20px;
+  /* 이미지와 텍스트 사이에 간격 추가 */
+}
+
+.shopping-item h3,
+.shopping-item p,
+.shopping-item a {
+  margin: 0;
+}
+
+.shopping-item a {
+  display: inline-block;
+  margin-top: 10px;
+  color: blue;
+  text-decoration: underline;
+}

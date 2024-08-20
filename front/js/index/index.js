@@ -32,6 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (signUpLink) signUpLink.style.display = 'block';
   }
 
+  fetchNaverShopping('뿔테안경');
+
   /** HOT LIVECHAT 랭킹 FETCH **/
   async function fetchHotLiveChats(num) {
     try {
@@ -486,3 +488,37 @@ document.addEventListener('DOMContentLoaded', () => {
   window.clickLiveChat = clickLiveChat;
   window.clickPost = clickPost;
 });
+
+async function fetchNaverShopping(keyword) {
+  try {
+    const response = await fetch(`/api/shopping?keyword=${keyword}`);
+    const result = await response.json();
+    console.log(result);
+    renderNaverShoppingList(result.data); // 데이터를 화면에 렌더링하는 함수
+  } catch (error) {
+    // console.error('네이버 쇼핑 API 호출 중 오류 발생:', error);
+    alert("네이버 쇼핑 API 호출 중 오류 발생");
+  }
+}
+
+function renderNaverShoppingList(items) {
+  const shoppingList = document.getElementById('shopping-list-container'); // id를 적절히 변경
+  shoppingList.innerHTML = '';
+
+  items.forEach(item => {
+    const listItem = document.createElement('div');
+    listItem.innerHTML = `
+      <div class="shopping-item">
+        <img src="${item.image}" alt="${item.title}">
+        <div class="text-content">
+          <h3>${item.title}</h3>
+          <p>상점: ${item.mallName}</p>
+          <p>카테고리: ${item.category2}</p>
+          <p>가격: ${item.lprice} 원</p>
+          <a href="${item.link}" target="_blank">구매하기</a>
+        </div>
+      </div>
+    `;
+    shoppingList.appendChild(listItem);
+  });
+}

@@ -22,6 +22,7 @@ import { HashtagModule } from './hashtag/hashtag.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ScheduleService } from './schedule/schedule.service';
 import { RedisModule } from './redis/redis.module';
+import { ShoppingModule } from './shopping/shopping.module';
 
 @Module({
   imports: [
@@ -59,8 +60,9 @@ import { RedisModule } from './redis/redis.module';
     PointModule,
     HashtagModule,
     RedisModule,
+    ShoppingModule,
   ],
   controllers: [AppController],
   providers: [AwsService, ScheduleService],
 })
-export class AppModule {}
+export class AppModule { }

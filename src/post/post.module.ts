@@ -29,4 +29,4 @@ import { RedisModule } from 'src/redis/redis.module';
   controllers: [PostController],
   providers: [PostService],
 })
-export class PostModule {}
+export class PostModule { }
