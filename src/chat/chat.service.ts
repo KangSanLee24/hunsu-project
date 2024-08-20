@@ -465,4 +465,24 @@ export class ChatService {
 
     return isChatRoom;
   }
+
+  //채팅방 멤버 목록 조회
+  async findChatMember(chatRoomId: number) {
+
+    const member = await this.entityManager.query(
+      `select b.nickname
+      from chat_members a join users b
+      on a.user_id = b.id 
+      where a.room_id = ${chatRoomId};`
+    );
+
+    const owner = await this.entityManager.query(
+      `select b.nickname
+      from chat_rooms a join users b
+      on a.user_id = b.id 
+      where a.id = ${chatRoomId};`
+    );
+
+    return {member, owner};    
+  }
 }

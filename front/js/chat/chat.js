@@ -59,6 +59,54 @@ document.addEventListener('DOMContentLoaded', async () => {
     return; // 이후 코드를 실행하지 않도록 중단
   }
 
+  /** 멤버 목록 토글 */
+  const toggleMembersButton = document.getElementById("toggleMembersButton");
+  const membersList = document.getElementById("membersList");
+  const closeMembersButton = document.getElementById("closeMembersButton");
+  const membersContainer = document.getElementById("membersContainer");
+
+  // 멤버 목록 토글 버튼 클릭 시
+  toggleMembersButton.addEventListener("click", function () {
+    if (membersList.style.display === "none") {
+      membersList.style.display = "block";
+      fetchMembers(roomId);  // API 호출하여 멤버 목록 가져오기
+    } else {
+      membersList.style.display = "none";
+    }
+  });
+
+  // 닫기 버튼 클릭 시
+  closeMembersButton.addEventListener("click", function () {
+    membersList.style.display = "none";
+  });
+
+  function fetchMembers(roomId) {
+    fetch(`/api/chatrooms/${roomId}/member`)
+      .then(response => response.json())
+      .then(data => {
+        const member = data.member;
+        const owner = data.owner[0]; 
+        membersContainer.innerHTML = ""; // 기존 목록 초기화
+
+        member.forEach(member => {
+          const li = document.createElement("li");
+        
+          // 닉네임과 방장 여부 확인
+          if (member.nickname === owner.nickname) {
+            li.textContent = `${member.nickname}     👑방장`; // 방장 표시 추가
+          } else {
+            li.textContent = member.nickname;
+          }
+          
+          membersContainer.appendChild(li);
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching members:', error);
+      membersContainer.innerHTML = "<li>멤버 목록을 불러오지 못했습니다.</li>";
+    });
+}
+
   // 채팅 목록을 자동으로 스크롤 하단으로 이동
   function scrollToBottom() {
     chatScroll.scrollTop = chatScroll.scrollHeight;
