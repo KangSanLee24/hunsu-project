@@ -67,6 +67,16 @@ export class ChatController {
   }
 
   /**
+   * 채팅방 멤버 목록 조회
+   * @returns
+   */
+  // @UseGuards(AuthGuard('jwt'))
+  @Get(':chatRoomId/member')
+  async findChatMember(@Param('chatRoomId') chatRoomId: string) {
+    return await this.chatService.findChatMember(+chatRoomId);
+  }
+
+  /**
    * hot live chat 조회
    * @returns
    */
