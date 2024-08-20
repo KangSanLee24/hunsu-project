@@ -69,7 +69,7 @@ jobs:
           SSH_HOST: ${{ secrets.AWS_EC2_HOST }}
 
       - name: Prepare to deploy
-        run: ssh ec2 'cd ${{ env.PROJECT_DIR }} && git switch main && git pull && echo "${{ secrets.ENV }}" > .env.production && echo "${{ secrets.ENV }}" > .env.development && sentry-cli login --auth-token "${{ secrets.SENTRY_AUTH_TOKEN }}"'
+        run: ssh ec2 'cd ${{ env.PROJECT_DIR }} && git switch main && git pull && echo "${{ secrets.ENV }}" > .env.production && echo "${{ secrets.ENV }}" > .env.development && npm install -g @sentry/cli && sentry-cli login --auth-token "${{ secrets.SENTRY_AUTH_TOKEN }}"'
 
       - name: Copy dist to EC2
         run: rsync -avzP -e ssh ./dist ec2:${{ env.PROJECT_DIR }}/
