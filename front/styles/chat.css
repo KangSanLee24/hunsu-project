@@ -315,6 +315,8 @@ code {
   right: 20px;
   top: 70px;
   width: 200px;
+  height: 350px; /* 세로 크기 */
+  overflow: auto; /* 내용이 넘칠 때 스크롤 바 추가 */
   background-color: white;
   border: 1px solid #ddd;
   border-radius: 5px;
