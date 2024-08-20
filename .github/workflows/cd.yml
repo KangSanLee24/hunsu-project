@@ -34,10 +34,14 @@ jobs:
       - name: Install Sentry CLI
         run: npm install -g @sentry/cli
 
-      - name: Set up Sentry environment
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        run: echo "Sentry environment is set up."
+      #
+      - name: Run Sentry wizard for sourcemaps
+        run: npx @sentry/wizard@latest -i sourcemaps
+
+      # - name: Set up Sentry environment
+      #   env:
+      #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      #   run: echo "Sentry environment is set up."
 
       #
       - name: Install dependencies
@@ -47,12 +51,6 @@ jobs:
       #
       - name: Build the project
         run: npm run build
-
-      #
-      - name: Inject debug IDs and upload source maps to Sentry
-        run: |
-          sentry-cli sourcemaps inject --org project-bg --project node-nestjs ./dist
-          sentry-cli sourcemaps upload --org project-bg --project node-nestjs ./dist
 
       # SSH 접속 후 명령을 통해서 배포 진행
       - name: Configure SSH
