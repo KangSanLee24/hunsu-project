@@ -172,27 +172,27 @@ document.addEventListener('DOMContentLoaded', () => {
     return element;
   }
 
-  // 공통 로그인 확인 함수
-  function handleLoginRequired(event, redirectUrl) {
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      // 로그인 되어 있으면 지정된 URL로 이동
-      window.location.href = redirectUrl;
-    } else {
-      // 로그인 되어 있지 않으면 알림창 표시
-      event.preventDefault(); // 기본 동작 막기
-      const confirmLogin = confirm(
-        '로그인이 되어있지 않습니다. 로그인을 하시겠습니까?'
-      );
-      if (confirmLogin) {
-        // 로그인 페이지로 리다이렉트하면서 리다이렉트 URL을 전달
-        window.location.href = './log-in';
-      } else {
-        // 로그인을 취소했을 때 포커스를 잃게 함
-        event.target.blur();
-      }
-    }
-  }
+  // // 공통 로그인 확인 함수
+  // function handleLoginRequired(event, redirectUrl) {
+  //   const accessToken = localStorage.getItem('accessToken');
+  //   if (accessToken) {
+  //     // 로그인 되어 있으면 지정된 URL로 이동
+  //     window.location.href = redirectUrl;
+  //   } else {
+  //     // 로그인 되어 있지 않으면 알림창 표시
+  //     event.preventDefault(); // 기본 동작 막기
+  //     const confirmLogin = confirm(
+  //       '로그인이 되어있지 않습니다. 로그인을 하시겠습니까?'
+  //     );
+  //     if (confirmLogin) {
+  //       // 로그인 페이지로 리다이렉트하면서 리다이렉트 URL을 전달
+  //       window.location.href = './log-in';
+  //     } else {
+  //       // 로그인을 취소했을 때 포커스를 잃게 함
+  //       event.target.blur();
+  //     }
+  //   }
+  // }
 
   // 댓글 작성 textarea 클릭 이벤트 리스너 추가
   const commentContentTextarea = document.getElementById('comment-content');
@@ -347,3 +347,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+// 공통 로그인 확인 함수
+export function handleLoginRequired(event, redirectUrl) {
+  const accessToken = localStorage.getItem('accessToken');
+  if (accessToken) {
+    // 로그인 되어 있으면 지정된 URL로 이동
+    window.location.href = redirectUrl;
+  } else {
+    // 로그인 되어 있지 않으면 알림창 표시
+    event.preventDefault(); // 기본 동작 막기
+    const confirmLogin = confirm(
+      '로그인이 되어있지 않습니다. 로그인을 하시겠습니까?'
+    );
+    if (confirmLogin) {
+      // 로그인 페이지로 리다이렉트하면서 리다이렉트 URL을 전달
+      window.location.href = './log-in';
+    } else {
+      // 로그인을 취소했을 때 포커스를 잃게 함
+      event.target.blur();
+    }
+  }
+}
+
+// export const handleLoginRequired = handleLoginRequired();

@@ -186,7 +186,7 @@ export class ChatService {
 
     //오늘인지 확인
 
-    const nowDate = Date.now() * 9 * 60 * 60 * 1000;
+    const nowDate = Date.now();
 
     const chatDate = new Date(formatTime);
 
@@ -394,25 +394,20 @@ export class ChatService {
   async getHotLiveChat(num: number) {
     const getHotLiveChat = await this.entityManager.query(
       `
-      select a.id, a.owner_id, a.title, a.count,
-      CASE
-      when b.user_id = a.owner_id then b.img_url
-      ELSE null
-      END as img_url
-      from (select a.id, a.user_id as owner_id, a.title, count(b.user_id) as count
-      from (select id, user_id ,title
-      from chat_rooms
-      where is_deleted = FALSE) a join chat_members b
-      on a.id  = b.room_id
-      GROUP by a.id
-      order by count DESC) a left join
-      (select room_id , user_id, img_url
-      from chat_Images
-      where (room_id, created_at) IN
-      (select room_id , max(created_at)
-      from chat_Images
-      group by room_id)) b
-      on a.id = b.room_id;
+      select c.id as id, c.user_id as owner_id, c.title as title, c.img_url as img_url, d.count as count, c.created_at
+      from (select a.id, a.user_id , a.title , b.img_url , b.created_at
+      from chat_rooms a left join chat_Images b
+      on a.user_id = b.user_id
+      where a.is_deleted = FALSE) c join (select room_id , count(*) as count
+      from chat_members
+      group by room_id) d
+      on c.id = d.room_id
+      where (c.user_id, c.created_at) in
+      (select a.user_id , max(a.created_at)
+      from chat_Images a join chat_rooms b
+      on a.user_id = b.user_id 
+      group by a.user_id)
+      order by count DESC;
       `
     );
 
@@ -435,6 +430,7 @@ export class ChatService {
         };
       })
     );
+
     return data;
   }
 
@@ -468,5 +464,25 @@ export class ChatService {
     });
 
     return isChatRoom;
+  }
+
+  //채팅방 멤버 목록 조회
+  async findChatMember(chatRoomId: number) {
+
+    const member = await this.entityManager.query(
+      `select b.nickname
+      from chat_members a join users b
+      on a.user_id = b.id 
+      where a.room_id = ${chatRoomId};`
+    );
+
+    const owner = await this.entityManager.query(
+      `select b.nickname
+      from chat_rooms a join users b
+      on a.user_id = b.id 
+      where a.id = ${chatRoomId};`
+    );
+
+    return {member, owner};    
   }
 }

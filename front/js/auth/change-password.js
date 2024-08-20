@@ -12,6 +12,7 @@ async function rePassword() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Source-Page': 'password-update' // 커스텀 헤더 추가
       },
       body: JSON.stringify({ email }),
     });

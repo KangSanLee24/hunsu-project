@@ -1,11 +1,11 @@
 config:
   # base url 정의
-  target: 'http://localhost:3000'
+  target: 'https://5zirap.shop'
   phases:
     # 부하테스트 시간 (초)
-    - duration: 60
+    - duration: 200
       # 부하테스트 동안의 사용자 수 (초당 요청 수)
-      arrivalRate: 100
+      arrivalRate: 20
       # rampTo: 300
       name: api-request-test
   payload:
@@ -23,33 +23,47 @@ scenarios:
   # 시나리오 정의
   - name: 'GET-posts'
     flow:
-      - get:
-          url: '/api/posts?page=1'
+      - loop:
+          - get:
+              url: '/api/posts?page=1'
+        count: 10
   - name: 'GET-post-detail'
     flow:
-      - get:
-          url: '/api/posts/82'
+      - loop:
+          - get:
+              url: '/api/posts/38'
+        count: 10
   - name: 'GET-post-likes'
     flow:
-      - get:
-          url: '/api/posts/82/likes'
+      - loop:
+          - get:
+              url: '/api/posts/38/likes'
+        count: 10
   - name: 'GET-post-my-like'
     flow:
-      - get:
-          url: '/api/posts/82/likes/me'
-          headers:
-            Authorization: 'Bearer {{ bearerToken }}'
+      - loop:
+          - get:
+              url: '/api/posts/38/likes/me'
+              headers:
+                Authorization: 'Bearer {{ bearerToken }}'
+        count: 10
   - name: 'GET-post-dislikes'
     flow:
-      - get:
-          url: '/api/posts/82/dislikes'
+      - loop:
+          - get:
+              url: '/api/posts/38/dislikes'
+        count: 10
   - name: 'GET-post-my-dislike'
     flow:
-      - get:
-          url: '/api/posts/82/dislikes/me'
-          headers:
-            Authorization: 'Bearer {{ bearerToken }}'
+      - loop:
+          - get:
+              url: '/api/posts/38/dislikes/me'
+              headers:
+                Authorization: 'Bearer {{ bearerToken }}'
+        count: 10
   - name: 'GET-comments'
     flow:
-      - get:
-          url: '/api/posts/82/comments'
+      - loop:
+          - get:
+              url: '/api/posts/38/comments'
+        count: 10

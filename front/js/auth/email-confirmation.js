@@ -5,12 +5,18 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  const emailInput = document.getElementById('email');
+  const storedEmail = localStorage.getItem('email');
+  if (storedEmail && emailInput) {
+    emailInput.value = storedEmail;
+  }
+
   verifyEmailForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     // 폼 데이터 가져오기
     // 이메일, 인증번호
-    const email = document.getElementById('email').value;
+    const email = emailInput.value;
     const token = document.getElementById('token').value;
 
     // 이전 페이지 여부로 회원가입, 비밀번호 변경때 다른 API 호출

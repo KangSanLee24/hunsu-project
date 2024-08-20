@@ -63,16 +63,23 @@ export class Post {
   user: User;
 
   // 게시글과 댓글 1대:다 관계
-  @OneToMany(() => Comment, (comment) => comment.post, { cascade: true })
+  @OneToMany(() => Comment, (comment) => comment.post, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   comments: Comment[];
 
   // // 게시글과 좋아요 1대:다 관계
-  @OneToMany(() => PostLike, (postLike) => postLike.post, { cascade: true })
+  @OneToMany(() => PostLike, (postLike) => postLike.post, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   postLikes: PostLike[];
 
   // // 게시글과 싫어요 1대:다 관계
   @OneToMany(() => PostDislike, (postDislike) => postDislike.post, {
     cascade: true,
+    onDelete: 'CASCADE',
   })
   postDislikes: PostDislike[];
 
