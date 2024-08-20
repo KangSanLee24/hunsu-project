@@ -35,7 +35,7 @@ jobs:
         run: npm install -g @sentry/cli
 
       - name: Set up Sentry environment
-        run: echo "${{ secrets.SENTRY_AUTH_TOKEN }}" | sentry-cli login --auth-token
+        run: echo "${{ secrets.SENTRY_AUTH_TOKEN }}" | sentry-cli login --auth-token "${{ secrets.SENTRY_AUTH_TOKEN }}"
 
       #
       - name: Run Sentry wizard for sourcemaps
