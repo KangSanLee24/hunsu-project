@@ -166,6 +166,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     notification.textContent = data.message;
     chatScroll.appendChild(notification);
     chatScroll.scrollTop = chatScroll.scrollHeight; // 최신 메시지로 스크롤
+
+    fetchMembers(roomId);
   });
 
   // 서버로부터 'chat' 이벤트 수신
@@ -349,6 +351,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     notification.textContent = data.message;
     chatScroll.appendChild(notification);
     chatScroll.scrollTop = chatScroll.scrollHeight; // 최신 메시지로 스크롤
+
+    fetchMembers(roomId);
   });
 
   // 서버로부터 'ownerLeft' 이벤트 수신
