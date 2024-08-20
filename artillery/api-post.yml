@@ -3,9 +3,9 @@ config:
   target: 'https://5zirap.shop'
   phases:
     # 부하테스트 시간 (초)
-    - duration: 40
+    - duration: 200
       # 부하테스트 동안의 사용자 수 (초당 요청 수)
-      arrivalRate: 100
+      arrivalRate: 20
       # rampTo: 300
       name: api-request-test
   payload:
@@ -17,39 +17,53 @@ config:
     name: category
   variables:
     # accessToken
-    bearerToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiQUMiLCJlbWFpbCI6ImdhbmdzYW4xNDE0QG5hdmVyLmNvbSIsInN1YiI6OCwiaWF0IjoxNzI0MTIwNTQyLCJleHAiOjE3MjQxNDU3NDJ9.GHExsyxjx5tgiru0HjUXt59Y9HfU1NWqqFfC9eyXQ6s' # Bearer 토큰을 변수로 선언
+    bearerToken: '' # Bearer 토큰을 변수로 선언
 # 부하 테스트 시나리오
 scenarios:
   # 시나리오 정의
   - name: 'GET-posts'
     flow:
-      - get:
-          url: '/api/posts?page=1'
+      - loop:
+          - get:
+              url: '/api/posts?page=1'
+        count: 10
   - name: 'GET-post-detail'
     flow:
-      - get:
-          url: '/api/posts/38'
+      - loop:
+          - get:
+              url: '/api/posts/38'
+        count: 10
   - name: 'GET-post-likes'
     flow:
-      - get:
-          url: '/api/posts/38/likes'
+      - loop:
+          - get:
+              url: '/api/posts/38/likes'
+        count: 10
   - name: 'GET-post-my-like'
     flow:
-      - get:
-          url: '/api/posts/38/likes/me'
-          headers:
-            Authorization: 'Bearer {{ bearerToken }}'
+      - loop:
+          - get:
+              url: '/api/posts/38/likes/me'
+              headers:
+                Authorization: 'Bearer {{ bearerToken }}'
+        count: 10
   - name: 'GET-post-dislikes'
     flow:
-      - get:
-          url: '/api/posts/38/dislikes'
+      - loop:
+          - get:
+              url: '/api/posts/38/dislikes'
+        count: 10
   - name: 'GET-post-my-dislike'
     flow:
-      - get:
-          url: '/api/posts/38/dislikes/me'
-          headers:
-            Authorization: 'Bearer {{ bearerToken }}'
+      - loop:
+          - get:
+              url: '/api/posts/38/dislikes/me'
+              headers:
+                Authorization: 'Bearer {{ bearerToken }}'
+        count: 10
   - name: 'GET-comments'
     flow:
-      - get:
-          url: '/api/posts/38/comments'
+      - loop:
+          - get:
+              url: '/api/posts/38/comments'
+        count: 10
