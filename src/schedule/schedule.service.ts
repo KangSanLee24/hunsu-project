@@ -31,9 +31,9 @@ export class ScheduleService {
 
      /** 유저 관련 스케줄러 **/
 
-     // task 1 유효기간 내 이메일 인증을 완료하지 않은 유저 삭제 (5분마다)
+     // task 1 유효기간 내 이메일 인증을 완료하지 않은 유저 삭제 (1분마다)
 
-     @Cron(CronExpression.EVERY_5_MINUTES)
+     @Cron(CronExpression.EVERY_MINUTE)
     async deleteUsers() {
         await this.authService.removeUserNotVerify();
     }

@@ -22,9 +22,13 @@ import { HashtagModule } from './hashtag/hashtag.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ScheduleService } from './schedule/schedule.service';
 import { RedisModule } from './redis/redis.module';
+import { SentryModule } from '@sentry/nestjs/setup';
+import { SentryWebhookInterceptor } from './sentry/sentry-webhook.intersepter';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
+    SentryModule.forRoot(),
     ServeStaticModule.forRoot(
       {
         rootPath: join(__dirname, '..', 'front', 'html'), // public 폴더를 정적 파일의 루트로 설정
@@ -61,6 +65,13 @@ import { RedisModule } from './redis/redis.module';
     RedisModule,
   ],
   controllers: [AppController],
-  providers: [AwsService, ScheduleService],
+  providers: [
+    AwsService,
+    ScheduleService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: SentryWebhookInterceptor,
+    },
+  ],
 })
 export class AppModule {}
