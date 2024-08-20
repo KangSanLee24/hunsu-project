@@ -5,7 +5,7 @@ import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { RecommentModule } from './recomment/recomment.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configValidationSchema } from './configs/env-validation.config';
 import { typeOrmModuleOptions } from './configs/database.config';
@@ -26,7 +26,9 @@ import { SentryModule } from '@sentry/nestjs/setup';
 import { SentryWebhookInterceptor } from './sentry/sentry-webhook.intersepter';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingMiddleware } from './middlewares/logging.middleware';
-import { ExceptionHandler, Logger } from 'winston';
+import { JwtService } from '@nestjs/jwt';
+import { WinstonModule } from 'nest-winston';
+import { Logger } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -65,7 +67,7 @@ import { ExceptionHandler, Logger } from 'winston';
     PointModule,
     HashtagModule,
     RedisModule,
-    ExceptionHandler,
+    WinstonModule,
   ],
   controllers: [AppController],
   providers: [
@@ -75,7 +77,8 @@ import { ExceptionHandler, Logger } from 'winston';
       provide: APP_INTERCEPTOR,
       useClass: SentryWebhookInterceptor,
     },
-    ,
+    JwtService,
+    ConfigService,
     Logger,
   ],
 })
