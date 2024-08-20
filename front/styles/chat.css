@@ -17,6 +17,7 @@ code {
   align-items: center;
   justify-content: center;
   height: 100%; /* 전체 높이로 설정 */
+  position: relative; /* 버튼 위치를 조정하기 위해 relative 추가 */
 }
 
 .button {
@@ -272,4 +273,84 @@ code {
   top: 10px; /* 상단 여백 */
   cursor: pointer; /* 클릭 가능한 아이콘으로 표시 */
   font-size: 1.2em; /* 아이콘 크기 조정 */
+}
+
+.user-list-container {
+  width: 200px;
+  padding: 10px;
+  border-left: 1px solid #ddd;
+  background-color: #f9f9f9;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.user-list-container h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.user-list-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.user-list-container li {
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.toggle-members-button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.members-list {
+  position: absolute;
+  right: 20px;
+  top: 70px;
+  width: 200px;
+  height: 350px; /* 세로 크기 */
+  overflow: auto; /* 내용이 넘칠 때 스크롤 바 추가 */
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 1000;
+}
+
+.members-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.members-list-header span {
+  font-weight: bold;
+}
+
+.close-members-button {
+  background-color: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#membersContainer {
+  list-style-type: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+#membersContainer li {
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
 }

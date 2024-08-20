@@ -6,6 +6,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json } from 'express';
 import * as express from 'express';
 import { join } from 'path';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
+import * as Sentry from '@sentry/node';
 import { winstonLogger } from './configs/winston.config';
 
 async function bootstrap() {
@@ -19,6 +21,15 @@ async function bootstrap() {
   // Configuration 이용해서 .env 활용
   const configService = app.get(ConfigService);
   const port = configService.get<number>('SERVER_PORT');
+  // 센트리 초기화 설정
+  Sentry.init({
+    dsn: configService.get<string>('SENTRY_DSN'),
+    integrations: [
+      nodeProfilingIntegration(), // 프로파일링 통합 추가
+    ],
+    tracesSampleRate: 1.0, // 100%의 트랜잭션을 캡처
+    profilesSampleRate: 1.0, // 100%의 프로파일링 데이터를 수집
+  });
 
   app.setGlobalPrefix('api', { exclude: ['health-check'] });
 

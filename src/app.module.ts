@@ -22,11 +22,15 @@ import { HashtagModule } from './hashtag/hashtag.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ScheduleService } from './schedule/schedule.service';
 import { RedisModule } from './redis/redis.module';
+import { SentryModule } from '@sentry/nestjs/setup';
+import { SentryWebhookInterceptor } from './sentry/sentry-webhook.intersepter';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingMiddleware } from './middlewares/logging.middleware';
 import { ExceptionHandler, Logger } from 'winston';
 
 @Module({
   imports: [
+    SentryModule.forRoot(),
     ServeStaticModule.forRoot(
       {
         rootPath: join(__dirname, '..', 'front', 'html'), // public 폴더를 정적 파일의 루트로 설정
@@ -64,7 +68,16 @@ import { ExceptionHandler, Logger } from 'winston';
     ExceptionHandler,
   ],
   controllers: [AppController],
-  providers: [AwsService, ScheduleService, Logger],
+  providers: [
+    AwsService,
+    ScheduleService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: SentryWebhookInterceptor,
+    },
+    ,
+    Logger,
+  ],
 })
 export class AppModule implements NestModule {
   public configure(consumer: MiddlewareConsumer): void {

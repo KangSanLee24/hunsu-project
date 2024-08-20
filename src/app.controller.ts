@@ -15,6 +15,13 @@ export class AppController {
     return 'This sever is healthy';
   }
 
+  // 센트리 오류 확인용
+  @Get('error')
+  getError() {
+    const lsw = null;
+    return lsw.toString();
+  }
+
   @Get('hello-logger')
   helloLogger() {
     this.logger.log('helloLogger => ', AppController.name);

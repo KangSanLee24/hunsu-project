@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Point } from './entities/point.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
+import { Between, MoreThan, Repository } from 'typeorm';
 import { PointLog } from './entities/point-log.entity';
 import { User } from 'src/user/entities/user.entity';
 import { MaxPointScore, PointScore, PointType } from './types/point.type';
@@ -23,7 +23,7 @@ export class PointService {
     private readonly pointLogRepository: Repository<PointLog>,
 
     private readonly redisService: RedisService
-  ) {}
+  ) { }
 
   // 출석 체크 메소드
   async checkAttendance(user: User): Promise<void> {
@@ -81,16 +81,7 @@ export class PointService {
       ),
     };
 
-    // 3-1. 오늘 포인트 타입별 획득 포인트 횟수 = 획득 점수 / 기본 점수
-    const todayCounts = {
-      attention: todayPoints.attention / PointScore.ATTENTION,
-      post: todayPoints.post / PointScore.POST,
-      postLike: todayPoints.postLike / PointScore.POST_LIKE,
-      comment: todayPoints.comment / PointScore.COMMENT,
-      commentLike: todayPoints.commentLike / PointScore.COMMENT_LIKE,
-    };
-
-    // 4. 최대 횟수 계산 = 최대 점수 / 기본 점수
+    // 3. 최대 횟수 계산 = 최대 점수 / 기본 점수
     const maxCounts = {
       attention: MaxPointScore.ATTENTION / PointScore.ATTENTION,
       weeklyAttention:
@@ -101,7 +92,19 @@ export class PointService {
       commentLike: MaxPointScore.COMMENT_LIKE / PointScore.COMMENT_LIKE,
     };
 
-    // 5. 결과 반환 : todayPoints 삭제.
+    // 4. 오늘 포인트 타입별 획득 포인트 횟수 = 획득 점수 / 기본 점수
+    // Math.min으로 maxCounts.xxx 넘지 않게 설정
+    // Math.max로 최소값 0이상으로 설정
+    // Count와 별개로 포인트 추가 차감은 진행됨.
+    const todayCounts = {
+      attention: Math.min(Math.max(0, todayPoints.attention / PointScore.ATTENTION), maxCounts.attention),
+      post: Math.min(Math.max(0, todayPoints.post / PointScore.POST), maxCounts.post),
+      postLike: Math.min(Math.max(0, todayPoints.postLike / PointScore.POST_LIKE), maxCounts.postLike),
+      comment: Math.min(Math.max(0, todayPoints.comment / PointScore.COMMENT), maxCounts.comment),
+      commentLike: Math.min(Math.max(0, todayPoints.commentLike / PointScore.COMMENT_LIKE), maxCounts.commentLike),
+    };
+
+    // 5. 결과 반환 : (삭제하거나 지워도 카운트 되지 않음.)
     return {
       id: userId,
       nickname: user.nickname, // 닉네임 추가
@@ -119,7 +122,7 @@ export class PointService {
     const pointScore = PointScore[pointType];
     const newPoint = sign
       ? point.accPoint + pointScore
-      : point.accPoint - pointScore;
+      : point.accPoint - pointScore
 
     // 포인트 테이블 업데이트
     await this.pointRepository.update({ userId }, { accPoint: newPoint });
@@ -167,11 +170,21 @@ export class PointService {
       today.getDate() + 1
     );
 
+    // const pointLogs = await this.pointLogRepository.find({
+    //   where: {
+    //     userId,
+    //     pointType,
+    //     createdAt: Between(startOfDay, endOfDay),
+    //   },
+    // });
+
+    // 포인트 추가된 로그만 조회 (차감 로그는 제외)
     const pointLogs = await this.pointLogRepository.find({
       where: {
         userId,
         pointType,
         createdAt: Between(startOfDay, endOfDay),
+        point: MoreThan(0), // 포인트가 추가된 로그만 조회 (차감된 로그는 제외)
       },
     });
 

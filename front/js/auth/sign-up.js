@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-Source-Page': 'sign-up' // 커스텀 헤더 추가
         },
         body: JSON.stringify({ email, password, passwordConfirm, nickname }),
       });
@@ -41,6 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const notification = document.getElementById('notification');
         const confirmBtn = document.getElementById('confirm-btn');
         notification.classList.remove('hidden');
+
+        localStorage.setItem('email', email);
 
         // 확인 버튼 클릭 시 페이지 이동
         confirmBtn.addEventListener('click', () => {

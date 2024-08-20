@@ -42,7 +42,7 @@ export class PostService {
 
     private readonly awsService: AwsService,
     private readonly pointService: PointService
-  ) {}
+  ) { }
 
   /* 게시글 생성 API */
   async create(createPostDto: CreatePostDto, userId: number) {
@@ -283,7 +283,7 @@ export class PostService {
       const topResult = topPosts.map((post) => ({
         id: post.id,
         userId: post.userId,
-        nickname: post.user.nickname,
+        nickname: post?.user?.nickname,
         category: post.category,
         title: post.title,
         content: post.content,

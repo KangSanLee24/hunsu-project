@@ -10,11 +10,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { User } from 'src/user/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { VerifyPassword } from './entities/verify-password.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Post } from 'src/post/entities/post.entity';
-import { RefreshToken } from './entities/refresh-token.entity';
-import { VerifyEmail } from 'src/mail/entities/verify-email.entity';
 import { MailModule } from 'src/mail/mail.module';
 // import { KakaoStrategy } from './guards/kakao.strategy';
 import { NaverStrategy } from './guards/naver.strategy';
@@ -22,6 +19,7 @@ import { Point } from 'src/point/entities/point.entity';
 import { PointModule } from 'src/point/point.module';
 import { PointLog } from 'src/point/entities/point-log.entity';
 import { SocialData } from './entities/social-data.entity';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
@@ -38,9 +36,6 @@ import { SocialData } from './entities/social-data.entity';
       Point,
       Post,
       Comment,
-      RefreshToken,
-      VerifyEmail,
-      VerifyPassword,
       PointLog,
       SocialData,
     ]),
@@ -48,6 +43,7 @@ import { SocialData } from './entities/social-data.entity';
     UserModule,
     MailModule,
     PointModule,
+    RedisModule
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, NaverStrategy],
