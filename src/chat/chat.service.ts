@@ -406,7 +406,8 @@ export class ChatService {
       (select a.user_id , max(a.created_at)
       from chat_Images a join chat_rooms b
       on a.user_id = b.user_id 
-      group by a.user_id);
+      group by a.user_id)
+      order by count DESC;
       `
     );
 
@@ -429,7 +430,7 @@ export class ChatService {
         };
       })
     );
-    console.log(data);
+
     return data;
   }
 
