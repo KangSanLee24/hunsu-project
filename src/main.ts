@@ -6,9 +6,14 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json } from 'express';
 import * as express from 'express';
 import { join } from 'path';
+import { winstonLogger } from './configs/winston.config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+    logger: winstonLogger, // 윈스턴 로거로 대체
+  });
+
   // PayloadTooLargeError 오류로 body를 10mb까지 받을 수 있게 수정.
   app.use(json({ limit: '10mb' }));
   // Configuration 이용해서 .env 활용

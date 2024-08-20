@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
@@ -22,6 +22,8 @@ import { HashtagModule } from './hashtag/hashtag.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ScheduleService } from './schedule/schedule.service';
 import { RedisModule } from './redis/redis.module';
+import { LoggingMiddleware } from './middlewares/logging.middleware';
+import { ExceptionHandler, Logger } from 'winston';
 
 @Module({
   imports: [
@@ -59,8 +61,13 @@ import { RedisModule } from './redis/redis.module';
     PointModule,
     HashtagModule,
     RedisModule,
+    ExceptionHandler,
   ],
   controllers: [AppController],
-  providers: [AwsService, ScheduleService],
+  providers: [AwsService, ScheduleService, Logger],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  public configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(LoggingMiddleware).forRoutes('*');
+  }
+}
