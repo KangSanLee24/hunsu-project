@@ -24,14 +24,23 @@ export class LoggingMiddleware implements NestMiddleware {
     const currentTime = Date.now();
 
     // 2. 현재 로그인한 유저 정보
-    const token = headers.authorization?.split(' ')[1];
+    const token = headers.authorization
+      ? headers.authorization?.split(' ')[1]
+      : null;
     let payload;
+    let userId = 0;
+
     if (token) {
-      payload = this.jwtService.verify(token, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-      });
+      try {
+        payload = this.jwtService.verify(token, {
+          secret: this.configService.get<string>('JWT_SECRET'),
+        });
+        userId = payload ? payload.sub : 0; // payload가 유효한 경우에만 userId 설정
+      } catch (error) {
+        this.loggerService.log(`JWT verification error: ${error.message}`);
+        // 기본 사용자 ID 설정
+      }
     }
-    const userId = payload ? payload.sub : 0;
 
     // 3. 로그 남기기
     res.on('finish', () => {
@@ -39,15 +48,7 @@ export class LoggingMiddleware implements NestMiddleware {
       const duration = Date.now() - currentTime;
       const logMessage = {
         context: 'UserRequest',
-        message: `[${new Date(currentTime)}][USER:${userId}][${method}][${statusCode}][${duration}ms][${originalUrl}]`,
-        time: new Date(currentTime),
-        reqMethod: method,
-        reqOriginalUrl: originalUrl,
-        resStatus: statusCode,
-        resDuration: duration,
-        userId: userId,
-        userIp: ip,
-        userAgent: userAgent,
+        message: `USER|${userId}][IP|${ip}][METHOD|${method}][SCODE|${statusCode}][DT|${duration}][URL|${originalUrl}][UA|${userAgent}`,
       };
       this.loggerService.log(logMessage);
     });
