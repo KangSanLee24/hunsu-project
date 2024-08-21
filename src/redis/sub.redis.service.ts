@@ -58,7 +58,7 @@ export class SubRedisService implements OnModuleInit, OnModuleDestroy {
   }
 
     /** 클라이언트 함수 **/
-  getSubClient(): Redis {
+  getSubClient(): Redis | undefined {
     return this.subRedisClient;
   }
 }

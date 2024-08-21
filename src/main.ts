@@ -8,6 +8,8 @@ import * as express from 'express';
 import { join } from 'path';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import * as Sentry from '@sentry/node';
+import { RedisService } from './redis/redis.service';
+import { RedisIoAdapter } from './redis-io.adapter/redis-io.adapter';
 import { winstonLogger } from './configs/winston.config';
 
 async function bootstrap() {
@@ -44,8 +46,8 @@ async function bootstrap() {
 
   // CORS 설정
   app.enableCors({
-    origin: ['http://localhost:3000'],
-    methods: ['POST', 'GET', 'OPTIONS'],
+    origin: ['https://5zirap.shop', 'http://localhost:3000'],
+    methods: ['GET,HEAD,PUT,PATCH,POST,DELETE'],
     allowedHeaders: ['POST', 'GET'],
     credentials: true,
   });
@@ -76,7 +78,19 @@ async function bootstrap() {
     },
   });
 
-  // PORT 실행
-  await app.listen(port);
+  app.enableShutdownHooks(); // 애플리케이션 종료 시 cleanup을 위해 활성화
+
+  // 모든 모듈이 초기화된 후 실행
+  await app.listen(port, async () => {
+    console.log('Application is running on: 3000');
+
+    // RedisService가 완전히 초기화된 후 RedisIoAdapter 초기화
+    const redisService = app.get(RedisService);
+    const redisIoAdapter = new RedisIoAdapter(app, redisService);
+    await redisIoAdapter.connectToRedis();
+
+    // redis 어댑터를 websocket에 적용
+    app.useWebSocketAdapter(redisIoAdapter);
+  });
 }
 bootstrap();

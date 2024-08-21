@@ -25,6 +25,7 @@ import { RedisModule } from './redis/redis.module';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { SentryWebhookInterceptor } from './sentry/sentry-webhook.intersepter';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { RedisIoAdapterModule } from './redis-io.adapter/redis-io.adapter.module';
 import { LoggingMiddleware } from './middlewares/logging.middleware';
 import { JwtService } from '@nestjs/jwt';
 import { WinstonModule } from 'nest-winston';
@@ -67,6 +68,7 @@ import { Logger } from '@nestjs/common';
     PointModule,
     HashtagModule,
     RedisModule,
+    RedisIoAdapterModule,
     WinstonModule,
   ],
   controllers: [AppController],
