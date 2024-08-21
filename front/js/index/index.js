@@ -506,7 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // 쇼핑 api 호출
 async function fetchNaverShopping(keyword, rank) {
   try {
-    const response = await fetch(`/api/shopping?keyword=${keyword}`);
+    const response = await fetch(`/api/shopping?keyword="${keyword}"`);
     const result = await response.json();
     appendNaverShoppingList(result.data, [rank], keyword); // 각 아이템에 순위 전달
   } catch (error) {
