@@ -25,7 +25,7 @@ export class SentryWebhookInterceptor implements NestInterceptor {
           this.reportError(
             error,
             'danger',
-            ':경광등: 데이터베이스 쿼리 오류 발생:경광등:'
+            ':rotating_light: 데이터베이스 쿼리 오류 발생:rotating_light:'
           );
         }
 
@@ -34,7 +34,7 @@ export class SentryWebhookInterceptor implements NestInterceptor {
           this.reportError(
             error,
             'warning',
-            ':경광등: 네트워크 요청 타임아웃 오류 발생:경광등:'
+            ':rotating_light: 네트워크 요청 타임아웃 오류 발생:rotating_light:'
           );
         }
 
@@ -43,7 +43,7 @@ export class SentryWebhookInterceptor implements NestInterceptor {
           this.reportError(
             error,
             'danger',
-            ':경광등: (참조|타입) 오류 발생:경광등:'
+            ':rotating_light: (참조|타입) 오류 발생:rotating_light:'
           );
         }
 
