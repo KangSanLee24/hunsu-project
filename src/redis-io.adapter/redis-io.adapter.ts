@@ -25,6 +25,7 @@ export class RedisIoAdapter extends IoAdapter {
 
             // sub은 채널을 구독해 메시지 수신에 사용
             const subClient = pubClient.duplicate();
+
             this.adapterConstructor = createAdapter(pubClient, subClient);
         } catch (error) {
             console.error('Error connecting to Redis:', error);
