@@ -362,39 +362,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 랜더링 - HASHTAG RANK **/
   function renderHashtagRank(data) {
     hashtagRank.innerHTML = '';
+    const hashRank = []; // 순위별 해시태그 리스트
+
     // 1. 들어온 데이터를 하나하나 HTML화
     for (let i = 1; i <= data.length; i++) {
       // 1-1. 데이터로 row HTML 생성
       const row = document.createElement('div');
       row.innerHTML = `        
-      <div class="hashtag-rank-info">                  
-      <div class="hashtag-rank-ranking">
-      <span class="hashtag-rank-ranking-var">${rankMark(i)}</span>
-      </div>                  
-      <div class="hashtag-rank-hashtag">
-      <span>${data[i - 1].hashtag}</span>
-      </div>                  
-      <div class="hashtag-rank-count">
-      <span>${Number(data[i - 1].count)}</span>
-      </div>
-      </div>
+        <div class="hashtag-rank-info">
+          <div class="hashtag-rank-ranking">
+            <span class="hashtag-rank-ranking-var">${rankMark(i)}</span>
+          </div>                  
+          <div class="hashtag-rank-hashtag">
+            <span>${data[i - 1].hashtag}</span>
+          </div>                  
+          <div class="hashtag-rank-count">
+            <span>${Number(data[i - 1].count)}</span>
+          </div>
+        </div>
       `;
       // 1-2. HASHTAG RANK TAB에 데이터 넣어주기
       hashtagRank.appendChild(row);
 
       // 1 ~ 3위까지만 
-      if (i < 4) {
+      if (i <= 3) {
         const hashtagWithoutHash = data[i - 1].hashtag.replace('#', ''); // # 기호 제거
-        hashRank.push(hashtagWithoutHash);
+        hashRank.push({ hashtagWithoutHash, rank: i });
       }
     }
-    // 1위, 2위, 3위 각각 3개씩 데이터를 fetch하고 렌더링
-    for (let i = 0; i < hashRank.length; i++) {
-      fetchNaverShopping(hashRank[i])
-    }
+
+    // 데이터를 렌더링
+    hashRank.forEach(({ hashtagWithoutHash, rank }) => {
+      fetchNaverShopping(hashtagWithoutHash, rank);
+    });
   }
 
   /** LIVECHAT 클릭 **/
@@ -501,42 +503,47 @@ document.addEventListener('DOMContentLoaded', () => {
   window.clickPost = clickPost;
 });
 
-// 네이버 쇼핑 API에서 데이터를 가져오는 비동기 함수
-async function fetchNaverShopping(keyword) {
+// 쇼핑 api 호출
+async function fetchNaverShopping(keyword, rank) {
   try {
-    // 주어진 해시태그(keyword)로 API 요청을 보내고 응답을 받음
     const response = await fetch(`/api/shopping?keyword=${keyword}`);
     const result = await response.json();
-
-    // 데이터를 화면에 추가하기 위해 함수 호출
-    appendNaverShoppingList(result.data); // 데이터를 화면에 렌더링하는 함수
+    appendNaverShoppingList(result.data, [rank], keyword); // 각 아이템에 순위 전달
   } catch (error) {
-    alert("네이버 쇼핑 API 호출 중 오류 발생");
+    console.error('Error fetching shopping data:', error);
   }
 }
 
-// 데이터를 받아와 화면에 추가하는 함수
-function appendNaverShoppingList(items) {
-  // 화면에 렌더링할 아이템을 담는 컨테이너
-  const shoppingList = document.getElementById('shopping-list-container'); // id를 적절히 변경
+function appendNaverShoppingList(items, rank, keyword) {
+  const shoppingList = document.getElementById('hash-shop-container');
 
-  // 추가할 HTML 구조
-  items.forEach(item => {
+  // 데이터 추가
+  items.forEach((item) => {
     const listItem = document.createElement('div');
     listItem.innerHTML = `
-      <div class="shopping-item">
-        <img src="${item.image}" alt="${item.title}">
-        <div class="text-content">
-          <h3>${item.title}</h3>
-          <p>상점: ${item.mallName}</p>
-          <p>카테고리: ${item.category2}</p>
-          <p>가격: ${item.lprice} 원</p>
-          <a href="${item.link}" target="_blank">구매하기</a>
+      <div class="shopping-item-card">
+        <div class="shopping-item-card-inner" onClick="window.open('${item.link}', '_blank')">
+          <div class="card-rank">
+            <span class="hashtag-rank-ranking-var">${rankMark(rank)}</span>
+            <span class="keyword"># ${keyword}</span>
+          </div>
+          <div class="card-thumbnail">
+            <img class="card-thumbnail-image" src="${item.image}" alt="${item.title}">
+          </div>
+          <div class="item-info">
+            <div class="item-title">
+              <span class="item-title-var">${item.title}</span>
+            </div>
+            <div class="item-mall">
+              <span class="item-mall-var">${item.mallName}</span>
+            </div>
+            <div class="item-price">
+              <span class="item-price-var">${item.lprice} 원</span>
+            </div>
+          </div>
         </div>
       </div>
     `;
-
-    // 생성한 아이템을 기존 컨테이너에 추가
-    shoppingList.appendChild(listItem); // 기존 내용에 추가
+    shoppingList.appendChild(listItem); // 리스트에 추가
   });
 }
