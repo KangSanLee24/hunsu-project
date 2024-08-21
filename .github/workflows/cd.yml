@@ -30,13 +30,25 @@ jobs:
           node-version: 20 # 설치 할 Node.js 버전 지정
           cache: 'npm' # npm 사용 시 'npm'
 
-      # VM에 의존성 패키지 설치하기
-      - name: Install dependencies # step의 이름 지정 (선택 사항)
-        run: |
+      # VM에 Sentry CLI 설치하기
+      - name: Install Sentry CLI
+        run: npm install -g @sentry/cli
 
-          # package-lock.json 파일에 저장 된 버전 정보와 동일하게 설치
+      - name: Set up Sentry environment
+        run: echo "${{ secrets.SENTRY_AUTH_TOKEN }}" | sentry-cli login --auth-token "${{ secrets.SENTRY_AUTH_TOKEN }}"
+
+      #
+      - name: Run Sentry wizard for sourcemaps
+        run: npx @sentry/wizard@latest -i sourcemaps
+
+      #
+      - name: Install dependencies
+        run: |
           npm ci
-          npm run build
+
+      #
+      - name: Build the project
+        run: npm run build
 
       # SSH 접속 후 명령을 통해서 배포 진행
       - name: Configure SSH
