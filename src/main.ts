@@ -46,11 +46,12 @@ async function bootstrap() {
 
   // CORS 설정
   app.enableCors({
-    origin: ['https://5zirap.shop', 'http://localhost:3000'],
-    methods: ['GET,HEAD,PUT,PATCH,POST,DELETE'],
+    origin: ['http://localhost:3000'],
+    methods: ['POST', 'GET', 'OPTIONS'],
     allowedHeaders: ['POST', 'GET'],
     credentials: true,
   });
+
 
   // 정적 파일 제공 설정
   app.use(
@@ -91,6 +92,8 @@ async function bootstrap() {
 
     // redis 어댑터를 websocket에 적용
     app.useWebSocketAdapter(redisIoAdapter);
+
+    console.log('WebSocket adapter is set up.');
   });
 }
 bootstrap();
