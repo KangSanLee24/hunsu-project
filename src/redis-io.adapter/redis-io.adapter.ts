@@ -15,19 +15,31 @@ export class RedisIoAdapter extends IoAdapter {
     }
 
     async connectToRedis(): Promise<void> {
-      	// 이미 연결되어 있는 redis 클라이언트를 받아옴
-      	// pub은 메시지 발행에 사용
-        const pubClient = this.redisService.getClient();
-		// sub은 채널을 구독해 메시지 수신에 사용
-        const subClient = pubClient.duplicate();
+        try {
+            // 이미 연결되어 있는 redis 클라이언트를 받아옴
+            const pubClient = this.redisService.getClient();
 
-        this.adapterConstructor = createAdapter(pubClient, subClient);
+            if (!pubClient) {
+                throw new Error('Failed to get Redis client.');
+            }
+
+            // sub은 채널을 구독해 메시지 수신에 사용
+            const subClient = pubClient.duplicate();
+            this.adapterConstructor = createAdapter(pubClient, subClient);
+        } catch (error) {
+            console.error('Error connecting to Redis:', error);
+            throw error; // 에러가 발생하면 다시 던져 호출자가 처리하게 함
+        }
     }
 
     // main.ts에서 redis 어댑터 생성시 호출됨
     createIOServer(port: number, options?: ServerOptions): any {
         const server = super.createIOServer(port, options);
-        server.adapter(this.adapterConstructor);
+        if (this.adapterConstructor) {
+            server.adapter(this.adapterConstructor);
+        } else {
+            console.error('Adapter constructor is not initialized.');
+        }
         return server;
     }
 }

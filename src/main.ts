@@ -73,16 +73,20 @@ async function bootstrap() {
     },
   });
 
-  // socket io redis adapter 세팅
-  const redisService = app.get(RedisService);
-  const redisIoAdapter = new RedisIoAdapter(app, redisService);
-  await redisIoAdapter.connectToRedis();
+  app.enableShutdownHooks();  // 애플리케이션 종료 시 cleanup을 위해 활성화
 
-  // redis 어댑터를 websocket에 적용
-  app.useWebSocketAdapter(redisIoAdapter);
-  
+  // 모든 모듈이 초기화된 후 실행
+  await app.listen(port, async () => {
+    console.log('Application is running on: 3000');
 
-  // PORT 실행
-  await app.listen(port);
+    // RedisService가 완전히 초기화된 후 RedisIoAdapter 초기화
+    const redisService = app.get(RedisService);
+    const redisIoAdapter = new RedisIoAdapter(app, redisService);
+    await redisIoAdapter.connectToRedis();
+
+    // redis 어댑터를 websocket에 적용
+    app.useWebSocketAdapter(redisIoAdapter);
+  });
+
 }
 bootstrap();
