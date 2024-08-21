@@ -78,11 +78,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.to(payload.roomId).emit('chat', {author: payload.author, body: payload.body, chatTime});
       this.chatService.chatHashtag(payload.body);
 
-      //채팅방 update
-      await this.chatRoomRepository.update(
-        {id: +payload.roomId},
-        {updatedAt: new Date(Date.now()) }
-      );
+      // 채팅방 update
+      // await this.chatRoomRepository.update(
+      //   {id: +payload.roomId},
+      //   {updatedAt: new Date(Date.now()) }
+      // );
+      this.chatService.updateChatRoom(+payload.roomId);
 
       return payload;
     } else {

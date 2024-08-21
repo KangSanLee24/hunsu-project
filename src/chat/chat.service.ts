@@ -208,24 +208,6 @@ export class ChatService {
     }
   }
 
-  //채팅방 채팅 내역 저장
-  // async sendChatRoom(chatRoomId: number, author: string, message: string) {
-  //   const findUser = await this.userRepository.findOne({
-  //     where: { nickname: author },
-  //     select: { id: true },
-  //   });
-
-  //   const chatLog = await this.chatLogRepository.save({
-  //     roomId: chatRoomId,
-  //     content: message,
-  //     memberId: findUser.id,
-  //   });
-
-  //   const chatTime = format(new Date(chatLog.createdAt), 'HH:mm');
-
-  //   return chatTime;
-  // }
-
   //채팅 내역 중 해시태그 레디스 저장
   async chatHashtag(chat: string) {
     const client = this.redisService.getClient();
@@ -484,5 +466,42 @@ export class ChatService {
     );
 
     return {member, owner};    
+  }
+
+  // 채팅내역이 오갈때 채팅방 업데이트 (분산락 적용)
+  async updateChatRoom(chatRoomId: number) {
+    const client = this.redisService.getClient();
+
+    // 100밀리초 동안 대기
+    // 최대 10번 시도
+
+    let retries = 0;
+    const retryDelay = 100;
+    const maxRetries = 10;
+
+    while (retries < maxRetries) {
+      const key = 'chatting:update'
+      const isLocked = await client.set(key, 'locked', 'EX', 10, 'NX');
+
+      // 락 획득 시
+      if(isLocked === 'OK') {
+        try {
+          await this.chatRoomRepository.update(
+            {id: chatRoomId},
+            {updatedAt: new Date(Date.now())}
+          );
+
+          // 락 해제
+          await client.del(key);
+        } catch (error) {
+          await client.del(key);
+          console.log(error.message); 
+        }
+      } else {   // 락 획득 못할 시에
+        retries ++;
+        await new Promise((resolve) => setTimeout(resolve, retryDelay));    // 대기 후 재시도
+      }
+    }
+    throw new Error('Failed to acquire lock after maximum retries');
   }
 }
