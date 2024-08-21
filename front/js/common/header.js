@@ -269,6 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /** 랜더링 - HASHTAG RANK **/
   function renderHashtagRank(data) {
+    let hasharray = [];
     hashtagRank.innerHTML = '';
     // 1. 들어온 데이터를 하나하나 HTML화
     for (let i = 0; i < data.length / 2; i++) {

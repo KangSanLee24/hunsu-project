@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 5. 해시태그 랭킹(HASHTAG RANK) 관련 변수 선언
   const hashtagRank = document.getElementById('tab-hashtag-rank');
 
+  let hashRank = [];
+
   /** 로그인 상태에 따른 분기 세팅 **/
   // 1. 만약 로그인이 되어있다면
   if (isLoggedIn) {
@@ -32,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (signUpLink) signUpLink.style.display = 'block';
   }
 
-  fetchNaverShopping('뿔테안경');
+  // fetchNaverShopping('뿔테안경');
 
   /** HOT LIVECHAT 랭킹 FETCH **/
   async function fetchHotLiveChats(num) {
@@ -382,6 +384,16 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       // 1-2. HASHTAG RANK TAB에 데이터 넣어주기
       hashtagRank.appendChild(row);
+
+      // 1 ~ 3위까지만 
+      if (i < 4) {
+        const hashtagWithoutHash = data[i - 1].hashtag.replace('#', ''); // # 기호 제거
+        hashRank.push(hashtagWithoutHash);
+      }
+    }
+    // 1위, 2위, 3위 각각 3개씩 데이터를 fetch하고 렌더링
+    for (let i = 0; i < hashRank.length; i++) {
+      fetchNaverShopping(hashRank[i])
     }
   }
 
@@ -489,22 +501,26 @@ document.addEventListener('DOMContentLoaded', () => {
   window.clickPost = clickPost;
 });
 
+// 네이버 쇼핑 API에서 데이터를 가져오는 비동기 함수
 async function fetchNaverShopping(keyword) {
   try {
+    // 주어진 해시태그(keyword)로 API 요청을 보내고 응답을 받음
     const response = await fetch(`/api/shopping?keyword=${keyword}`);
     const result = await response.json();
-    console.log(result);
-    renderNaverShoppingList(result.data); // 데이터를 화면에 렌더링하는 함수
+
+    // 데이터를 화면에 추가하기 위해 함수 호출
+    appendNaverShoppingList(result.data); // 데이터를 화면에 렌더링하는 함수
   } catch (error) {
-    // console.error('네이버 쇼핑 API 호출 중 오류 발생:', error);
     alert("네이버 쇼핑 API 호출 중 오류 발생");
   }
 }
 
-function renderNaverShoppingList(items) {
+// 데이터를 받아와 화면에 추가하는 함수
+function appendNaverShoppingList(items) {
+  // 화면에 렌더링할 아이템을 담는 컨테이너
   const shoppingList = document.getElementById('shopping-list-container'); // id를 적절히 변경
-  shoppingList.innerHTML = '';
 
+  // 추가할 HTML 구조
   items.forEach(item => {
     const listItem = document.createElement('div');
     listItem.innerHTML = `
@@ -519,6 +535,8 @@ function renderNaverShoppingList(items) {
         </div>
       </div>
     `;
-    shoppingList.appendChild(listItem);
+
+    // 생성한 아이템을 기존 컨테이너에 추가
+    shoppingList.appendChild(listItem); // 기존 내용에 추가
   });
 }

@@ -13,7 +13,7 @@ export class ShoppingService {
 
   /* 네이버 쇼핑 API 상품 검색 */
   async search(keyword: string) {
-    const url = `https://openapi.naver.com/v1/search/shop.json?query=${keyword}`;
+    const url = `https://openapi.naver.com/v1/search/shop.json?query=${keyword}&display=3`;
     const headers = {
       'X-Naver-Client-Id': this.CLIENT_ID,
       'X-Naver-Client-Secret': this.CLIENT_SECRET,
