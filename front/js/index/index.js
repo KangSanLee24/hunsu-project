@@ -137,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
 
@@ -178,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
 
@@ -491,7 +493,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. HOT POST RANKING LIST (완료)
   fetchHotPosts('CHAT');
   fetchHotPosts('FASHION');
-  fetchHotPosts('COOKING');
   // 3. POINT RANKING LIST
   fetchWeeklyPointRank(10);
   fetchTotalPointRank(10);

@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Timestamp } from 'typeorm';
+import { LogMethodType, LogStatusCodeType } from '../types/log.type';
+import { IsOptional } from 'class-validator';
 
 @Entity({
   name: 'logs',
@@ -7,36 +9,43 @@ export class Log {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   context: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   level: string;
 
-  @Column()
+  @Column({ type: 'text', nullable: false })
   message: string;
 
-  @Column()
-  reqMethod?: string;
+  @IsOptional()
+  @Column({ type: 'enum', enum: LogMethodType, nullable: true })
+  reqMethod?: LogMethodType;
 
-  @Column()
+  @IsOptional()
+  @Column({ type: 'varchar', nullable: true })
   reqOriginalUrl?: string;
 
-  @Column()
+  @IsOptional()
+  @Column({ type: 'int', nullable: true })
   resDuration?: number;
 
-  @Column()
+  @IsOptional()
+  @Column({ type: 'int', nullable: true })
   resStatus?: number;
 
-  @Column()
-  userId: number;
+  @IsOptional()
+  @Column({ type: 'int', nullable: true })
+  userId?: number;
 
-  @Column()
-  userIp: string;
+  @IsOptional()
+  @Column({ type: 'varchar', nullable: true })
+  userIp?: string;
 
-  @Column()
-  userAgent: string;
+  @IsOptional()
+  @Column({ type: 'text', nullable: true })
+  userAgent?: string;
 
-  @Column()
-  createdAt: Date;
+  @Column({ type: 'timestamp', nullable: false })
+  timestamp: Timestamp;
 }
