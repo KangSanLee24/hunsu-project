@@ -32,7 +32,13 @@ async function fetchBoardData(category, sort, page, keyword) {
     if (keyword) {
       queryParams.append('keyword', keyword);
     }
-    const response = await fetch(`/api/posts?${queryParams.toString()}`);
+    const response = await fetch(`/api/posts?${queryParams.toString()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
     const result = await response.json();
 
