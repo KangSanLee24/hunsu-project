@@ -8,6 +8,8 @@ import * as express from 'express';
 import { join } from 'path';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import * as Sentry from '@sentry/node';
+import { RedisService } from './redis/redis.service';
+import { RedisIoAdapter } from './redis-io.adapter/redis-io.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -70,6 +72,15 @@ async function bootstrap() {
       docExpansion: 'none',
     },
   });
+
+  // socket io redis adapter 세팅
+  const redisService = app.get(RedisService);
+  const redisIoAdapter = new RedisIoAdapter(app, redisService);
+  await redisIoAdapter.connectToRedis();
+
+  // redis 어댑터를 websocket에 적용
+  app.useWebSocketAdapter(redisIoAdapter);
+  
 
   // PORT 실행
   await app.listen(port);
