@@ -13,6 +13,7 @@ import { RedisIoAdapter } from './redis-io.adapter/redis-io.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
   // PayloadTooLargeError 오류로 body를 10mb까지 받을 수 있게 수정.
   app.use(json({ limit: '10mb' }));
   // Configuration 이용해서 .env 활용
@@ -41,8 +42,8 @@ async function bootstrap() {
 
   // CORS 설정
   app.enableCors({
-    origin: ['http://localhost:3000'],
-    methods: ['POST', 'GET', 'OPTIONS'],
+    origin: ['https://5zirap.shop', 'http://localhost:3000'],
+    methods: ['GET,HEAD,PUT,PATCH,POST,DELETE',],
     allowedHeaders: ['POST', 'GET'],
     credentials: true,
   });
