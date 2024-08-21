@@ -35,7 +35,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   /** 클라이언트 함수 **/
-  getClient(): Redis {
+  getClient(): Redis | undefined {
     return this.redisClient;
   }
 
