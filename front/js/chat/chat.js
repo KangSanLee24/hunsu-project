@@ -31,7 +31,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const socket = io('');
+  const socket = io('wss://5zirap.shop/', {
+    transports: ['websocket']
+ });
 
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get('roomId');
