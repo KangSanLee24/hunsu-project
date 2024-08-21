@@ -600,7 +600,6 @@ export class AuthService {
 
     //인증 유효시간 5분
     const verifyTime = new Date(Date.now() - 5 * 60 * 1000);
-    console.log(verifyTime);
 
     const findUsers = await this.userRepository.find({
       where: { 
