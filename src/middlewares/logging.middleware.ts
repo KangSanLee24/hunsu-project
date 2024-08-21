@@ -8,7 +8,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { NextFunction, Request, Response } from 'express';
-import { format } from 'date-fns';
 
 @Injectable()
 export class LoggingMiddleware implements NestMiddleware {
@@ -22,7 +21,9 @@ export class LoggingMiddleware implements NestMiddleware {
     // 1. 필요한 데이터 정리
     const { ip, method, originalUrl, headers } = req;
     const userAgent = req.get('user-agent');
+    const currentTime = Date.now();
 
+    // 2. 현재 로그인한 유저 정보
     const token = headers.authorization?.split(' ')[1];
     let payload;
     if (token) {
@@ -30,16 +31,25 @@ export class LoggingMiddleware implements NestMiddleware {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
     }
-
     const userId = payload ? payload.sub : 0;
-    const currentTime = new Date();
 
-    // 2. 로그 남기기
+    // 3. 로그 남기기
     res.on('finish', () => {
       const { statusCode } = res;
-      this.loggerService.log(
-        `[${currentTime}][userId:${userId}][${method}][${statusCode}][${originalUrl}][IP:${ip}][${userAgent}]`
-      );
+      const duration = Date.now() - currentTime;
+      const logMessage = {
+        context: 'UserRequest',
+        message: `[${new Date(currentTime)}][USER:${userId}][${method}][${statusCode}][${duration}ms][${originalUrl}]`,
+        time: new Date(currentTime),
+        reqMethod: method,
+        reqOriginalUrl: originalUrl,
+        resStatus: statusCode,
+        resDuration: duration,
+        userId: userId,
+        userIp: ip,
+        userAgent: userAgent,
+      };
+      this.loggerService.log(logMessage);
     });
 
     next();
