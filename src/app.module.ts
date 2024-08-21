@@ -25,6 +25,7 @@ import { RedisModule } from './redis/redis.module';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { SentryWebhookInterceptor } from './sentry/sentry-webhook.intersepter';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { RedisIoAdapterModule } from './redis-io.adapter/redis-io.adapter.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     PointModule,
     HashtagModule,
     RedisModule,
+    RedisIoAdapterModule,
   ],
   controllers: [AppController],
   providers: [
