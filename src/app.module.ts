@@ -30,6 +30,7 @@ import { LoggingMiddleware } from './middlewares/logging.middleware';
 import { JwtService } from '@nestjs/jwt';
 import { WinstonModule } from 'nest-winston';
 import { Logger } from '@nestjs/common';
+import { LogModule } from './log/log.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { Logger } from '@nestjs/common';
     RedisModule,
     RedisIoAdapterModule,
     WinstonModule,
+    LogModule,
   ],
   controllers: [AppController],
   providers: [

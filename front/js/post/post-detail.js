@@ -66,14 +66,20 @@ async function renderPostDetail(postId) {
           document.getElementById('post-delete-btn').disabled = true;
         }
       }
-    } catch (error) { }
+    } catch (error) {}
   }
 }
 
 /** 게시글 상세 조회 API 호출 **/
 async function fetchPost(postId) {
   try {
-    const response = await fetch(`/api/posts/${postId}`);
+    const response = await fetch(`/api/posts/${postId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
     if (!response.ok) throw new Error('게시글을 불러오는 데 실패했습니다.');
     return await response.json();
   } catch (error) {
