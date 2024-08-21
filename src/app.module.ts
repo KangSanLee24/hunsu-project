@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { RecommentModule } from './recomment/recomment.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configValidationSchema } from './configs/env-validation.config';
 import { typeOrmModuleOptions } from './configs/database.config';
@@ -25,7 +25,12 @@ import { RedisModule } from './redis/redis.module';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { SentryWebhookInterceptor } from './sentry/sentry-webhook.intersepter';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ShoppingModule } from './shopping/shopping.module';
 import { RedisIoAdapterModule } from './redis-io.adapter/redis-io.adapter.module';
+import { LoggingMiddleware } from './middlewares/logging.middleware';
+import { JwtService } from '@nestjs/jwt';
+import { WinstonModule } from 'nest-winston';
+import { Logger } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -64,7 +69,9 @@ import { RedisIoAdapterModule } from './redis-io.adapter/redis-io.adapter.module
     PointModule,
     HashtagModule,
     RedisModule,
+    ShoppingModule,
     RedisIoAdapterModule,
+    WinstonModule,
   ],
   controllers: [AppController],
   providers: [
@@ -74,6 +81,13 @@ import { RedisIoAdapterModule } from './redis-io.adapter/redis-io.adapter.module
       provide: APP_INTERCEPTOR,
       useClass: SentryWebhookInterceptor,
     },
+    JwtService,
+    ConfigService,
+    Logger,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  public configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(LoggingMiddleware).forRoutes('*');
+  }
+}

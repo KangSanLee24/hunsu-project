@@ -10,10 +10,14 @@ import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import * as Sentry from '@sentry/node';
 import { RedisService } from './redis/redis.service';
 import { RedisIoAdapter } from './redis-io.adapter/redis-io.adapter';
+import { winstonLogger } from './configs/winston.config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+    logger: winstonLogger, // 윈스턴 로거로 대체
+  });
+
   // PayloadTooLargeError 오류로 body를 10mb까지 받을 수 있게 수정.
   app.use(json({ limit: '10mb' }));
   // Configuration 이용해서 .env 활용
@@ -75,7 +79,7 @@ async function bootstrap() {
     },
   });
 
-  app.enableShutdownHooks();  // 애플리케이션 종료 시 cleanup을 위해 활성화
+  app.enableShutdownHooks(); // 애플리케이션 종료 시 cleanup을 위해 활성화
 
   // 모든 모듈이 초기화된 후 실행
   await app.listen(port, async () => {
@@ -91,6 +95,5 @@ async function bootstrap() {
 
     console.log('WebSocket adapter is set up.');
   });
-
 }
 bootstrap();

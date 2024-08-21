@@ -7,4 +7,4 @@ import { SubRedisService } from './sub.redis.service';
   providers: [RedisService, SubRedisService],
   exports: [RedisService, SubRedisService],
 })
-export class RedisModule {}
+export class RedisModule { }

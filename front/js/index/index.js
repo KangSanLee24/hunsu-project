@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 5. 해시태그 랭킹(HASHTAG RANK) 관련 변수 선언
   const hashtagRank = document.getElementById('tab-hashtag-rank');
 
+  let hashRank = [];
+
   /** 로그인 상태에 따른 분기 세팅 **/
   // 1. 만약 로그인이 되어있다면
   if (isLoggedIn) {
@@ -31,6 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginLink) loginLink.style.display = 'block';
     if (signUpLink) signUpLink.style.display = 'block';
   }
+
+  // fetchNaverShopping('뿔테안경');
 
   /** HOT LIVECHAT 랭킹 FETCH **/
   async function fetchHotLiveChats(num) {
@@ -358,29 +362,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /** 랜더링 - HASHTAG RANK **/
   function renderHashtagRank(data) {
     hashtagRank.innerHTML = '';
+    const hashRank = []; // 순위별 해시태그 리스트
+
     // 1. 들어온 데이터를 하나하나 HTML화
     for (let i = 1; i <= data.length; i++) {
       // 1-1. 데이터로 row HTML 생성
       const row = document.createElement('div');
       row.innerHTML = `        
-      <div class="hashtag-rank-info">                  
-      <div class="hashtag-rank-ranking">
-      <span class="hashtag-rank-ranking-var">${rankMark(i)}</span>
-      </div>                  
-      <div class="hashtag-rank-hashtag">
-      <span>${data[i - 1].hashtag}</span>
-      </div>                  
-      <div class="hashtag-rank-count">
-      <span>${Number(data[i - 1].count)}</span>
-      </div>
-      </div>
+        <div class="hashtag-rank-info">
+          <div class="hashtag-rank-ranking">
+            <span class="hashtag-rank-ranking-var">${rankMark(i)}</span>
+          </div>                  
+          <div class="hashtag-rank-hashtag">
+            <span>${data[i - 1].hashtag}</span>
+          </div>                  
+          <div class="hashtag-rank-count">
+            <span>${Number(data[i - 1].count)}</span>
+          </div>
+        </div>
       `;
       // 1-2. HASHTAG RANK TAB에 데이터 넣어주기
       hashtagRank.appendChild(row);
+
+      // 1 ~ 3위까지만 
+      if (i <= 3) {
+        const hashtagWithoutHash = data[i - 1].hashtag.replace('#', ''); // # 기호 제거
+        hashRank.push({ hashtagWithoutHash, rank: i });
+      }
     }
+
+    // 데이터를 렌더링
+    hashRank.forEach(({ hashtagWithoutHash, rank }) => {
+      fetchNaverShopping(hashtagWithoutHash, rank);
+    });
   }
 
   /** LIVECHAT 클릭 **/
@@ -486,3 +502,48 @@ document.addEventListener('DOMContentLoaded', () => {
   window.clickLiveChat = clickLiveChat;
   window.clickPost = clickPost;
 });
+
+// 쇼핑 api 호출
+async function fetchNaverShopping(keyword, rank) {
+  try {
+    const response = await fetch(`/api/shopping?keyword="${keyword}"`);
+    const result = await response.json();
+    appendNaverShoppingList(result.data, [rank], keyword); // 각 아이템에 순위 전달
+  } catch (error) {
+    console.error('Error fetching shopping data:', error);
+  }
+}
+
+function appendNaverShoppingList(items, rank, keyword) {
+  const shoppingList = document.getElementById('hash-shop-container');
+
+  // 데이터 추가
+  items.forEach((item) => {
+    const listItem = document.createElement('div');
+    listItem.innerHTML = `
+      <div class="shopping-item-card">
+        <div class="shopping-item-card-inner" onClick="window.open('${item.link}', '_blank')">
+          <div class="card-rank">
+            <span class="hashtag-rank-ranking-var">${rankMark(rank)}</span>
+            <span class="keyword"># ${keyword}</span>
+          </div>
+          <div class="card-thumbnail">
+            <img class="card-thumbnail-image" src="${item.image}" alt="${item.title}">
+          </div>
+          <div class="item-info">
+            <div class="item-title">
+              <span class="item-title-var">${item.title}</span>
+            </div>
+            <div class="item-mall">
+              <span class="item-mall-var">${item.mallName}</span>
+            </div>
+            <div class="item-price">
+              <span class="item-price-var">${item.lprice} 원</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    shoppingList.appendChild(listItem); // 리스트에 추가
+  });
+}
