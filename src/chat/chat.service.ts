@@ -469,6 +469,7 @@ export class ChatService {
   }
 
   // 채팅내역이 오갈때 채팅방 업데이트 (분산락 적용)
+  
   async updateChatRoom(chatRoomId: number) {
     const client = this.redisService.getClient();
 
@@ -490,9 +491,9 @@ export class ChatService {
             {id: chatRoomId},
             {updatedAt: new Date(Date.now())}
           );
-
           // 락 해제
           await client.del(key);
+
         } catch (error) {
           await client.del(key);
           console.log(error.message); 
