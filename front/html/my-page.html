@@ -1,28 +1,23 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>마이 페이지</title>
-    <link rel="stylesheet" href="/static/styles/style.css" />
-    <link rel="stylesheet" href="/static/styles/my-page.css" />
-  </head>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>마이 페이지</title>
+  <link rel="stylesheet" href="/static/styles/style.css" />
+  <link rel="stylesheet" href="/static/styles/my-page.css" />
+</head>
+
+<body>
 
   <body>
     <header>
       <div id="logo" class="logo">
-        <div
-          id="logo-home"
-          class="logo-home"
-          onClick="window.location.href='./index'"
-        >
+        <div id="logo-home" class="logo-home" onClick="window.location.href='./index'">
           5ZIRAP
         </div>
-        <div
-          id="admin-btn"
-          class="admin-btn"
-          onClick="window.location.href='./log-manager'"
-        >
+        <div id="admin-btn" class="admin-btn" onClick="window.location.href='./log-manager'">
           ADMIN
         </div>
       </div>
@@ -56,11 +51,11 @@
         <table class="task-table">
           <thead>
             <tr>
-              <th>출석체크</th>
-              <th>게시글</th>
-              <th>게시글 좋아요</th>
-              <th>댓글</th>
-              <th>댓글 좋아요</th>
+              <th>출석체크 (20점)</th>
+              <th>게시글 (5점)</th>
+              <th>게시글 좋아요 (1점)</th>
+              <th>댓글 (2점)</th>
+              <th>댓글 좋아요 (1점)</th>
             </tr>
           </thead>
           <tbody>
@@ -101,11 +96,7 @@
         <button id="alarmButton" class="footerAlarm" onclick="clickAlarmBtn()">
           🔔 알람
         </button>
-        <button
-          id="myPageButton"
-          class="my-page-button"
-          onclick="clickMyPageBtn()"
-        >
+        <button id="myPageButton" class="my-page-button" onclick="clickMyPageBtn()">
           🏆 마이페이지
         </button>
       </div>
@@ -115,4 +106,5 @@
     <script type="module" src="/static/js/my-page/my-page.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </body>
+
 </html>

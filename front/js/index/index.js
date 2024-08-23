@@ -395,10 +395,17 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    // 데이터를 순차적으로 렌더링
+    async function processShoppingData(hashRank) {
+      for (let i = 0; i < hashRank.length; i++) {
+        const { hashtagWithoutHash, rank } = hashRank[i];
+        // 각 요청이 순차적으로 처리되어 순서가 보장됨
+        await fetchNaverShopping(hashtagWithoutHash, rank);
+      }
+    }
+
     // 데이터를 렌더링
-    hashRank.forEach(({ hashtagWithoutHash, rank }) => {
-      fetchNaverShopping(hashtagWithoutHash, rank);
-    });
+    processShoppingData(hashRank);
   }
 
   /** LIVECHAT 클릭 **/
