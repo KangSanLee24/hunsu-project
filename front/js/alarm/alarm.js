@@ -1,9 +1,10 @@
 import { elapsedTime } from '../common/elapsed-time.js';
+import { identifyUser } from '../common/identify-user.js';
 
 /** 페이지에 필요한 변수 세팅 **/
 // 1. 로그인 관련 변수 선언
 const accessToken = localStorage.getItem('accessToken');
-const isLoggedIn = !!accessToken;
+const user = accessToken ? await identifyUser(accessToken) : null;
 const loginLink = document.querySelector('a[href="./log-in"]');
 const signUpLink = document.querySelector('a[href="./sign-up"]');
 
@@ -22,7 +23,7 @@ const alarmsPerPage = 10; // 페이지 당 게시글 수
 
 /** 로그인 상태에 따른 분기 세팅 **/
 // 1. 만약 로그인이 되어있다면
-if (isLoggedIn) {
+if (user) {
   // 1-1. 로그인O => 로그인 및 회원가입 버튼 [숨기기]
   if (loginLink) loginLink.style.display = 'none';
   if (signUpLink) signUpLink.style.display = 'none';
@@ -89,7 +90,7 @@ function renderAlarmList(data) {
     // 2-1. row 생성 준비
     const row = document.createElement('tr');
     // 2-2. 읽은 알람인지 아닌지 구별
-    let check = '';
+    let check = '⬜';
     if (item.isChecked == true) {
       check = '✅';
     }
@@ -178,8 +179,8 @@ async function deleteAlarm(alarmId) {
         // 3-1. API 호출에 성공한 경우
         // 3-1-1. 결과 메시지 엘러트
         alert(result.message);
-        // 3-1-2. 새로고침
-        window.location.reload();
+        // 3-1-2. 새로 fetch
+        fetchAlarmData(currentPage);
       } else {
         // 3-2. API 호출에 실패한 경우
         alert(result.message);
@@ -216,8 +217,8 @@ async function deleteAllAlarm() {
         // 3-1. API 호출에 성공한 경우
         // 3-1-1. 결과 메시지 엘러트
         alert(result.message);
-        // 3-1-2. 새로고침
-        window.location.reload();
+        // 3-1-2. 새로 fetch
+        fetchAlarmData(currentPage);
       } else {
         // 3-2. API 호출에 실패한 경우
         alert(result.message);
@@ -254,8 +255,8 @@ async function readAllAlarm() {
         // 3-1. API 호출에 성공한 경우
         // 3-1-1. 결과 메시지 엘러트
         alert(result.message);
-        // 3-1-2. 새로고침
-        window.location.reload();
+        // 3-1-2. 새로 fetch
+        fetchAlarmData(currentPage);
       } else {
         // 3-2. API 호출에 실패한 경우
         alert(result.message);
@@ -272,33 +273,28 @@ async function readAllAlarm() {
 /** 읽음 처리 반전 **/
 async function checkAlarm(alarmId) {
   try {
-    // 0. 재확인
-    if (window.confirm('해당 알람의 [읽음O]/[읽음X] 상태를 바꾸시겠습니까?')) {
-      // 1. 알람 [읽음]상태 취소 request => response 받기
-      const response = await fetch(`/api/alarms/${alarmId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      });
+    // 1. 알람 [읽음]상태 취소 request => response 받기
+    const response = await fetch(`/api/alarms/${alarmId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
 
-      // 2. 받아온 response를 json화
-      const result = await response.json();
+    // 2. 받아온 response를 json화
+    const result = await response.json();
 
-      // 3. 결과 처리
-      if (response.status === 200) {
-        // 3-1. API 호출에 성공한 경우
-        // 3-1-1. 결과 메시지 엘러트
-        alert(result.message);
-        // 3-1-2. 새로고침
-        window.location.reload();
-      } else {
-        // 3-2. API 호출에 실패한 경우
-        alert(result.message);
-      }
+    // 3. 결과 처리
+    if (response.status === 200) {
+      // 3-1. API 호출에 성공한 경우
+      // 3-1-1. 결과 메시지 (콘솔)
+      console.log(result.message);
+      // 3-1-2. 새로 fetch
+      fetchAlarmData(currentPage);
     } else {
-      alert('취소하셨습니다.');
+      // 3-2. API 호출에 실패한 경우
+      alert(result.message);
     }
   } catch (error) {
     // 4. 그 밖의 에러 발생

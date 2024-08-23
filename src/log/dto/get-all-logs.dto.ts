@@ -1,6 +1,5 @@
 import { Type } from 'class-transformer';
 import {
-  IsDate,
   IsString,
   IsEnum,
   IsInt,
@@ -45,14 +44,14 @@ export class GetAllLogsDto {
   methodType: LogMethodType;
 
   @IsOptional()
-  @IsNumber()
-  userId: number;
+  @IsString()
+  userId: string;
 
   @IsOptional()
   @IsString()
   keyword: string;
 
   @IsOptional()
-  @IsDate()
-  time: Date;
+  @IsString()
+  time: string;
 }

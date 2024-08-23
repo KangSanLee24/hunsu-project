@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>로그매니저(관리자모드)</title>
+    <link rel="stylesheet" href="/static/styles/style.css" />
+    <link rel="stylesheet" href="/static/styles/log-manager.css" />
+  </head>
+
+  <body>
+    <header>
+      <div id="logo" class="logo">
+        <div
+          id="logo-home"
+          class="logo-home"
+          onClick="window.location.href='./index'"
+        >
+          5ZIRAP
+        </div>
+        <div
+          id="admin-btn"
+          class="admin-btn"
+          onClick="window.location.href='./log-manager'"
+        >
+          ADMIN
+        </div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="./log-in">로그인</a></li>
+          <li><a href="./sign-up">회원가입</a></li>
+          <li><a id="userNickname"></a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <h1>🛠️ 로그매니저(관리자모드)</h1>
+      <hr />
+      <!-- 로그 데이터 리스트 -->
+      <table id="log-list-table">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Context</th>
+            <th>Level</th>
+            <th>Message</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody id="log-list"></tbody>
+      </table>
+      <p id="after-log-list"></p>
+
+      <!-- 페이지네이션 부분 -->
+      <div class="pagination">
+        <button id="prev-button" disabled>이전</button>
+        <span id="page-numbers"></span>
+        <span id="current-page-label"></span>
+        <button id="next-button">다음</button>
+      </div>
+
+      <!-- 조회 부분 -->
+      <div class="filter-container">
+        <input
+          type="text"
+          id="time-input"
+          placeholder="시간(yyyy-mm-dd HH:mm:ss.SSS)"
+        />
+
+        <select id="context-select">
+          <option value="">All</option>
+          <option value="USER_REQUEST">UserRequest</option>
+          <option value="SYSTEM">System</option>
+        </select>
+
+        <select id="level-select">
+          <option value="">All</option>
+          <option value="info">Info</option>
+          <option value="warn">Warn</option>
+          <option value="error">Error</option>
+        </select>
+
+        <select id="status-select">
+          <option value="">All</option>
+          <option value="INFORMATIONAL">Informational</option>
+          <option value="SUCCESS">Success</option>
+          <option value="REDIRECTION">Redirection</option>
+          <option value="CLIENT_ERROR">ClientError</option>
+          <option value="SERVER_ERROR">ServerError</option>
+        </select>
+
+        <select id="method-select">
+          <option value="">All</option>
+          <option value="GET">GET</option>
+          <option value="POST">POST</option>
+          <option value="PATCH">PATCH</option>
+          <option value="DELETE">DELETE</option>
+        </select>
+
+        <input
+          type="text"
+          id="userid-input"
+          placeholder="사용자id(number) 입력"
+        />
+
+        <input
+          type="text"
+          id="keyword-input"
+          placeholder="검색어(keyword) 입력"
+        />
+
+        <button id="filter-button">조회</button>
+      </div>
+
+      <!-- 로그 상세창 모달 (미완성: 작업 일시 중단) -->
+      <div id="log-detail-modal" class="log-detail-modal">
+        <div id="modal-id-time" class="modal-id-time">
+          <span>LogID</span>
+          <input />
+          <span>Timestamp</span>
+          <input />
+        </div>
+
+        <div id="modal-context-level" class="modal-context-level">
+          <!-- Context & Level -->
+          <span>Context</span>
+          <input />
+          <span>Level</span>
+          <input />
+        </div>
+        <div id="modal-method-duration" class="modal-method-duration">
+          <!-- Method & 요청URL & status & duration -->
+          <span>Method</span>
+          <input />
+          <span>요청URL</span>
+          <input />
+          <span>statusCode</span>
+          <input />
+          <span>duration</span>
+          <input />
+        </div>
+        <div id="modal-user-agent" class="modal-user-agent">
+          <!-- userId & userIP -->
+          <div id="user-id-ip" class="user-id-ip">
+            <span>사용자 id</span>
+            <input />
+            <span>사용자 IP</span>
+            <input />
+          </div>
+          <!-- userAgent -->
+          <div id="user-agent" class="user-agent">
+            <span>사용자환경</span>
+            <textarea></textarea>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="footer-menu">
+        <button onclick="window.location.href='./chat-list'">
+          💬 Live Chat
+        </button>
+        <button onclick="window.location.href='./post-list'">📝 게시판</button>
+        <button onclick="window.location.href='./index'">🏠 홈으로</button>
+        <button id="alarmButton" class="footerAlarm" onclick="clickAlarmBtn()">
+          🔔 알람
+        </button>
+        <button
+          id="myPageButton"
+          class="my-page-button"
+          onclick="clickMyPageBtn()"
+        >
+          🏆 마이페이지
+        </button>
+      </div>
+    </footer>
+
+    <script type="module" src="/static/js/common/header.js"></script>
+    <script type="module" src="/static/js/admin/log-manager.js" defer></script>
+  </body>
+</html>
