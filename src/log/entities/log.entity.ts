@@ -10,6 +10,9 @@ export class Log {
   id: number;
 
   @Column({ type: 'varchar', nullable: false })
+  timestamp: string;
+
+  @Column({ type: 'varchar', nullable: false, default: 'SystemEtc' })
   context: string;
 
   @Column({ type: 'varchar', nullable: false })
@@ -45,7 +48,4 @@ export class Log {
   @IsOptional()
   @Column({ type: 'text', nullable: true })
   userAgent?: string;
-
-  @Column({ type: 'timestamp', nullable: false })
-  timestamp: Timestamp;
 }

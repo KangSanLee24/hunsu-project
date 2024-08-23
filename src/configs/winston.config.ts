@@ -18,10 +18,10 @@ const logDir = __dirname + '/../../logs';
 const dailyOptions = (level: string) => {
   return {
     level,
-    datePattern: 'YYYY-MM-DD-HH',
+    datePattern: 'YYYY-MM-DD-HH-mm',
     dirname: logDir,
     filename: `%DATE%.log`,
-    zippedArchive: true,
+    zippedArchive: false,
     maxSize: '20m',
     maxFiles: 168,
     // maxFiles: '14d',
