@@ -45,6 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function displayUserInfo(id, point, nickname) {
     if (loginLink) loginLink.style.display = 'none';
     if (signUpLink) signUpLink.style.display = 'none';
+    console.log(loginLink);
+    console.log('로그인, 회원가입 버튼 지우기')
 
     // 알람 연결
     const userId = id;
