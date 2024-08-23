@@ -126,10 +126,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       const checkChatOwner = await this.chatService.checkChatOwner(+roomId, +authorId);
 
+      //방장인 경우
       if (checkChatOwner == true) {
         await this.chatService.outChatRoom(+roomId, +authorId);
         this.server.to(roomId).emit('ownerLeft', {});
-      } else {
+      } else {    //방장이 아닌 경우
         await this.chatService.outChatRoom(+roomId, +authorId);
         this.server.to(roomId).emit('userLeft', { message: `${author} 님이 퇴장하셨습니다` });
       }

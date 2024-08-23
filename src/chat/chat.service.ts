@@ -62,7 +62,6 @@ export class ChatService {
   async findChatRooms() {
     const chatRooms = await this.chatRoomRepository.find({
       relations: ['user'],
-      where: { isDeleted: false },
       select: {
         id: true,
         user: {
@@ -91,13 +90,48 @@ export class ChatService {
       throw new ForbiddenException('채팅방 삭제 권한이 없습니다.');
     }
 
-    //채팅방 삭제 예정 컬럼 업데이트
-    await this.chatRoomRepository.update(
-      { id: chatRoomId },
-      { isDeleted: true }
+    //조인
+    const findDeleteChat = await this.chatRoomRepository.find({
+      where: { id: chatRoomId },
+      relations: ['chatImages'],
+      select: {
+        id: true,
+        chatImages: {
+          imgUrl: true,
+        },
+      },
+    });
+
+    //트랜잭션
+    //로그, 이미지, 멤버, 방 삭제
+    //격리수준 -READ UNCOMMITED -> 트랜잭션 중 다른 데이터 삽입 가능
+    //2024-08-13 채팅 내역 테이블 삭제 (레디스로 이동)
+
+    await this.entityManager.transaction(
+      'READ UNCOMMITTED',
+      async (manager) => {
+        try {
+          for (const room of findDeleteChat) {
+            await manager.delete(ChatImage, { roomId: room.id });
+            await manager.delete(ChatMember, { roomId: room.id });
+            await manager.delete(ChatRoom, { id: room.id });
+          }
+
+          // 트랜잭션이 성공했을 때 S3 삭제
+          await Promise.all(
+            findDeleteChat.map(async (chat) => {
+              for (const image of chat.chatImages) {
+                await this.awsService.deleteImageFromS3(image.imgUrl);
+              }
+            })
+          );
+        } catch (error) {
+          console.error('트랜잭션 중 오류 발생:', error);
+        }
+      }
     );
 
-    return { message: '삭제예정 컬럼 업데이트 완료' };
+    return { message: `${chatRoomId}채팅방 삭제 완료` };
   }
 
   //채팅방 입장
@@ -332,7 +366,6 @@ export class ChatService {
         createdAt: true,
       },
       where: {
-        isDeleted: false,
         title: title ? Like(`%${title}%`) : Like('%%'),
       },
       order: { createdAt: sort ? sort : 'DESC' },
@@ -346,50 +379,6 @@ export class ChatService {
     return chatRoomsFormatted;
   }
 
-  //채팅방 진짜 삭제
-  async deleteChatRoom() {
-    //조인
-    const findDeleteChat = await this.chatRoomRepository.find({
-      where: { isDeleted: true },
-      relations: ['chatImages'],
-      select: {
-        id: true,
-        chatImages: {
-          imgUrl: true,
-        },
-      },
-    });
-
-    //트랜잭션
-    //로그, 이미지, 멤버, 방 삭제
-    //격리수준 -READ UNCOMMITED -> 트랜잭션 중 다른 데이터 삽입 가능
-    //2024-08-13 채팅 내역 테이블 삭제 (레디스로 이동)
-
-    await this.entityManager.transaction(
-      'READ UNCOMMITTED',
-      async (manager) => {
-        try {
-          for (const room of findDeleteChat) {
-            await manager.delete(ChatImage, { roomId: room.id });
-            await manager.delete(ChatMember, { roomId: room.id });
-            await manager.delete(ChatRoom, { id: room.id });
-          }
-
-          // 트랜잭션이 성공했을 때 S3 삭제
-          await Promise.all(
-            findDeleteChat.map(async (chat) => {
-              for (const image of chat.chatImages) {
-                await this.awsService.deleteImageFromS3(image.imgUrl);
-              }
-            })
-          );
-        } catch (error) {
-          console.error('트랜잭션 중 오류 발생:', error);
-        }
-      }
-    );
-  }
-
   //랭킹 (숫자 입력 가능)
   async getHotLiveChat(num: number) {
     const getHotLiveChat = await this.entityManager.query(
@@ -397,8 +386,7 @@ export class ChatService {
       select c.id as id, c.user_id as owner_id, c.title as title, c.img_url as img_url, d.count as count, c.created_at
       from (select a.id, a.user_id , a.title , b.img_url , b.created_at
       from chat_rooms a left join chat_Images b
-      on a.user_id = b.user_id
-      where a.is_deleted = FALSE) c join (select room_id , count(*) as count
+      on a.user_id = b.user_id) c join (select room_id , count(*) as count
       from chat_members
       group by room_id) d
       on c.id = d.room_id
@@ -460,7 +448,7 @@ export class ChatService {
   //죽은 방인지 확인
   async isChatRoom(chatRoomId: number) {
     const isChatRoom = await this.chatRoomRepository.findOne({
-      where: { id: chatRoomId, isDeleted: false },
+      where: { id: chatRoomId },
     });
 
     return isChatRoom;
