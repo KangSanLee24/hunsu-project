@@ -1,21 +1,28 @@
 import { levelMark } from './level-rank.js';
 import { rankMark } from './level-rank.js';
+import { identifyUser } from './identify-user.js';
 
+/** 헤더에 필요한 변수들 선언 **/
+// 1. 로그인 관련 변수 선언
+const accessToken = localStorage.getItem('accessToken');
+const refreshToken = localStorage.getItem('refreshToken');
+const loginLink = document.querySelector('a[href="./log-in"]');
+const signUpLink = document.querySelector('a[href="./sign-up"]');
+const userNickname = document.getElementById('userNickname'); // 사용자 닉네임
+
+// 2. 현재 페이지 위치 URL을 localStorage에 저장
+const redirectUrl = window.location.href;
+const preUrl = localStorage.setItem('redirectUrl', redirectUrl);
+
+// 3. 헤더 관련 변수 선언
+const adminBtn = document.getElementById('admin-btn');
+const headerNav = document.querySelector('header nav ul'); // header 요소 선언
+
+// 4. 기타 변수 선언
+const hashtagRank = document.getElementById('tab-hashtag-rank');
+
+/** 페이지 로드되면 바로 실행 **/
 document.addEventListener('DOMContentLoaded', () => {
-  /** 헤더에 필요한 변수들 선언 **/
-  // 현재 페이지 위치 URL을 localStorage에 저장
-  const redirectUrl = window.location.href;
-  const preUrl = localStorage.setItem('redirectUrl', redirectUrl);
-
-  const accessToken = localStorage.getItem('accessToken');
-  const refreshToken = localStorage.getItem('refreshToken');
-  const loginLink = document.querySelector('a[href="./log-in"]');
-  const signUpLink = document.querySelector('a[href="./sign-up"]');
-  const userNickname = document.getElementById('userNickname'); // 사용자 닉네임
-  const headerNav = document.querySelector('header nav ul'); // header 요소 선언
-
-  const hashtagRank = document.getElementById('tab-hashtag-rank');
-
   if (accessToken) {
     fetchUserInfo(accessToken, refreshToken);
   } else {
@@ -128,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
           result.data.point,
           result.data.nickname
         );
+        if (result.data.role == 'ADMIN') adminBtn.style.display = 'block';
       } else if (refreshToken) {
         // accessToken이 유효하지 않을 때
         const refreshResult = await fetchRefreshToken(refreshToken);
@@ -145,6 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
               newResult.data.point,
               newResult.data.nickname
             );
+            if (newResult.data.role == 'ADMIN')
+              adminBtn.style.display = 'block';
           } else {
             // 재조회 실패시 로그인 옵션 표시
             showLoginOptions();
@@ -171,28 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (innerHTML) element.innerHTML = innerHTML;
     return element;
   }
-
-  // // 공통 로그인 확인 함수
-  // function handleLoginRequired(event, redirectUrl) {
-  //   const accessToken = localStorage.getItem('accessToken');
-  //   if (accessToken) {
-  //     // 로그인 되어 있으면 지정된 URL로 이동
-  //     window.location.href = redirectUrl;
-  //   } else {
-  //     // 로그인 되어 있지 않으면 알림창 표시
-  //     event.preventDefault(); // 기본 동작 막기
-  //     const confirmLogin = confirm(
-  //       '로그인이 되어있지 않습니다. 로그인을 하시겠습니까?'
-  //     );
-  //     if (confirmLogin) {
-  //       // 로그인 페이지로 리다이렉트하면서 리다이렉트 URL을 전달
-  //       window.location.href = './log-in';
-  //     } else {
-  //       // 로그인을 취소했을 때 포커스를 잃게 함
-  //       event.target.blur();
-  //     }
-  //   }
-  // }
 
   // 댓글 작성 textarea 클릭 이벤트 리스너 추가
   const commentContentTextarea = document.getElementById('comment-content');

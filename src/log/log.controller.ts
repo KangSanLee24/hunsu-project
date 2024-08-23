@@ -7,12 +7,18 @@ import {
   Delete,
   Param,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { LogService } from './log.service';
 import { GetAllLogsDto } from './dto/get-all-logs.dto';
+import { Roles } from 'src/decorators/roles.decorator';
+import { Role } from 'src/user/types/user-role.type';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
+@UseGuards(RolesGuard)
+@Roles(Role.ADMIN)
 @ApiTags('99. LOG API')
 @Controller('logs')
 export class LogController {
