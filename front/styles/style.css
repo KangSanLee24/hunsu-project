@@ -61,15 +61,34 @@ nav a {
   font-size: 18px;
 }
 
-header .logo {
+.logo {
+  display: flex;
+  flex-direction: row;
+}
+
+.logo-home {
   font-size: 24px;
   font-weight: bold;
   color: white;
   cursor: pointer;
+  margin-right: 10px;
+}
+.logo-home:hover {
+  color: rgb(201, 51, 51);
 }
 
-header .logo:hover {
+.admin-btn {
+  font-size: 24px;
+  font-weight: bold;
+  color: rgb(228, 228, 107);
+
+  cursor: pointer;
+}
+.admin-btn:hover {
   color: rgb(201, 51, 51);
+}
+#admin-btn {
+  display: none;
 }
 
 /* 헤더 : 닉네임 + 로그아웃 부분 */
