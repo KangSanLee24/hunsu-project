@@ -49,7 +49,7 @@ export class LogController {
   @ApiQuery({
     name: 'userId',
     required: false,
-    type: Number,
+    type: String,
   })
   @ApiQuery({
     name: 'keyword',
@@ -59,6 +59,7 @@ export class LogController {
   @ApiQuery({
     name: 'time',
     required: false,
+    type: String,
   })
   @Get('')
   async getAllLogs(@Query() getAllLogsDto?: GetAllLogsDto) {
@@ -97,6 +98,19 @@ export class LogController {
   @Post('log-transfer')
   async insertLogs() {
     const data = await this.logService.insertLogs();
+
+    return {
+      status: HttpStatus.CREATED,
+      message: '로그 DB 전송에 성공했습니다.',
+      data: data,
+    };
+  }
+
+  /** 로그 DB전송(C) - 파일명 직접 입력 API **/
+  @ApiOperation({ summary: '5. 로그 DB 전송 - 파일명 직접 입력' })
+  @Post('log-transfer-test')
+  async inserLogsTest() {
+    const data = await this.logService.insertLogsTest();
 
     return {
       status: HttpStatus.CREATED,

@@ -42,40 +42,49 @@ th {
 .filter-container select,
 input,
 button {
+  border-radius: 5px;
   margin: 3px;
-}
-
-.deleteAlarm {
-  border: 0px;
-  background-color: white;
-  cursor: pointer;
-}
-
-.checkAlarm {
-  border: 0px;
-  background-color: white;
-  cursor: pointer;
-}
-
-.footerAlarm {
-  color: blue;
-  font-weight: bold;
 }
 
 .notLogIn {
   text-align: center;
 }
 
-.onClickAlarm {
-  color: black;
+.deleteLog {
+  border: 0px;
+  background-color: white;
   cursor: pointer;
 }
 
-.onClickAlarm:hover {
-  color: blue;
-  font-weight: bold;
+/* 모달 */
+.log-detail-modal {
+  visibility: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+
+  padding: 10px;
+
+  border-radius: 10px;
+  background-color: black;
+  color: white;
 }
 
-.alarm-btn {
-  cursor: pointer;
+.modal-user-agent {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-id-time,
+.modal-context-level,
+.modal-method-duration,
+.user-id-ip {
+  display: flex;
+  flex-direction: row;
 }
