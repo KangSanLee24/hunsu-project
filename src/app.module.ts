@@ -93,3 +93,4 @@ export class AppModule implements NestModule {
     consumer.apply(LoggingMiddleware).forRoutes('*');
   }
 }
+// export class AppModule {}

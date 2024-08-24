@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   MessageEvent,
+  OnModuleInit,
 } from '@nestjs/common';
 
 import { Alarm } from './entities/alarm.entity';
@@ -17,16 +18,23 @@ import { AlarmFromType } from './types/alarm-from.type';
 import { ALARM_MESSAGES } from 'src/constants/alarm-message.constant';
 import { Observable, Subject, filter, map } from 'rxjs';
 import { paginate } from 'nestjs-typeorm-paginate';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
-export class AlarmService {
+export class AlarmService implements OnModuleInit {
   // 신규 생성 이벤트 [알람 받을 유저 명단]
   private users$: Subject<any> = new Subject();
 
   // 신규 생성 이벤트 [감지기]
   private observer = this.users$.asObservable();
 
+  // Redis
+  private pubClient;
+  private subClient;
+
   constructor(
+    private readonly redisService: RedisService,
+
     @InjectRepository(Alarm)
     private readonly alarmRepository: Repository<Alarm>,
 
@@ -36,6 +44,19 @@ export class AlarmService {
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>
   ) {}
+  onModuleInit() {
+    this.pubClient = this.redisService.getClient();
+    this.subClient = this.redisService.getClient().duplicate();
+
+    const subClient = this.subClient;
+    subClient.subscribe('newEvent');
+
+    subClient.on('message', (channel, message) => {
+      console.log(`현재 연결된 서버 : ${channel}`);
+      const data = JSON.parse(message);
+      this.users$.next(data);
+    });
+  }
 
   /** 알람 생성(C) **/
   async createAlarm(
@@ -309,7 +330,12 @@ export class AlarmService {
 
   /** 신규 생성 이벤트 등록(SSE) (+) **/
   newEventRegister(userId: number, data: any) {
-    // 알람 명단에 대상자 추가
-    this.users$.next({ id: userId, data });
+    const pubClient = this.pubClient;
+
+    const message = { id: userId, data };
+    pubClient.publish('newEvent', JSON.stringify(message));
+
+    // // 알람 명단에 대상자 추가
+    // this.users$.next({ id: userId, data });
   }
 }
