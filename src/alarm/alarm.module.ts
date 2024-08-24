@@ -9,9 +9,14 @@ import { Comment } from 'src/comment/entities/comment.entity';
 import { AlarmController } from './alarm.controller';
 import { AlarmService } from './alarm.service';
 import { UserModule } from 'src/user/user.module';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Alarm, User, Post, Comment]), UserModule],
+  imports: [
+    TypeOrmModule.forFeature([Alarm, User, Post, Comment]),
+    UserModule,
+    RedisModule,
+  ],
   controllers: [AlarmController],
   providers: [AlarmService],
   exports: [AlarmService],

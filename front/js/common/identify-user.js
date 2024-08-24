@@ -7,6 +7,10 @@ export const identifyUser = async (accessToken) => {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-  const data = await response.json();
-  return data;
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  } else {
+    return null;
+  }
 };

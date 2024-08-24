@@ -293,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. SSE - 메시지 받기
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
+
       if (data.type == 'alarm') {
         console.log(`알람: ${data.message}`);
         alert(`알람: ${data.message}`);
