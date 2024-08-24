@@ -52,7 +52,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-
   // 정적 파일 제공 설정
   app.use(
     express.static(join(__dirname, '..', 'front', 'html'), {
@@ -103,7 +102,7 @@ async function bootstrap() {
 
   // Redis 클라이언트가 준비될 때까지 대기
   await redisService.onModuleInit();
-  
+
   const redisIoAdapter = new RedisIoAdapter(app, redisService);
   await redisIoAdapter.connectToRedis();
 

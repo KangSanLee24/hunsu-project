@@ -44,3 +44,17 @@ input,
 button {
   margin: 3px;
 }
+
+.post-write {
+  position: fixed;
+  border: 3px solid black;
+  border-radius: 50%;
+
+  width: 80px;
+  height: 80px;
+
+  bottom: 8%;
+  left: 77%;
+
+  cursor: pointer;
+}
