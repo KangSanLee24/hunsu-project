@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (response.ok && result.status === 200) {
           // 성공적인 응답 시 로그인 페이지로 이동
-          alert('이메일 인증이 성공적으로 완료되었습니다.');
+          alert('이메일 인증이 성공적으로 완료되었습니다.\n회원가입으로 인한 포인트 50점이 지급됩니다.');
           window.location.href = './log-in';
         } else {
           // 오류 처리

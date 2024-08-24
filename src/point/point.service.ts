@@ -114,7 +114,7 @@ export class PointService {
     };
   }
 
-  // 포인트 추가, 차감 메소드
+  // 포인트 추가, 차감 메소드 (차감 시 0으로 처리)
   async savePointLog(userId: number, pointType: PointType, sign: boolean) {
     const point = await this.pointRepository.findOne({ where: { userId } });
     const user = await this.userRepository.findOneBy({ id: userId });
@@ -122,17 +122,17 @@ export class PointService {
     const pointScore = PointScore[pointType];
     const newPoint = sign
       ? point.accPoint + pointScore
-      : point.accPoint - pointScore
+      : point.accPoint; // 차감 시 포인트는 변화 없음
 
     // 포인트 테이블 업데이트
     await this.pointRepository.update({ userId }, { accPoint: newPoint });
 
     // sign = true 면 포인트 추가, sign = false 면 포인트 차감
-    // 포인트 로그 테이블에 추가
+    // 포인트 로그 테이블에 추가 (차감 시 포인트는 0으로 기록)
     const pointResult = await this.pointLogRepository.save({
       userId,
       pointType,
-      point: sign ? pointScore : -pointScore,
+      point: sign ? pointScore : 0,
     });
 
     // 4. 레디스 포인트 증감
