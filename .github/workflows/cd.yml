@@ -27,7 +27,7 @@ jobs:
       - name: Setup Node.js environment # step의 이름 지정 (선택 사항)
         uses: actions/setup-node@v4 # Node.js 설치를 위해 미리 정의 된 workflow를 불러와서 사용
         with:
-          node-version: 20 # 설치 할 Node.js 버전 지정
+          node-version: 20.15.1 # 설치 할 Node.js 버전 지정
           cache: 'npm' # npm 사용 시 'npm'
 
       # VM에 Sentry CLI 설치하기
