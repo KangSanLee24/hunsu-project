@@ -334,15 +334,15 @@ https://github.com/KangSanLee24/hunsu-project/blob/dev/src/point/point.controlle
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/point/point.controller.ts#L60
 
-### 3. 주간 랭킹 조회 API
+### 3. 주간 포인트 랭킹 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/point/point.controller.ts#L86
 
-### 4. 종합 랭킹 조회 API
+### 4. 종합 포인트 랭킹 조회 - 레디스 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/point/point.controller.ts#L96
 
-### 5. 주간 포인트 랭킹 조회 API
+### 5. 주간 포인트 랭킹 조회 -레디스 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/point/point.controller.ts#L74
 
