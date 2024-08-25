@@ -25,6 +25,7 @@ import { PostDislike } from 'src/post/entities/post-dislike.entity';
 import { RedisService } from 'src/redis/redis.service';
 import { format } from 'date-fns';
 import { SubRedisService } from 'src/redis/sub.redis.service';
+import { AlarmService } from 'src/alarm/alarm.service';
 
 @Injectable()
 export class PostService {
@@ -41,8 +42,9 @@ export class PostService {
     private readonly postDislikeRepository: Repository<PostDislike>,
 
     private readonly awsService: AwsService,
-    private readonly pointService: PointService
-  ) { }
+    private readonly pointService: PointService,
+    private readonly alarmService: AlarmService
+  ) {}
 
   /* 게시글 생성 API */
   async create(createPostDto: CreatePostDto, userId: number) {
@@ -119,13 +121,35 @@ export class PostService {
     const postKey = `post:1:20:all:DESC:none`;
     await this.subRedisService.deleteValue(postKey); // 해당 캐시 삭제
 
-    // hashtags = [#청바지, #모자]
-    const postHashtag = hashtags.map((item) => {
+    // 7. 해시태그 저장 관련 로직 (+레디스)
+
+    // 7-1. ZINCRBY 이전 데이터
+    const zBefore = await client.zrevrange('hashtag', 0, 9, 'WITHSCORES');
+
+    // 7-2. 레디스로 ZINCRBY : 예시> hashtags = [#청바지, #모자]
+    const postHashtag = hashtags.map(async (item) => {
       const uniqueTag = `${item}:${currentTime}`;
+      // 7-2-1. SortedSet 저장
       client.zincrby('hashtag', 1, item);
+      // 7-2-2. Hash 저장
       client.hset('hashtag_expire', uniqueTag, expireTime);
       console.log(`redis : post-hashtag ${item}`);
     });
+
+    // 7-3. ZINCRBY 이후 데이터
+    const zAfter = await client.zrevrange('hashtag', 0, 9, 'WITHSCORES');
+
+    // 7-4. 해시태그 TOP10 이내의 데이터 변동이 있는 경우에만 이벤트 등록
+    if (zBefore.join() !== zAfter.join()) {
+      // 7-4-1. 이벤트 데이터 생성
+      const alarmData = {
+        type: 'hashtag',
+        message: `게시글에서 해시태그가 추가되어, 해시태그 Top10 이내 데이터 변동이 있었습니다.`,
+        data: zAfter,
+      };
+      // 7-4-2. 이벤트 등록
+      this.alarmService.newEventRegister(0, alarmData);
+    }
 
     return {
       id: post.id,
