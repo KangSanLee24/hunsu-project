@@ -383,11 +383,11 @@ export class ChatService {
   async getHotLiveChat(num: number) {
     const getHotLiveChat = await this.entityManager.query(
       `
-      select c.id as id, c.title as title, c.img_url as img_url, d.count as count, 
+      select c.id as id, c.user_id as owner_id, c.title as title, c.img_url as img_url, d.count as count, 
       case
         when c.created_at is not null then (c.user_id, c.created_at) in (select a.user_id , max(a.created_at)
           from chat_Images a join chat_rooms b
-          on a.user_id = b.user_id 
+          on a.user_id = b.user_id
           group by a.user_id)
       ELSE null
       end as created_at
