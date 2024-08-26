@@ -42,7 +42,7 @@
 
 ### 문제
 - 유저 피드백 결과 `일일퀘스트` 점수에 `음수` 값이 나오며 갱신이 안된다는 피드백 확인
-<img src="docs/point-trouble.png" width="80%">
+<img src="point-trouble.png" width="80%">
 
 ### 해결 방법
 
