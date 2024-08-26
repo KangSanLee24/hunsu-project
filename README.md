@@ -90,10 +90,10 @@
 <img src="docs/architecture.png" width="80%">
 
 ## 🎇 6. 와이어 프레임
-👉 [와이어 프레임 바로가기]()
+<img src="docs/frame.png" width="80%">
 
 ## 📒 7. ERD
-👉 [ERD 바로가기](https://drawsql.app/teams/les-team-1/diagrams/hunsu-project)
+<img src="docs/erd.png" width="80%">
 
 ## 📝 8. API
 
