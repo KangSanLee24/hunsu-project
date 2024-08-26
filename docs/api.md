@@ -24,21 +24,46 @@
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.ts#L47
 
+<div align="center">
+  <img src="./api_images/01_AUTH/01_sign-up.png" width="100%">
+  <img src="./api_images/01_AUTH/01_sign-up_result.png" width="100%">
+</div>
+
 ### 2. 로그인 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.ts#L59
+
+<div align="center">
+  <img src="./api_images/01_AUTH/02_log-in.png" width="100%">
+  <img src="./api_images/01_AUTH/02_log-in_result.png" width="100%">
+</div>
 
 ### 3. 로그아웃API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.ts#L73
 
+<div align="center">
+  <img src="./api_images/01_AUTH/03_log-out.png" width="100%">
+  <img src="./api_images/01_AUTH/03_log-out_result.png" width="100%">
+</div>
+
 ### 4. 토큰 재발급 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.ts#L87
 
+<div align="center">
+  <img src="./api_images/01_AUTH/04_re-token.png" width="100%">
+  <img src="./api_images/01_AUTH/04_re-token_result.png" width="100%">
+</div>
+
 ### 5. 이메일 인증 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.ts#L99
+
+<div align="center">
+  <img src="./api_images/01_AUTH/05_verify-email.png" width="100%">
+  <img src="./api_images/01_AUTH/05_verify-email_result.png" width="100%">
+</div>
 
 ### 5-1A. NAVER 로그인 API
 
@@ -52,11 +77,11 @@ https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.ts#L129
 
-### 5-1A. GOOGLE 로그인 API
+### 5-2A. GOOGLE 로그인 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.ts#L144
 
-### 5-1B. GOOGLE 로그인 콜백 API
+### 5-2B. GOOGLE 로그인 콜백 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.ts#L148
 
@@ -64,43 +89,95 @@ https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.ts#L167
 
+<div align="center">
+  <img src="./api_images/01_AUTH/06_re-password.png" width="100%">
+  <img src="./api_images/01_AUTH/06_re-password_result.png" width="100%">
+</div>
+
 ### 7. 비밀번호 변경 인증 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.ts#L178
+
+<div align="center">
+  <img src="./api_images/01_AUTH/07_verify-password.png" width="100%">
+  <img src="./api_images/01_AUTH/07_verify-password_result.png" width="100%">
+</div>
 
 ### 8. 비밀번호 변경 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.ts#L190
 
+<div align="center">
+  <img src="./api_images/01_AUTH/08_update-password.png" width="100%">
+  <img src="./api_images/01_AUTH/08_update-password_result.png" width="100%">
+</div>
+
 ### 9. 아이디 찾기 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/auth/auth.controller.ts#L202
 
+<div align="center">
+  <img src="./api_images/01_AUTH/09_find-id.png" width="100%">
+  <img src="./api_images/01_AUTH/09_find-id_result.png" width="100%">
+</div>
+
 ## 02. USER API
+
+: 사용자 정보 관련 API입니다.
 
 ### 1. 회원 정보 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/user/user.controller.ts#L95
 
+<div align="center">
+  <img src="./api_images/02_USER/01_user-information.png" width="100%">
+  <img src="./api_images/02_USER/01_user-information_result.png" width="100%">
+</div>
+
 ### 2. 내 정보 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/user/user.controller.ts#L34
+
+<div align="center">
+  <img src="./api_images/02_USER/02_user-me-information.png" width="100%">
+  <img src="./api_images/02_USER/02_user-me-information_result.png" width="100%">
+</div>
 
 ### 3. 내 정보 수정API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/user/user.controller.ts#L80
 
+<div align="center">
+  <img src="./api_images/02_USER/03_user-me-information-update.png" width="100%">
+  <img src="./api_images/02_USER/03_user-me-information-update_result.png" width="100%">
+</div>
+
 ### 4. 회원탈퇴 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/user/user.controller.ts#L109
+
+<div align="center">
+  <img src="./api_images/02_USER/04_user-delete.png" width="100%">
+  <img src="./api_images/02_USER/04_user-delete_result.png" width="100%">
+</div>
 
 ### 5. 사용자가 작성한 댓글 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/user/user.controller.ts#L64
 
+<div align="center">
+  <img src="./api_images/02_USER/05_user-comment.png" width="100%">
+  <img src="./api_images/02_USER/05_user-comment_result.png" width="100%">
+</div>
+
 ### 6. 사용자가 작성한 게시글 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/user/user.controller.ts#L48
+
+<div align="center">
+  <img src="./api_images/02_USER/06_user-post.png" width="100%">
+  <img src="./api_images/02_USER/06_user-post_result.png" width="100%">
+</div>
 
 ## 03. POST API
 
@@ -110,21 +187,46 @@ https://github.com/KangSanLee24/hunsu-project/blob/dev/src/user/user.controller.
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.ts#L45
 
+<div align="center">
+  <img src="./api_images/03_POST/01_post-create.png" width="100%">
+  <img src="./api_images/03_POST/01_post-create_result.png" width="100%">
+</div>
+
 ### 2. 게시글 목록 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.ts#L84
+
+<div align="center">
+  <img src="./api_images/03_POST/02_find-all-post.png" width="100%">
+  <img src="./api_images/03_POST/02_find-all-post_result.png" width="100%">
+</div>
 
 ### 3. 게시글 상세 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.ts#L148
 
+<div align="center">
+  <img src="./api_images/03_POST/03_post-detaile.png" width="100%">
+  <img src="./api_images/03_POST/03_post-detaile_result.png" width="100%">
+</div>
+
 ### 4. 게시글 수정 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.ts#L163
 
+<div align="center">
+  <img src="./api_images/03_POST/04_post-update.png" width="100%">
+  <img src="./api_images/03_POST/04_post-update_result.png" width="100%">
+</div>
+
 ### 5. 게시글 삭제 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.ts#L182
+
+<div align="center">
+  <img src="./api_images/03_POST/05_post-delete.png" width="100%">
+  <img src="./api_images/03_POST/05_post-delete_result.png" width="100%">
+</div>
 
 ### 6. 게시글 강제 삭제 API
 
@@ -169,6 +271,11 @@ https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.
 ### 1. 댓글 생성 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/comment/comment.controller.ts#L37
+
+<div align="center">
+  <img src="./api_images/04_COMMENT/01_comment-create.png" width="100%">
+  <img src="./api_images/04_COMMENT/01_comment-create_result.png" width="100%">
+</div>
 
 ### 2. 댓글 목록 조회 API
 
