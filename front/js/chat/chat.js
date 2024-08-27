@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const socket = io('wss://5zirap.shop/', {
+  const socket = io('localhost:3000', {
     transports: ['websocket']
  });
 
