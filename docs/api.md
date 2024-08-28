@@ -404,17 +404,37 @@ https://github.com/KangSanLee24/hunsu-project/blob/dev/src/comment/comment.contr
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/recomment/recomment.controller.ts#L36
 
+<div align="center">
+  <img src="./api_images/05_RECOMMENT/01_recomment-create.png" width="100%">
+  <img src="./api_images/05_RECOMMENT/01_recomment-create_result.png" width="100%">
+</div>
+
 ### 2. 대댓글 목록 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/recomment/recomment.controller.ts#L56
+
+<div align="center">
+  <img src="./api_images/05_RECOMMENT/02_recomment.png" width="100%">
+  <img src="./api_images/05_RECOMMENT/02_recomment_result.png" width="100%">
+</div>
 
 ### 3. 대댓글 수정 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/recomment/recomment.controller.ts#L70
 
+<div align="center">
+  <img src="./api_images/05_RECOMMENT/03_recomment-update.png" width="100%">
+  <img src="./api_images/05_RECOMMENT/03_recomment-update_result.png" width="100%">
+</div>
+
 ### 4. 대댓글 삭제 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/recomment/recomment.controller.ts#L101
+
+<div align="center">
+  <img src="./api_images/05_RECOMMENT/04_recomment-delete.png" width="100%">
+  <img src="./api_images/05_RECOMMENT/04_recomment-delete_result.png" width="100%">
+</div>
 
 ## 06. ALARM API
 
