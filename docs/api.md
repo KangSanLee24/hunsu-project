@@ -236,6 +236,10 @@ https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.ts#L136
 
+<div align="center">
+  <img src="./api_images/03_POST/07_image-upload.png" width="100%">
+</div>
+
 ### 8. 화제글 목록 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.ts#L109
@@ -244,25 +248,55 @@ https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.ts#L210
 
+<div align="center">
+  <img src="./api_images/03_POST/09_post-likes.png" width="100%">
+  <img src="./api_images/03_POST/09_post-likes_result.png" width="100%">
+</div>
+
 ### 10. 나의 게시글 좋아요 여부 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.ts#L225
+
+<div align="center">
+  <img src="./api_images/03_POST/10_post-likes-me.png" width="100%">
+  <img src="./api_images/03_POST/10_post-likes-me_result.png" width="100%">
+</div>
 
 ### 11. 게시글 좋아요 클릭 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.ts#L243
 
+<div align="center">
+  <img src="./api_images/03_POST/11_post-likes-click.png" width="100%">
+  <img src="./api_images/03_POST/11_post-likes-click_result.png" width="100%">
+</div>
+
 ### 12. 게시글 싫어요 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.ts#L259
+
+<div align="center">
+  <img src="./api_images/03_POST/12_post-dislikes.png" width="100%">
+  <img src="./api_images/03_POST/12_post-dislikes_result.png" width="100%">
+</div>
 
 ### 13. 나의 게시글 싫어요 여부 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.ts#L274
 
+<div align="center">
+  <img src="./api_images/03_POST/13_post-dislikes-me.png" width="100%">
+  <img src="./api_images/03_POST/13_post-dislikes-me_result.png" width="100%">
+</div>
+
 ### 14. 게시글 싫어요 클릭 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/post/post.controller.ts#L292
+
+<div align="center">
+  <img src="./api_images/03_POST/14_post-dislikes-click.png" width="100%">
+  <img src="./api_images/03_POST/14_post-dislikes-click_result.png" width="100%">
+</div>
 
 ## 04. COMMENT API
 
@@ -281,13 +315,28 @@ https://github.com/KangSanLee24/hunsu-project/blob/dev/src/comment/comment.contr
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/comment/comment.controller.ts#L60
 
+<div align="center">
+  <img src="./api_images/04_COMMENT/02_comment.png" width="100%">
+  <img src="./api_images/04_COMMENT/02_comment_result.png" width="100%">
+</div>
+
 ### 3. 댓글 수정 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/comment/comment.controller.ts#L75
 
+<div align="center">
+  <img src="./api_images/04_COMMENT/03_comment-update.png" width="100%">
+  <img src="./api_images/04_COMMENT/03_comment-update_result.png" width="100%">
+</div>
+
 ### 4. 댓글 삭제 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/comment/comment.controller.ts#L102
+
+<div align="center">
+  <img src="./api_images/04_COMMENT/04_comment-delete.png" width="100%">
+  <img src="./api_images/04_COMMENT/04_comment-delete_result.png" width="100%">
+</div>
 
 ### 5. 댓글 강제 삭제 API
 
@@ -297,25 +346,55 @@ https://github.com/KangSanLee24/hunsu-project/blob/dev/src/comment/comment.contr
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/comment/comment.controller.ts#L136
 
+<div align="center">
+  <img src="./api_images/04_COMMENT/06_comment-likes.png" width="100%">
+  <img src="./api_images/04_COMMENT/06_comment-likes_result.png" width="100%">
+</div>
+
 ### 7. 나의 댓글 좋아요 여부 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/comment/comment.controller.ts#L150
+
+<div align="center">
+  <img src="./api_images/04_COMMENT/07_comment-likes-me.png" width="100%">
+  <img src="./api_images/04_COMMENT/07_comment-likes-me_result.png" width="100%">
+</div>
 
 ### 8. 댓글 좋아요 클릭 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/comment/comment.controller.ts#L168
 
+<div align="center">
+  <img src="./api_images/04_COMMENT/08_comment-likes-click.png" width="100%">
+  <img src="./api_images/04_COMMENT/08_comment-likes-click_result.png" width="100%">
+</div>
+
 ### 9. 댓글 싫어요 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/comment/comment.controller.ts#L184
+
+<div align="center">
+  <img src="./api_images/04_COMMENT/09_comment-dislikes.png" width="100%">
+  <img src="./api_images/04_COMMENT/09_comment-dislikes_result.png" width="100%">
+</div>
 
 ### 10. 나의 댓글 싫어요 여부 조회 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/comment/comment.controller.ts#L200
 
+<div align="center">
+  <img src="./api_images/04_COMMENT/10_comment-dislikes-me.png" width="100%">
+  <img src="./api_images/04_COMMENT/10_comment-dislikes-me_result.png" width="100%">
+</div>
+
 ### 11. 댓글 싫어요 클릭 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/comment/comment.controller.ts#L221
+
+<div align="center">
+  <img src="./api_images/04_COMMENT/11_comment-dislikes-click.png" width="100%">
+  <img src="./api_images/04_COMMENT/11_comment-dislikes-click_result.png" width="100%">
+</div>
 
 ## 05. RECOMMENT API
 
