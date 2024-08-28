@@ -528,6 +528,11 @@ https://github.com/KangSanLee24/hunsu-project/blob/dev/src/chat/chat.controller.
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/hashtag/hashtag.controller.ts#L14
 
+<div align="center">
+  <img src="./api_images/08_HASHTAG/01_hashtag-rank.png" width="100%">
+  <img src="./api_images/08_HASHTAG/01_hashtag-rank_result.png" width="100%">
+</div>
+
 ## 09. POINT API
 
 : 포인트 관련 API입니다.
@@ -563,6 +568,11 @@ https://github.com/KangSanLee24/hunsu-project/blob/dev/src/point/point.controlle
 ### 1. 네이버 쇼핑 상품 검색 API
 
 https://github.com/KangSanLee24/hunsu-project/blob/dev/src/shopping/shopping.controller.ts#L6
+
+<div align="center">
+  <img src="./api_images/10_SHOPPING/01_naver-shopping.png" width="100%">
+  <img src="./api_images/10_SHOPPING/01_naver-shopping_result.png" width="100%">
+</div>
 
 ## 11. LOG API
 
