@@ -10,35 +10,36 @@
 2. 팀원 구성
 3. 개발 기간
 4. 개발 환경
-5. 와이어 프레임
-6. ERD
-7. API
-8. 파일 구조 및 아키텍처
-9. FAQ 및 연락처?
-10. 성과 및 회고
+5. 시스템 아키텍처
+6. 와이어 프레임
+7. ERD
+8. API
+9. 파일 구조
+10. FAQ 및 연락처
+11. 성과 및 회고
 
 ---
 
-## 📝 프로젝트 소개
+## 📝 1. 프로젝트 소개
 
 프로젝트 이름 : 5ZIRAP 프로젝트
 
-내용 : asdf
+내용 : 타인 패션에 실시간 채팅 및 게시글 작성과 댓글을 통해 오지랖 부리는 패션 커뮤니티 서비스
 
 구분 : 팀 프로젝트
 
-GitHub :
-
 📹 시연 영상
 
-- 중간 발표 시연 영상 :
-- 최종 발표 시연 영상 :
+- 중간 발표 시연 영상 : [중간 발표 시연 영상 바로가기](https://youtu.be/zSOTA8icjtc)
+- 최종 발표 시연 영상 : [최종 발표 시연 영상 바로가기](https://www.youtube.com/watch?v=oWCF9iayqWg)
 
-🏠 배포 :
+🏠 배포 : https://5zirap.shop
 
 ### [How To Install?](docs/Installation.md)
 
-## 👨‍👩‍👧‍👦 팀원 구성
+👉 [서비스 주요 기능 보러가기](https://teamsparta.notion.site/77371eacf273486eb64a63264d11583d)
+
+## 👨‍👩‍👧‍👦 2. 팀원 구성
 
 - 리더 : 이강산 [@KangSanLee24](https://github.com/KangSanLee24)
 - 부리더 : 석한솔 [@CDR4733](https://github.com/CDR4733)
@@ -46,13 +47,14 @@ GitHub :
 - 팀원 : 엄혜인 [@Eomhyein](https://github.com/Eomhyein)
 - 팀원 : 박근균 [@pcpp0606](https://github.com/pcpp0606)
 
-## 개발 기간
+## 🗓️ 3. 개발 기간
 
-2024.07.?? ~ 2024.08.27
+**2024.07.19 ~ 2024.08.27**
+- 2024.08.09 중간 발표
+- 2024.08.27 최종 발표
 
-## 🛠 파일 구조 및 아키텍처
 
-## ⚙ 개발 환경
+## ⚙ 4. 개발 환경
 
 <h3 tabindex="-1" dir="auto">
 ✔</g-emoji> Front-end</h3>
@@ -68,14 +70,6 @@ GitHub :
 <img src="https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=NestJS&logoColor=white">
 <img src="https://img.shields.io/badge/Typeorm-262627?style=for-the-badge&logo=Typeorm&logoColor=white">
 <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=TypeScript&logoColor=white">
-</div>
-<h3 tabindex="-1" dir="auto">
-✔</g-emoji> 스크래이핑 툴</h3>
-<div dir="auto">
-<img src="https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=Axios&logoColor=white">
-<img src="https://img.shields.io/badge/Selenium-43B02A?style=for-the-badge&logo=Selenium&logoColor=white">
-<img src="https://img.shields.io/badge/cheerio-008DB6?style=for-the-badge&logo=cheerio&logoColor=white">
-</div>
 <h3 tabindex="-1" dir="auto">
 ✔</g-emoji> Database</h3>
 <div dir="auto">
@@ -92,18 +86,28 @@ GitHub :
 <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white">
 </div>
 
-## 와이어 프레임
+## 🛠️ 5. 시스템 아키텍처
+<img src="docs/architecture.png" width="80%">
 
-## 📒 ERD
+## 🎇 6. 와이어 프레임
+<img src="docs/frame.png" width="80%">
 
-## 📝 API
+## 📒 7. ERD
+<img src="docs/erd.png" width="80%">
+
+## 📝 8. API
 
 👉 [API 문서 바로가기](docs/api.md)
 
-## FAQ 및 연락처?
+## 📝 9. 파일 구조
+👉 [파일 구조 바로가기](docs/file-tree.md)
 
-gangsan1414@gmail.com
+## 📞 10. FAQ 및 연락처
 
-## 🔎 성과 및 회고
+팀장 이강산 gangsan1414@gmail.com
 
-👉 [성과 및 회고 문서 바로가기](docs/trouble-shouting.md)
+## 🔎 11. 성과 및 회고
+
+👉 [트러블슈팅](docs/trouble-shouting.md)
+
+👉 [KPT 회고](docs/kpt.md)
