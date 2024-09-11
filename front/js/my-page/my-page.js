@@ -9,60 +9,70 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
-    // 포인트 정보 가져오기
-    const response = await fetch(`/api/points/me`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (response.ok) {
-      const result = await response.json();
-      displayUserPoints(result.data);
-    } else {
-      alert('포인트 정보를 불러오는 데 실패했습니다.');
-    }
-
-    // 작성한 게시글 정보 가져오기
-    const postResponse = await fetch(`/api/users/me/posts`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (postResponse.ok) {
-      const postResult = await postResponse.json();
-      displayUserPosts(postResult.data);
-    } else {
-      alert('작성한 게시글 정보를 불러오는 데 실패했습니다.');
-    }
-
-    // 작성한 댓글 정보 가져오기
-    const commentResponse = await fetch(`/api/users/me/comments`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (commentResponse.ok) {
-      const commentResult = await commentResponse.json();
-      displayUserComments(commentResult.data);
-    } else {
-      alert('작성한 댓글 정보를 불러오는 데 실패했습니다.');
-    }
+    await fetchUserPoints(accessToken);
+    await fetchUserPosts(accessToken);
+    await fetchUserComments(accessToken);
   } catch (error) {
     console.error('Error fetching point data:', error);
     alert('포인트 정보를 불러오는 중 오류가 발생했습니다.');
   }
 });
 
-// 포인트 보기
+/** FETCH - 포인트 정보 조회 API **/
+async function fetchUserPoints(token) {
+  const response = await fetch(`/api/points/me`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (response.ok) {
+    const result = await response.json();
+    displayUserPoints(result.data);
+  } else {
+    alert('포인트 정보를 불러오는 데 실패했습니다.');
+  }
+}
+
+/** FETCH - 작성한 게시글 정보 조회 API **/
+async function fetchUserPosts(token) {
+  const postResponse = await fetch(`/api/users/me/posts`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (postResponse.ok) {
+    const postResult = await postResponse.json();
+    displayUserPosts(postResult.data);
+  } else {
+    alert('작성한 게시글 정보를 불러오는 데 실패했습니다.');
+  }
+}
+
+/** FETCH - 작성한 댓글 정보 조회 API **/
+async function fetchUserComments(token) {
+  const commentResponse = await fetch(`/api/users/me/comments`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (commentResponse.ok) {
+    const commentResult = await commentResponse.json();
+    displayUserComments(commentResult.data);
+  } else {
+    alert('작성한 댓글 정보를 불러오는 데 실패했습니다.');
+  }
+}
+
+/** 랜더링 - 포인트 **/
 function displayUserPoints(data) {
   if (!data) {
     console.error('displayUserPoints: 데이터가 정의되지 않았거나 null입니다.');
@@ -130,7 +140,7 @@ function displayUserPoints(data) {
   }
 }
 
-// 작성한 게시글 표시
+/** 랜더링 - 작성한 게시글 **/
 function displayUserPosts(posts) {
   const myPostsList = document.getElementById('myPostsList');
   myPostsList.innerHTML = '';
@@ -152,7 +162,7 @@ function displayUserPosts(posts) {
   });
 }
 
-// 작성한 댓글 표시
+/** 랜더링 - 작성한 댓글 **/
 function displayUserComments(comments) {
   const myCommentsList = document.getElementById('myCommentsList');
   myCommentsList.innerHTML = '';
