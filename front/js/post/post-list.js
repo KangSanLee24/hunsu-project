@@ -1,5 +1,5 @@
 import { elapsedTime } from '../common/elapsed-time.js';
-import { identifyUser } from '../common/identify-user.js';
+import { fetchAccessToken } from '../common/identify-user.js';
 
 const boardListElement = document.getElementById('board-list');
 const categorySelect = document.getElementById('category-select');
@@ -13,7 +13,7 @@ const keywordInput = document.getElementById('keyword-input');
 
 // 로그인 관련
 const accessToken = localStorage.getItem('accessToken');
-const user = accessToken ? await identifyUser(accessToken) : null;
+const user = accessToken ? await fetchAccessToken(accessToken) : null;
 
 let currentPage = 1; // 현재 페이지
 let totalPages = 0; // 총 페이지 수

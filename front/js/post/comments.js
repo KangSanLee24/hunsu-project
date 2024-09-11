@@ -1,5 +1,5 @@
 import { elapsedTime } from '../common/elapsed-time.js';
-import { identifyUser } from '../common/identify-user.js';
+import { fetchAccessToken } from '../common/identify-user.js';
 import { handleLoginRequired } from '../common/header.js';
 
 /** 댓글 목록 조회에 필요한 변수 선언 **/
@@ -14,7 +14,7 @@ const commentList = document.getElementById('comment-list');
 
 // 3. 로그인 관련
 const accessToken = localStorage.getItem('accessToken');
-const user = accessToken ? await identifyUser(accessToken) : null;
+const user = accessToken ? await fetchAccessToken(accessToken) : null;
 
 /** 댓글 목록 조회 API **/
 async function fetchComments() {

@@ -1,4 +1,4 @@
-import { identifyUser } from '../common/identify-user.js';
+import { fetchAccessToken } from '../common/identify-user.js';
 
 /** 게시글 상세 페이지에 필요한 변수 선언 **/
 // 1. URL에서 게시글 ID를 가져와서 상세 내용 로드
@@ -14,7 +14,7 @@ const submitDislikeButton = document.getElementById('dislike-btn');
 
 // 3. 로그인 관련
 const accessToken = localStorage.getItem('accessToken');
-const user = accessToken ? await identifyUser(accessToken) : null;
+const user = accessToken ? await fetchAccessToken(accessToken) : null;
 
 /** 게시글 상세 페이지 랜더링 **/
 async function renderPostDetail(postId) {
