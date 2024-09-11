@@ -1,9 +1,9 @@
-import { identifyUser } from '../common/identify-user.js';
+import { fetchAccessToken } from '../common/identify-user.js';
 
 /** 페이지에 필요한 변수 세팅 **/
 // 1. 로그인 관련 변수 선언
 const accessToken = localStorage.getItem('accessToken');
-const user = accessToken ? await identifyUser(accessToken) : null;
+const user = accessToken ? await fetchAccessToken(accessToken) : null;
 const loginLink = document.querySelector('a[href="./log-in"]');
 const signUpLink = document.querySelector('a[href="./sign-up"]');
 
