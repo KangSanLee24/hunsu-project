@@ -1,7 +1,7 @@
 ---
 name: 'Issue: DOCS'
 about: Suggest an idea for this project
-title: '[DOCS][Doamin] 제목'
+title: '[DOCS][Domain] 제목'
 labels: ''
 assignees: ''
 ---

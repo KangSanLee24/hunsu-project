@@ -1,7 +1,7 @@
 ---
 name: 'Issue: REFACTOR'
 about: Suggest an idea for this project
-title: '[REFACTOR][Doamin] 제목'
+title: '[REFACTOR][Domain] 제목'
 labels: ''
 assignees: ''
 ---

@@ -1,7 +1,7 @@
 ---
 name: 'Issue: FEATURE'
 about: Suggest an idea for this project
-title: '[FEATURE][Doamin][구현기능] 제목'
+title: '[FEATURE][Domain][구현기능] 제목'
 labels: ''
 assignees: ''
 ---
